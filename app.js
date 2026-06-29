@@ -1727,6 +1727,7 @@ class App {
     this.saveSuggestedUnit(unit);
     if (buyer) this.saveSuggestedItem('buyer', buyer);
     if (supplier) this.saveSuggestedItem('supplier', supplier);
+    if (type === 'expense' && category) this.saveSuggestedItem('category', category);
     insertRecord('transactions', data, this.isOnline);
     this.closeModal('transaction');
     

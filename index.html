@@ -13,6 +13,7 @@
   <datalist id="suggested-buyers"></datalist>
   <datalist id="suggested-suppliers"></datalist>
   <datalist id="suggested-crop-names"></datalist>
+  <datalist id="suggested-categorys"></datalist>
 
   <!-- Sticky App Header -->
   <header id="app-header" class="hidden">
@@ -625,19 +626,8 @@
         </div>
 
         <!-- Category (Only for expenses) -->
-        <div class="form-group hidden" id="tx-category-group">
-          <label for="tx-category">ޚަރަދުގެ ބާވަތް (Category)</label>
-          <select id="tx-category" class="form-input">
-            <option value="Seeds" data-i18n="Seeds">އޮށް / އޮށުވައި</option>
-            <option value="Fertilizer" data-i18n="Fertilizer">ކާދު</option>
-            <option value="Fuel" data-i18n="Fuel">ތެޔޮ</option>
-            <option value="Labour" data-i18n="Labour">މަސައްކަތު މީހުން</option>
-            <option value="Equipment" data-i18n="Equipment">ހާލަތު ސާމާނު</option>
-            <option value="Transport" data-i18n="Transport">ދަތުރުފަތުރު</option>
-            <option value="Water" data-i18n="Water">ފެން</option>
-            <option value="Electricity" data-i18n="Electricity">ކަރަންޓު</option>
-            <option value="Other" data-i18n="Other">އެހެނިހެން</option>
-          </select>
+        <div id="tx-category-group" class="hidden">
+          <app-input type="text" id="tx-category" label="ޚަރަދުގެ ބާވަތް (Category)" list="suggested-categorys"></app-input>
         </div>
 
         <div id="tx-buyer-group">
@@ -907,6 +897,6 @@
   </div>
 
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=1.2.3"></script>
+  <script type="module" src="app.js?v=1.2.4"></script>
 </body>
 </html>
