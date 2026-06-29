@@ -478,10 +478,35 @@ function deductInventoryFertilizer(fertilizerName, quantity, isOnline) {
 }
 
 // Authentication Logic
-export function authenticate(username, password) {
+export async function authenticate(username, password) {
   initDB();
   const serverStore = getStore("server");
-  const user = serverStore.users.find(u => u.username === username && u.password === password);
+  let user = serverStore.users.find(u => u.username === username && u.password === password);
+  
+  // If user is not found locally, fetch directly from remote Firestore
+  if (!user && db) {
+    try {
+      const querySnapshot = await getDocs(collection(db, "users"));
+      const usersList = [];
+      querySnapshot.forEach((doc) => {
+        usersList.push(doc.data());
+      });
+      
+      if (usersList.length > 0) {
+        serverStore.users = usersList;
+        saveStore(serverStore, "server");
+        
+        const localStore = getStore("local");
+        localStore.users = usersList;
+        saveStore(localStore, "local");
+      }
+      
+      // Try finding again with remote data
+      user = usersList.find(u => u.username === username && u.password === password);
+    } catch (err) {
+      console.error("Firestore authenticate check failed:", err);
+    }
+  }
   
   if (user) {
     if (user.status !== "active") {

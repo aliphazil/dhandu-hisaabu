@@ -449,15 +449,14 @@ class App {
     setTimeout(() => toast.remove(), 3000);
   }
 
-  // Auth Handling
-  handleLogin(e) {
+  async handleLogin(e) {
     e.preventDefault();
     const userEl = document.getElementById('login-username');
     const passEl = document.getElementById('login-password');
     const errEl = document.getElementById('login-error');
     
     try {
-      const session = authenticate(userEl.value, passEl.value);
+      const session = await authenticate(userEl.value, passEl.value);
       errEl.classList.add('hidden');
       this.loginSuccess(session);
       userEl.value = '';
