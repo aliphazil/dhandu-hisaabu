@@ -314,7 +314,8 @@ class App {
       unit: ['ކިލޯ', 'ޕެކެޓް', 'ލީޓަރު', 'ފުޅި', 'އަދަދު', 'ބަސްތާ'],
       buyer: ['ރިސޯޓް', 'ލޯކަލް މާރުކޭޓް', 'ސުޕަމާކެޓް'],
       supplier: ['އެގްރޯ ބާޒާރު', 'ސިޓީ ގާޑަން', 'ލޯކަލް ފިހާރަ'],
-      crop: ['ކަރާ', 'ކޮޕީފަތް', 'ބަރަބޯ', 'ކެކުރި', 'ދޮންކެޔޮ', 'ފަޅޯ', 'މިރުސް']
+      crop: ['ކަރާ', 'ކޮޕީފަތް', 'ބަރަބޯ', 'ކެކުރި', 'ދޮންކެޔޮ', 'ފަޅޯ', 'މިރުސް'],
+      category: ['Seeds', 'Fertilizer', 'Fuel', 'Labour', 'Equipment', 'Transport', 'Water', 'Electricity', 'Other']
     };
 
     for (const key in defaults) {
@@ -350,11 +351,18 @@ class App {
       datalist.innerHTML = items.map(u => `<option value="${u}"></option>`).join('');
     }
 
+    if (type === 'category') {
+      const select = document.getElementById('tx-category');
+      if (select) {
+        select.innerHTML = items.map(cat => `<option value="${cat}">${t(cat) || cat}</option>`).join('');
+      }
+    }
+
     const listContainer = document.getElementById(`list-items-${type}`);
     if (listContainer) {
       listContainer.innerHTML = items.map(item => `
         <div class="lookup-item">
-          <span>${item}</span>
+          <span>${t(item) || item}</span>
           <button type="button" class="lookup-delete-btn" onclick="window.app.deleteLookupItem('${type}', '${item.replace(/'/g, "\\'")}')">&times;</button>
         </div>
       `).join('');

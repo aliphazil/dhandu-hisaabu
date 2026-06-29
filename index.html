@@ -540,7 +540,7 @@
 
       <!-- Lists Management -->
       <div class="card high-contrast-card" style="margin-block-start: 24px;">
-        <h3 class="section-title" style="margin-block-end: 16px;">ލިސްޓުތައް ބެލެހެއްޓުން (ޔުނިޓް، ގަންނަ ފަރާތް، ސަޕްލަޔަރު، ގޮވާން)</h3>
+        <h3 class="section-title" style="margin-block-end: 16px;">ލިސްޓުތައް ބެލެހެއްޓުން (ޔުނިޓް، ގަންނަ ފަރާތް، ސަޕްލަޔަރު، ގޮވާން، ޚަރަދުގެ ކެޓަގަރީ)</h3>
         <p class="text-muted" style="margin-block-end: 20px; font-size: 0.85rem;">މިތަނަށް އިތުރުކުރާ އައިޓަމްތައް ފޯމުތައް ފުރާއިރު ސަޖެސްޝަންގެ ގޮތުގައި ފެންނާނެއެވެ.</p>
         
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
@@ -582,6 +582,16 @@
               <button class="btn btn-primary" style="padding:6px 12px; font-size: 0.85rem;" onclick="window.app.addLookupItem('unit', 'add-list-unit')">އިތުރުކުރަން</button>
             </div>
             <div id="list-items-unit" class="lookup-list-container" style="max-height:150px; overflow-y:auto; border:1px solid var(--border-color); padding:8px; border-radius:6px; background:var(--card-bg);"></div>
+          </div>
+
+          <!-- Manage Expense Categories -->
+          <div class="list-manage-box">
+            <h4 style="font-weight:700; margin-block-end:10px;">ޚަރަދުގެ ކެޓަގަރީތައް (Categories)</h4>
+            <div style="display:flex; gap:8px; margin-block-end:10px;">
+              <input type="text" id="add-list-category" class="form-input" style="padding:6px 10px;" placeholder="މިސާލު: ކަރަންޓް">
+              <button class="btn btn-primary" style="padding:6px 12px; font-size: 0.85rem;" onclick="window.app.addLookupItem('category', 'add-list-category')">އިތުރުކުރަން</button>
+            </div>
+            <div id="list-items-category" class="lookup-list-container" style="max-height:150px; overflow-y:auto; border:1px solid var(--border-color); padding:8px; border-radius:6px; background:var(--card-bg);"></div>
           </div>
         </div>
       </div>
@@ -897,6 +907,6 @@
   </div>
 
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=1.2.2"></script>
+  <script type="module" src="app.js?v=1.2.3"></script>
 </body>
 </html>
