@@ -383,13 +383,14 @@ class App {
     this.updateNetworkUI();
     
     if (this.isOnline) {
-      const syncResult = syncOfflineData();
-      if (syncResult.success && syncResult.count > 0) {
-        this.showToast(`${t('syncSuccess')} (${syncResult.count} ރެކޯޑް)`);
-        
-        // Refresh whatever view is currently active
-        this.showView(this.currentView);
-      }
+      syncOfflineData().then(syncResult => {
+        if (syncResult && syncResult.success && syncResult.count > 0) {
+          this.showToast(`${t('syncSuccess')} (${syncResult.count} ރެކޯޑް)`);
+          this.showView(this.currentView);
+        }
+      }).catch(err => {
+        console.error("Sync failed:", err);
+      });
     } else {
       this.showToast(t('offline'));
     }

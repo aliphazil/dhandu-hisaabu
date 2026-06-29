@@ -1,4 +1,24 @@
 // Database and Storage Engine for "ދަނޑު ހިސާބު" (Dhandu Hisaabu)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, collection, doc, setDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyD4nLy63w9FnhjF3UYwCBn9VD5jvI8ztK4",
+  authDomain: "dhandu-hisaabu.firebaseapp.com",
+  projectId: "dhandu-hisaabu",
+  storageBucket: "dhandu-hisaabu.firebasestorage.app",
+  messagingSenderId: "401937768714",
+  appId: "1:401937768714:web:cf6ec6374a515900f2daf3"
+};
+
+let db = null;
+try {
+  const app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+} catch (err) {
+  console.error("Firebase init failed:", err);
+}
 
 // Seed Data
 const DEFAULT_FARMS = [
@@ -88,6 +108,72 @@ export function initDB() {
   // Pending synchronizations outbox
   if (!localStorage.getItem("dhandu_hisaabu_outbox")) {
     localStorage.setItem("dhandu_hisaabu_outbox", JSON.stringify([]));
+  }
+  
+  // Pull from Firestore in background if online
+  pullFromFirestore();
+}
+
+// Seeding helper to push default data to Firestore
+export async function pushAllToFirestore() {
+  if (!db) return;
+  try {
+    const serverDB = getStore("server");
+    const tables = ["farms", "users", "crops", "transactions", "fertilizer_records", "harvest_records", "inventory", "audit_logs"];
+    for (const table of tables) {
+      const records = serverDB[table] || [];
+      for (const record of records) {
+        const docId = record.id || record.username;
+        if (docId) {
+          await setDoc(doc(db, table, docId), record);
+        }
+      }
+    }
+    console.log("Successfully seeded Firestore with default data.");
+  } catch (err) {
+    console.error("Failed to seed Firestore:", err);
+  }
+}
+
+// Background pull sync helper
+export async function pullFromFirestore() {
+  if (!db) return;
+  try {
+    const tables = ["farms", "users", "crops", "transactions", "fertilizer_records", "harvest_records", "inventory", "audit_logs"];
+    const serverDB = {};
+    for (const table of tables) {
+      const querySnapshot = await getDocs(collection(db, table));
+      serverDB[table] = [];
+      querySnapshot.forEach((doc) => {
+        serverDB[table].push(doc.data());
+      });
+    }
+
+    let hasData = false;
+    for (const table of tables) {
+      if (serverDB[table] && serverDB[table].length > 0) {
+        hasData = true;
+        break;
+      }
+    }
+
+    if (hasData) {
+      localStorage.setItem("dhandu_hisaabu_server_db", JSON.stringify(serverDB));
+      const outbox = getOutbox();
+      if (outbox.length === 0) {
+        localStorage.setItem("dhandu_hisaabu_local_db", JSON.stringify(serverDB));
+        // Force app refresh if views are open
+        if (window.app && typeof window.app.navigate === "function" && window.app.currentView) {
+          window.app.navigate(window.app.currentView);
+        }
+      }
+      console.log("Pulled fresh state from Firestore.");
+    } else {
+      console.log("Firestore is empty. Seeding with default data...");
+      await pushAllToFirestore();
+    }
+  } catch (err) {
+    console.error("Firestore pull failed:", err);
   }
 }
 
@@ -414,48 +500,55 @@ export function authenticate(username, password) {
 }
 
 // Synchronization Manager
-export function syncOfflineData() {
+export async function syncOfflineData() {
   const outbox = getOutbox();
   if (outbox.length === 0) return { success: true, count: 0 };
   
   const serverDB = getStore("server");
   
-  outbox.forEach(operation => {
-    const { action, table, id, data } = operation;
-    
-    if (action === "insert") {
-      if (!serverDB[table]) serverDB[table] = [];
-      // Push record to server
-      serverDB[table].push(data);
-    } else if (action === "update") {
-      const idx = serverDB[table].findIndex(r => r.id === id);
-      if (idx !== -1) {
-        serverDB[table][idx] = {
-          ...serverDB[table][idx],
-          ...data,
-          updatedDate: new Date().toISOString()
-        };
-      }
-    } else if (action === "delete") {
-      const idx = serverDB[table].findIndex(r => r.id === id);
-      if (idx !== -1) {
-        serverDB[table].splice(idx, 1);
+  try {
+    for (const operation of outbox) {
+      const { action, table, id, data } = operation;
+      const docId = id || (data && data.username);
+      if (!docId) continue;
+      
+      const docRef = doc(db, table, docId);
+      
+      if (action === "insert") {
+        await setDoc(docRef, data);
+        if (!serverDB[table]) serverDB[table] = [];
+        serverDB[table].push(data);
+      } else if (action === "update") {
+        await setDoc(docRef, data, { merge: true });
+        const idx = serverDB[table].findIndex(r => (r.id === id || r.username === id));
+        if (idx !== -1) {
+          serverDB[table][idx] = { ...serverDB[table][idx], ...data };
+        }
+      } else if (action === "delete") {
+        await deleteDoc(docRef);
+        const idx = serverDB[table].findIndex(r => (r.id === id || r.username === id));
+        if (idx !== -1) {
+          serverDB[table].splice(idx, 1);
+        }
       }
     }
-  });
-  
-  saveStore(serverDB, "server");
-  
-  // Clear outbox
-  const count = outbox.length;
-  saveOutbox([]);
-  
-  // Pull fresh server DB state into local DB
-  localStorage.setItem("dhandu_hisaabu_local_db", JSON.stringify(serverDB));
-  
-  logAuditEvent("DATA_SYNC", `Synchronized ${count} offline operations from outbox to server.`);
-  
-  return { success: true, count };
+    
+    saveStore(serverDB, "server");
+    
+    // Clear outbox
+    const count = outbox.length;
+    saveOutbox([]);
+    
+    // Pull fresh server DB state into local DB
+    localStorage.setItem("dhandu_hisaabu_local_db", JSON.stringify(serverDB));
+    
+    logAuditEvent("DATA_SYNC", `Synchronized ${count} offline operations from outbox to Firestore.`);
+    
+    return { success: true, count };
+  } catch (err) {
+    console.error("Firestore sync failed:", err);
+    throw err;
+  }
 }
 
 // Platform Administrator Specific: Create Farm
