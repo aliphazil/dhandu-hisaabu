@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="dv" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ދަނޑު ހިސާބު - ދިވެހި ދަނޑުވެރިންނަށް ޚާއްޞަ މޯބައިލް އެޕްލިކޭޝަން">
+  <title data-i18n="appName">ދަނޑު ހިސާބު</title>
+  <link rel="stylesheet" href="/style.css?v=1.0.6">
+</head>
+<body>
+  <!-- Suggestions datalists for forms -->
+  <datalist id="suggested-units"></datalist>
+  <datalist id="suggested-buyers"></datalist>
+  <datalist id="suggested-suppliers"></datalist>
+  <datalist id="suggested-crop-names"></datalist>
+
+  <!-- Sticky App Header -->
+  <header id="app-header" class="hidden">
+    <div class="logo-section">
+      <div class="logo-icon">🌿</div>
+      <h1 class="app-title" data-i18n="appName">ދަނޑު ހިސާބު</h1>
+    </div>
+    
+    <div class="demo-controllers">
+      <!-- Network sync simulator -->
+      <div id="network-status" class="status-badge online" onclick="window.app.toggleNetwork()">
+        <span class="dot"></span>
+        <span id="network-text" data-i18n="online">އޮންލައިން</span>
+      </div>
+      
+      <!-- User profile & role switcher -->
+      <div class="user-menu">
+        <button class="avatar-btn" id="avatar-btn" onclick="window.app.toggleUserMenu()">👤</button>
+        <div class="role-switcher-dropdown" id="role-dropdown">
+          <h4 data-i18n="role">ރޯލް ބަދަލުކުރަން</h4>
+          <button id="switch-sysadmin" onclick="window.app.switchDemoRole('sysadmin')">
+            <strong data-i18n="platformAdmin">ޕްލެޓްފޯމް އެޑްމިން</strong>
+            <span>Username: sysadmin</span>
+          </button>
+          <button id="switch-villa-admin" onclick="window.app.switchDemoRole('villa_admin')">
+            <strong data-i18n="farmAdmin">ހިތަދޫ އެޑްމިން</strong>
+            <span>Username: villa_admin</span>
+          </button>
+          <button id="switch-villa-worker" onclick="window.app.switchDemoRole('villa_worker')">
+            <strong data-i18n="staffRole">ހިތަދޫ މުވައްޒަފު</strong>
+            <span>Username: villa_worker</span>
+          </button>
+          <button id="switch-garden-admin" onclick="window.app.switchDemoRole('garden_admin')">
+            <strong data-i18n="farmAdmin">ކުނަހަންދޫ އެޑްމިން</strong>
+            <span>Username: garden_admin</span>
+          </button>
+          <hr style="margin: 6px 0; border: none; border-block-start: 1px solid var(--border-color);">
+          <button onclick="window.app.logout()" style="color: var(--danger);" data-i18n="logout">ލޮގްއައުޓް</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Bottom Navigation Bar (Controlled by App State) -->
+  <nav id="app-nav" class="bottom-nav hidden">
+    <!-- Items are generated dynamically in app.js depending on user roles -->
+  </nav>
+
+  <!-- Main View Area -->
+  <main class="container">
+
+    <!-- 1. LOGIN SCREEN -->
+    <section id="view-login" class="card">
+      <div style="text-align: center; margin-block-end: 24px;">
+        <div style="font-size: 3rem; margin-block-end: 10px;">🌿</div>
+        <h2 style="font-weight: 700; color: var(--primary-dark);" data-i18n="appName">ދަނޑު ހިސާބު</h2>
+        <p class="text-muted">ދިވެހި ދަނޑުވެރިންނަށް ޚާއްޞަ މޯބައިލް އެޕް</p>
+      </div>
+
+      <form id="login-form" onsubmit="window.app.handleLogin(event)">
+        <app-input type="text" id="login-username" label="ޔޫޒަރނޭމް" required autocomplete="username"></app-input>
+        <app-input type="password" id="login-password" label="ޕާސްވޯޑް" required autocomplete="current-password"></app-input>
+        
+        <div id="login-error" class="text-danger hidden" style="margin-block-end: 12px; font-weight: bold; text-align: center;" data-i18n="incorrectPassword">
+          ޕާސްވޯޑް ނުވަތަ ޔޫޒަރނޭމް ދިމާނުވޭ
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;" data-i18n="login">ލޮގިން</button>
+        <button type="button" class="btn btn-secondary" style="width: 100%; margin-block-start: 10px;" onclick="window.app.openRegisterModalSelf()">
+          📝 އަލަށް ދަނޑެއް ރަޖިސްޓްރީ ކުރަން
+        </button>
+      </form>
+
+      <div style="margin-block-start: 30px; border-block-start: 1px solid var(--border-color); padding-block-start: 16px;">
+        <h4 style="margin-block-end: 12px; font-weight: 700;" class="text-muted">ޑެމޯ އެކައުންޓްތައް (ފަސޭހައިން ލޮގިންވުމަށް):</h4>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <button class="btn btn-secondary" onclick="window.app.quickLogin('sysadmin', 'sysadminpassword')" style="font-size: 0.9rem;">
+            🛡️ ޕްލެޓްފޯމް އެޑްމިނިސްޓްރޭޓަރ (ސިސްއެޑްމިން)
+          </button>
+          <button class="btn btn-secondary" onclick="window.app.quickLogin('villa_admin', 'villaadminpassword')" style="font-size: 0.9rem;">
+            🏡 ހިތަދޫ ވިލާ ދަނޑު - އެޑްމިން
+          </button>
+          <button class="btn btn-secondary" onclick="window.app.quickLogin('villa_worker', 'villaworkerpassword')" style="font-size: 0.9rem;">
+            🧑‍🌾 ހިތަދޫ ވިލާ ދަނޑު - މުވައްޒަފު
+          </button>
+          <button class="btn btn-secondary" onclick="window.app.quickLogin('garden_admin', 'gardenadminpassword')" style="font-size: 0.9rem;">
+            🏡 ކުނަހަންދޫ ގާޑަން - އެޑްމިން
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. STAFF WORKER VIEW -->
+    <section id="view-staff-dashboard" class="hidden">
+      <div id="staff-welcome" style="margin-block-end: 20px;">
+        <h2 style="font-weight: 700;">އައްސަލާމް ޢަލައިކުމް، <span id="staff-name">މުވައްޒަފު</span>!</h2>
+        <p class="text-muted" id="staff-farm-name">ދަނޑުގެ ނަން</p>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="staff-menu-grid">
+        <button class="touch-btn touch-btn-income" onclick="window.app.openRecordModal('income')">
+          <span class="touch-btn-icon">💰</span>
+          <span data-i18n="recordIncome">އާމްދަނީ ރެކޯޑްކުރަން</span>
+        </button>
+        <button class="touch-btn touch-btn-fertilizer" onclick="window.app.openFertilizerModal()">
+          <span class="touch-btn-icon">🌿</span>
+          <span data-i18n="recordFertilizer">ކާދު އެޅުން ރެކޯޑްކުރަން</span>
+        </button>
+      </div>
+
+      <!-- Today's logs / recent activities by this user -->
+      <div class="card high-contrast-card" style="margin-block-start: 24px;">
+        <h3 class="section-title" data-i18n="todayEntries">މިއަދުގެ އެންޓްރީތައް</h3>
+        <div id="staff-activity-list" class="activity-list">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. PLATFORM ADMINISTRATOR VIEW -->
+    <section id="view-platform-dashboard" class="hidden">
+      <div style="margin-block-end: 20px;">
+        <h2 style="font-weight: 700;" data-i18n="platformAdminTab">ޕްލެޓްފޯމް މެނޭޖްމަންޓް</h2>
+        <p class="text-muted">އެޕްލިކޭޝަން ބޭނުންކުރާ ދަނޑުތަކާއި ސަބްސްކްރިޕްޝަންތައް ބެލެހެއްޓުން</p>
+      </div>
+
+      <!-- Platform stats cards -->
+      <div class="dashboard-grid">
+        <div class="card">
+          <div class="card-title">ޖުމްލަ ދަނޑުތައް</div>
+          <div class="stats-value" id="platform-total-farms">0</div>
+        </div>
+        <div class="card">
+          <div class="card-title">ހަރަކާތްތެރި ދަނޑުތައް</div>
+          <div class="stats-value" id="platform-active-farms">0</div>
+        </div>
+        <div class="card">
+          <div class="card-title">ޖުމްލަ ޔޫޒަރުން</div>
+          <div class="stats-value" id="platform-total-users">0</div>
+        </div>
+        <div class="card">
+          <div class="card-title">ޑޭޓާބޭސް ސައިޒް</div>
+          <div class="stats-value" style="font-size: 1.25rem;" id="platform-db-size">0 KB</div>
+        </div>
+      </div>
+
+      <!-- Farm List Management -->
+      <div class="card high-contrast-card" style="margin-block-end: 24px;">
+        <div class="card-header-actions">
+          <h3 class="section-title">ދަނޑުތަކުގެ ލިސްޓް</h3>
+          <button class="btn btn-primary" onclick="window.app.openCreateFarmModal()" data-i18n="add">އަލަށް އިތުރުކުރަން</button>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>ދަނޑުގެ ނަން</th>
+                <th>ވެރިފަރާތް / ރަށް</th>
+                <th>ފޯނު</th>
+                <th data-i18n="status">ހާލަތު</th>
+                <th data-i18n="actions">އަމަލުތައް</th>
+              </tr>
+            </thead>
+            <tbody id="platform-farms-table">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Central System Audit Logs (Platform only) -->
+      <div class="card" style="margin-block-end: 24px;">
+        <h3 class="section-title">ސިސްޓަމް އޮޑިޓް ލޮގް (Authentication/Farms)</h3>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>ތާރީޚް</th>
+                <th>ޔޫޒަރ</th>
+                <th>ހަރަކާތް</th>
+                <th>ތަފްސީލް</th>
+              </tr>
+            </thead>
+            <tbody id="platform-logs-table">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. FARM ADMINISTRATOR DASHBOARD VIEW -->
+    <section id="view-farm-dashboard" class="hidden">
+      <!-- Sync alerts / notifications banner -->
+      <div id="notification-banner" class="notification-banner hidden">
+        <span>⚠️</span>
+        <span id="notification-message"></span>
+      </div>
+
+      <!-- Dashboard Title -->
+      <div style="margin-block-end: 20px;">
+        <h2 style="font-weight: 700;" id="farm-dashboard-welcome">ދަނޑުގެ މައުލޫމާތު</h2>
+        <p class="text-muted" id="farm-dashboard-island">ހިތަދޫ</p>
+      </div>
+
+      <!-- Key Financial Metrics & Active Crops -->
+      <div class="dashboard-grid">
+        <div class="card">
+          <div class="card-title" data-i18n="todayIncome">މިއަދުގެ އާމްދަނީ</div>
+          <div class="stats-value" id="dash-today-income">0</div>
+        </div>
+        <div class="card">
+          <div class="card-title" data-i18n="todayExpense">މިއަދުގެ ޚަރަދު</div>
+          <div class="stats-value" id="dash-today-expense">0</div>
+        </div>
+        <div class="card">
+          <div class="card-title" data-i18n="netProfit">ސާފު ފައިދާ</div>
+          <div class="stats-value profit-positive" id="dash-net-profit">0</div>
+        </div>
+        <div class="card">
+          <div class="card-title" data-i18n="activeCropsCount">ހުރި ގަސްތައް</div>
+          <div class="stats-value" id="dash-active-crops">0</div>
+        </div>
+      </div>
+
+      <!-- Upcoming Harvests card -->
+      <div class="card high-contrast-card" style="margin-block-end: 20px;">
+        <h3 class="section-title" data-i18n="upcomingHarvests">ކަނޑަންވެފަ ހުރި ބާވަތްތައް</h3>
+        <div id="dash-harvests-list" class="activity-list">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Recent activities list -->
+      <div class="card" style="margin-block-end: 20px;">
+        <h3 class="section-title" data-i18n="recentActivity">ފަހުގެ ހަރަކާތްތައް</h3>
+        <div id="dash-activities-list" class="activity-list">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. CROPS LIST & MANAGEMENT VIEW -->
+    <section id="view-crops" class="hidden">
+      <div class="card-header-actions">
+        <h2 style="font-weight: 700;" data-i18n="crops">ގަސްތައް / ކްރޮޕްސް</h2>
+        <button class="btn btn-primary" onclick="window.app.openCropModal()" data-i18n="add">އަލަށް އިތުރުކުރަން</button>
+      </div>
+
+      <div id="crops-list" style="display: grid; grid-template-columns: 1fr; gap: 16px; margin-block-start: 16px;">
+        <!-- Populated dynamically with Crop Cards -->
+      </div>
+    </section>
+
+    <!-- 6. INCOME VIEW -->
+    <section id="view-income" class="hidden">
+      <div class="card-header-actions">
+        <h2 style="font-weight: 700;">އާމްދަނީ</h2>
+        <button class="btn btn-primary" onclick="window.app.openRecordModal('income')">💰 އާމްދަނީ އިތުރުކުރަން</button>
+      </div>
+
+      <div class="card high-contrast-card" style="margin-block-start: 20px;">
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="date">ތާރީޚް</th>
+                <th>ގަސް</th>
+                <th>ބައިވެރިޔާ</th>
+                <th data-i18n="description">ތަފްސީލް</th>
+                <th data-i18n="amount">އަދަދު (ރ)</th>
+                <th data-i18n="status">ހާލަތު</th>
+                <th data-i18n="actions">އަމަލުތައް</th>
+              </tr>
+            </thead>
+            <tbody id="income-table-body">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6.5. EXPENSES VIEW -->
+    <section id="view-expense" class="hidden">
+      <div class="card-header-actions">
+        <h2 style="font-weight: 700;">ޚަރަދު</h2>
+        <button class="btn btn-danger" style="background-color: var(--danger);" onclick="window.app.openRecordModal('expense')">💸 ޚަރަދެއް އިތުރުކުރަން</button>
+      </div>
+
+      <div class="card high-contrast-card card-expense" style="margin-block-start: 20px;">
+        <div class="table-responsive">
+          <table class="table-expense">
+            <thead>
+              <tr>
+                <th data-i18n="date">ތާރީޚް</th>
+                <th>ކެޓަގަރީ</th>
+                <th>ސަޕްލަޔަރު</th>
+                <th data-i18n="description">ތަފްސީލް</th>
+                <th data-i18n="amount">އަދަދު (ރ)</th>
+                <th data-i18n="actions">އަމަލުތައް</th>
+              </tr>
+            </thead>
+            <tbody id="expenses-table-body">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. FERTILIZER RECORDS VIEW -->
+    <section id="view-fertilizer" class="hidden">
+      <div class="card-header-actions">
+        <h2 style="font-weight: 700;" data-i18n="fertilizer">ކާދު އެޅުން</h2>
+        <button class="btn btn-primary" onclick="window.app.openFertilizerModal()" data-i18n="add">އަލަށް އިތުރުކުރަން</button>
+      </div>
+
+      <div class="card high-contrast-card" style="margin-block-start: 20px;">
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="date">ތާރީޚް</th>
+                <th data-i18n="crops">ގަސް</th>
+                <th>ކާދުގެ ނަން</th>
+                <th data-i18n="quantity">މިންވަރު</th>
+                <th>އެޅި ފަރާތް</th>
+                <th data-i18n="actions">އަމަލުތައް</th>
+              </tr>
+            </thead>
+            <tbody id="fertilizer-table-body">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. HARVEST RECORDS VIEW -->
+    <section id="view-harvests" class="hidden">
+      <div class="card-header-actions">
+        <h2 style="font-weight: 700;" data-i18n="harvests">މައުސޫލު ހޮވުން</h2>
+        <button class="btn btn-primary" onclick="window.app.openHarvestModal()" data-i18n="add">އަލަށް އިތުރުކުރަން</button>
+      </div>
+
+      <div class="card high-contrast-card" style="margin-block-start: 20px;">
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="date">ތާރީޚް</th>
+                <th data-i18n="crops">ގަސް</th>
+                <th data-i18n="quantity">މިންވަރު</th>
+                <th>ކޮލިޓީ</th>
+                <th>ވިއްކި އަގު</th>
+                <th data-i18n="actions">އަމަލުތައް</th>
+              </tr>
+            </thead>
+            <tbody id="harvests-table-body">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. INVENTORY VIEW -->
+    <section id="view-inventory" class="hidden">
+      <div class="card-header-actions">
+        <h2 style="font-weight: 700;" data-i18n="inventory">އިންވެންޓްރީ</h2>
+        <button class="btn btn-primary" onclick="window.app.openInventoryModal()" data-i18n="add">އަލަށް އިތުރުކުރަން</button>
+      </div>
+
+      <div class="card high-contrast-card" style="margin-block-start: 20px;">
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>ބާވަތް</th>
+                <th>ސާމާނުގެ ނަން</th>
+                <th>މިހާރު ހުރި އަދަދު</th>
+                <th>މަދުވެގެން ހުންނަންޖެހޭ މިންވަރު</th>
+                <th data-i18n="actions">އަމަލުތައް</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-table-body">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. STAFF MANAGEMENT VIEW -->
+    <section id="view-staff" class="hidden">
+      <div class="card-header-actions">
+        <h2 style="font-weight: 700;" data-i18n="staff">މުވައްޒަފުން</h2>
+        <button class="btn btn-primary" onclick="window.app.openStaffModal()" data-i18n="add">އަލަށް އިތުރުކުރަން</button>
+      </div>
+
+      <div class="card high-contrast-card" style="margin-block-start: 20px;">
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>ނަން</th>
+                <th>ފޯނު ނަންބަރު</th>
+                <th>ޔޫޒަރނޭމް</th>
+                <th data-i18n="status">ހާލަތު</th>
+                <th data-i18n="actions">އަމަލުތައް</th>
+              </tr>
+            </thead>
+            <tbody id="staff-table-body">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. REPORTS PANEL -->
+    <section id="view-reports" class="hidden">
+      <div style="margin-block-end: 20px;">
+        <h2 style="font-weight: 700;" data-i18n="reports">ރިޕޯޓްތައް</h2>
+        <p class="text-muted">ފައިދާ އާއި ގެއްލުން އަދި ދަނޑުގެ މަސައްކަތްތަކުގެ ތަފްސީލީ ރިޕޯޓްތައް</p>
+      </div>
+
+      <!-- Report Selection Controls -->
+      <div class="card" style="margin-block-end: 20px;">
+        <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+          <div class="form-group" style="margin: 0;">
+            <label for="report-select-type">ރިޕޯޓްގެ ބާވަތް އިޚްތިޔާރުކުރައްވާ</label>
+            <select id="report-select-type" class="form-input" onchange="window.app.generateReport()">
+              <option value="pl" data-i18n="profitAndLoss">ފައިދާ އާއި ގެއްލުމުގެ ރިޕޯޓް</option>
+              <option value="crop" data-i18n="cropPerformance">ގަސްތަކުގެ ރިޕޯޓް</option>
+              <option value="fertilizer" data-i18n="fertilizerUsage">ކާދު ބޭނުންކުރި މިންވަރު</option>
+              <option value="harvest" data-i18n="harvestSummary">މައުސޫލު ހޮވުމުގެ ޚުލާސާ</option>
+              <option value="expense-cat" data-i18n="expenseByCategory">ޚަރަދުތައް ކެޓަގަރީން</option>
+            </select>
+          </div>
+          
+          <div class="form-row-2col">
+            <app-input type="date" id="report-start-date" label="ފެށޭ ތާރީޚް" oninput="window.app.generateReport()"></app-input>
+            <app-input type="date" id="report-end-date" label="ނިމޭ ތާރީޚް" oninput="window.app.generateReport()"></app-input>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Rendered Report Sheet -->
+      <div class="card high-contrast-card" id="report-sheet">
+        <div style="text-align: center; margin-block-end: 24px; border-block-end: 1px solid var(--border-color); padding-block-end: 16px;">
+          <h3 id="report-sheet-title" style="font-weight: 700; color: var(--primary-dark);">ފައިދާ އާއި ގެއްލުމުގެ ރިޕޯޓް</h3>
+          <p class="text-muted" id="report-sheet-farm-info">ހިތަދޫ ވިލާ ދަނޑު</p>
+          <p class="text-muted" style="font-size: 0.8rem; margin-block-start: 4px;">ތާރީޚް: <span class="date-num" id="report-sheet-date">2026-06-29</span></p>
+        </div>
+
+        <!-- Rendered Bar Chart (Dynamic CSS Bar chart) -->
+        <div id="report-chart-container" class="bar-chart-container hidden">
+          <!-- Bars are generated dynamically in app.js -->
+        </div>
+
+        <!-- Rendered Data Tables -->
+        <div class="table-responsive" id="report-table-wrapper" style="border: none;">
+          <table style="width: 100%;">
+            <thead id="report-table-head">
+              <!-- Dynamic head -->
+            </thead>
+            <tbody id="report-table-body">
+              <!-- Dynamic body -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Action buttons row -->
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="window.app.exportReport('excel')" data-i18n="exportExcel">Excel އަށް ފޮނުވަން</button>
+        <button class="btn btn-primary" onclick="window.app.exportReport('pdf')" data-i18n="exportPDF">PDF ޕްރިންޓް</button>
+      </div>
+    </section>
+
+    <!-- 12. AUDIT LOGS FOR FARM ADMIN -->
+    <section id="view-logs" class="hidden">
+      <div style="margin-block-end: 20px;">
+        <h2 style="font-weight: 700;" data-i18n="logs">އޮޑިޓް ލޮގް</h2>
+        <p class="text-muted">ދަނޑުގައި މުވައްޒަފުން ކުރި މަސައްކަތްތަކާއި ލޮގިން ތާރީޚް</p>
+      </div>
+
+      <div class="card high-contrast-card">
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>ތާރީޚް</th>
+                <th>މުވައްޒަފު</th>
+                <th>ހަރަކާތް</th>
+                <th>ތަފްސީލް</th>
+              </tr>
+            </thead>
+            <tbody id="farm-logs-table-body">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13. FARM PROFILE -->
+    <section id="view-profile" class="hidden">
+      <h2 style="font-weight: 700; margin-block-end: 20px;" data-i18n="profile">ދަނޑުގެ ޕްރޮފައިލް</h2>
+      <div class="card high-contrast-card">
+        <form id="profile-form" onsubmit="window.app.saveProfile(event)">
+          <app-input type="text" id="profile-farm-name" label="ދަނޑުގެ ނަން" required></app-input>
+          <app-input type="text" id="profile-owner-name" label="ވެރިފަރާތުގެ ނަން" required></app-input>
+          <app-input type="text" id="profile-island" label="ރަށް" required></app-input>
+          <app-input type="textarea" id="profile-address" label="އެޑްރެސް" required autocomplete="street-address"></app-input>
+          <app-input type="text" id="profile-size" label="ދަނޑުގެ ބޮޑުމިން (އަކަފޫޓު)" required></app-input>
+          <app-input type="text" id="profile-contact" label="ގުޅޭނެ ނަންބަރު" required></app-input>
+          <app-input type="text" id="profile-gps" label="ޖީ.ޕީ.އެސް ކޯޑިނޭޓްސް"></app-input>
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-block-start: 12px;" data-i18n="save">ރައްކާކުރަން</button>
+        </form>
+      </div>
+
+      <!-- Lists Management -->
+      <div class="card high-contrast-card" style="margin-block-start: 24px;">
+        <h3 class="section-title" style="margin-block-end: 16px;">ލިސްޓުތައް ބެލެހެއްޓުން (ޔުނިޓް، ގަންނަ ފަރާތް، ސަޕްލަޔަރު، ގޮވާން)</h3>
+        <p class="text-muted" style="margin-block-end: 20px; font-size: 0.85rem;">މިތަނަށް އިތުރުކުރާ އައިޓަމްތައް ފޯމުތައް ފުރާއިރު ސަޖެސްޝަންގެ ގޮތުގައި ފެންނާނެއެވެ.</p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
+          <!-- Manage Crop Names -->
+          <div class="list-manage-box">
+            <h4 style="font-weight:700; margin-block-end:10px;">ގަސްގަހާގެހީގެ ބާވަތްތައް</h4>
+            <div style="display:flex; gap:8px; margin-block-end:10px;">
+              <input type="text" id="add-list-crop" class="form-input" style="padding:6px 10px;" placeholder="މިސާލު: ކޮޕީފަތް">
+              <button class="btn btn-primary" style="padding:6px 12px; font-size: 0.85rem;" onclick="window.app.addLookupItem('crop', 'add-list-crop')">އިތުރުކުރަން</button>
+            </div>
+            <div id="list-items-crop" class="lookup-list-container" style="max-height:150px; overflow-y:auto; border:1px solid var(--border-color); padding:8px; border-radius:6px; background:var(--card-bg);"></div>
+          </div>
+
+          <!-- Manage Buyers -->
+          <div class="list-manage-box">
+            <h4 style="font-weight:700; margin-block-end:10px;">ގަންނަ ފަރާތްތައް (Buyers)</h4>
+            <div style="display:flex; gap:8px; margin-block-end:10px;">
+              <input type="text" id="add-list-buyer" class="form-input" style="padding:6px 10px;" placeholder="މިސާލު: ރިސޯޓް">
+              <button class="btn btn-primary" style="padding:6px 12px; font-size: 0.85rem;" onclick="window.app.addLookupItem('buyer', 'add-list-buyer')">އިތުރުކުރަން</button>
+            </div>
+            <div id="list-items-buyer" class="lookup-list-container" style="max-height:150px; overflow-y:auto; border:1px solid var(--border-color); padding:8px; border-radius:6px; background:var(--card-bg);"></div>
+          </div>
+
+          <!-- Manage Suppliers -->
+          <div class="list-manage-box">
+            <h4 style="font-weight:700; margin-block-end:10px;">ސަޕްލަޔަރުން (Suppliers)</h4>
+            <div style="display:flex; gap:8px; margin-block-end:10px;">
+              <input type="text" id="add-list-supplier" class="form-input" style="padding:6px 10px;" placeholder="މިސާލު: ދަނޑުވެރި ޝޮޕް">
+              <button class="btn btn-primary" style="padding:6px 12px; font-size: 0.85rem;" onclick="window.app.addLookupItem('supplier', 'add-list-supplier')">އިތުރުކުރަން</button>
+            </div>
+            <div id="list-items-supplier" class="lookup-list-container" style="max-height:150px; overflow-y:auto; border:1px solid var(--border-color); padding:8px; border-radius:6px; background:var(--card-bg);"></div>
+          </div>
+
+          <!-- Manage Units -->
+          <div class="list-manage-box">
+            <h4 style="font-weight:700; margin-block-end:10px;">ޔުނިޓްތައް (Units)</h4>
+            <div style="display:flex; gap:8px; margin-block-end:10px;">
+              <input type="text" id="add-list-unit" class="form-input" style="padding:6px 10px;" placeholder="މިސާލު: ކިލޯ">
+              <button class="btn btn-primary" style="padding:6px 12px; font-size: 0.85rem;" onclick="window.app.addLookupItem('unit', 'add-list-unit')">އިތުރުކުރަން</button>
+            </div>
+            <div id="list-items-unit" class="lookup-list-container" style="max-height:150px; overflow-y:auto; border:1px solid var(--border-color); padding:8px; border-radius:6px; background:var(--card-bg);"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+
+  </main>
+
+  <!-- ================= MODALS & POP-UPS ================= -->
+
+  <!-- A. TRANSACTION RECORD MODAL (Income/Expense) -->
+  <div class="modal-overlay" id="modal-transaction">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-transaction-title">އާމްދަނީ ރެކޯޑްކުރަން</h3>
+        <button class="modal-close" onclick="window.app.closeModal('transaction')">&times;</button>
+      </div>
+      <form id="form-transaction" onsubmit="window.app.saveTransaction(event)">
+        <!-- Hidden input for type -->
+        <input type="hidden" id="tx-type" value="income">
+        
+        <app-input type="date" id="tx-date" label="ތާރީޚް" required></app-input>
+
+        <!-- Crop selection (For income and crop-based expenses) -->
+        <div class="form-group" id="tx-crop-group">
+          <label for="tx-crop" data-i18n="crops">ގަސްތައް / ކްރޮޕްސް</label>
+          <select id="tx-crop" class="form-input">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <!-- Category (Only for expenses) -->
+        <div class="form-group hidden" id="tx-category-group">
+          <label for="tx-category">ޚަރަދުގެ ބާވަތް (Category)</label>
+          <select id="tx-category" class="form-input">
+            <option value="Seeds" data-i18n="Seeds">އޮށް / އޮށުވައި</option>
+            <option value="Fertilizer" data-i18n="Fertilizer">ކާދު</option>
+            <option value="Fuel" data-i18n="Fuel">ތެޔޮ</option>
+            <option value="Labour" data-i18n="Labour">މަސައްކަތު މީހުން</option>
+            <option value="Equipment" data-i18n="Equipment">ހާލަތު ސާމާނު</option>
+            <option value="Transport" data-i18n="Transport">ދަތުރުފަތުރު</option>
+            <option value="Water" data-i18n="Water">ފެން</option>
+            <option value="Electricity" data-i18n="Electricity">ކަރަންޓު</option>
+            <option value="Other" data-i18n="Other">އެހެނިހެން</option>
+          </select>
+        </div>
+
+        <div id="tx-buyer-group">
+          <app-input type="text" id="tx-buyer" label="ގަންނަ ފަރާތް" list="suggested-buyers"></app-input>
+        </div>
+
+        <div id="tx-supplier-group" class="hidden">
+          <app-input type="text" id="tx-supplier" label="ސަޕްލަޔަރ" list="suggested-suppliers"></app-input>
+        </div>
+
+        <div class="form-row-2col">
+          <app-input type="number" id="tx-quantity" label="މިންވަރު" min="0" step="any" oninput="window.app.calculateTxTotal()"></app-input>
+          <app-input type="text" id="tx-unit" label="ޔުނިޓް" placeholder="މިސާލަކަށް: ކިލޯ، ޕެކެޓް" list="suggested-units"></app-input>
+        </div>
+
+        <div class="form-row-2col">
+          <div id="tx-price-unit-group">
+            <app-input type="number" id="tx-price-unit" label="ޔުނިޓެއްގެ އަގު" min="0" oninput="window.app.calculateTxTotal()"></app-input>
+          </div>
+          <app-input type="number" id="tx-amount" label="ޖުމްލަ ޚަރަދު / އަދަދު" required min="0"></app-input>
+        </div>
+
+        <div class="form-group" id="tx-paystatus-group">
+          <label for="tx-paystatus">ޕޭމަންޓް ހާލަތު</label>
+          <select id="tx-paystatus" class="form-input">
+            <option value="paid" data-i18n="badge-paid">ފައިސާ ލިބިއްޖެ / ދައްކައިފި</option>
+            <option value="pending" data-i18n="badge-pending">ޕެންޑިންގް / ނުލިބޭ</option>
+          </select>
+        </div>
+
+        <app-input type="text" id="tx-description" label="ތަފްސީލް"></app-input>
+
+        <div class="form-group">
+          <label for="tx-photo" data-i18n="photo">ފޮޓޯ އަޕްލޯޑް</label>
+          <input type="file" id="tx-photo" class="form-input" accept="image/*">
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn btn-secondary" onclick="window.app.closeModal('transaction')" data-i18n="cancel">ކެންސަލް</button>
+          <button type="submit" class="btn btn-primary" data-i18n="save">ރައްކާކުރަން</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- B. FERTILIZER APPLICATION MODAL -->
+  <div class="modal-overlay" id="modal-fertilizer">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" data-i18n="recordFertilizer">ކާދު އެޅުން ރެކޯޑްކުރަން</h3>
+        <button class="modal-close" onclick="window.app.closeModal('fertilizer')">&times;</button>
+      </div>
+      <form id="form-fertilizer" onsubmit="window.app.saveFertilizer(event)">
+        <app-input type="date" id="fert-date" label="ތާރީޚް" required></app-input>
+
+        <div class="form-group">
+          <label for="fert-crop" data-i18n="crops">ގަސްތައް / ކްރޮޕްސް</label>
+          <select id="fert-crop" class="form-input" required>
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="fert-name">ކާދުގެ ބާވަތް (ނަން)</label>
+          <select id="fert-name" class="form-input" required>
+            <!-- Populated from Inventory stock -->
+          </select>
+        </div>
+
+        <div class="form-row-2col">
+          <app-input type="number" id="fert-quantity" label="މިންވަރު" min="0.1" step="any" required></app-input>
+          <app-input type="text" id="fert-unit" label="ޔުނިޓް" readonly value="kg"></app-input>
+        </div>
+
+        <div class="form-group">
+          <label for="fert-method" data-i18n="fertMethod">ކާދު އަޅާ ގޮތް</label>
+          <select id="fert-method" class="form-input" required>
+            <option value="fertSoil" data-i18n="fertSoil">ފަސްގަނޑަށް އެޅުން</option>
+            <option value="fertFoliar" data-i18n="fertFoliar">ފަތަށް ޖެހުން</option>
+            <option value="fertDrip" data-i18n="fertDrip">ފެންދޭ ނިޒާމުން</option>
+          </select>
+        </div>
+
+        <app-input type="number" id="fert-cost" label="ކާދުގެ ޚަރަދު (ލަފާކުރާ)" min="0"></app-input>
+        <app-input type="text" id="fert-notes" label="ނޯޓް"></app-input>
+
+        <div class="btn-row">
+          <button type="button" class="btn btn-secondary" onclick="window.app.closeModal('fertilizer')" data-i18n="cancel">ކެންސަލް</button>
+          <button type="submit" class="btn btn-primary" data-i18n="save">ރައްކާކުރަން</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- C. CROP MODAL (Add/Edit Crop) -->
+  <div class="modal-overlay" id="modal-crop">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-crop-title">އަލަށް ގަހެއް އިންދުން</h3>
+        <button class="modal-close" onclick="window.app.closeModal('crop')">&times;</button>
+      </div>
+      <form id="form-crop" onsubmit="window.app.saveCrop(event)">
+        <input type="hidden" id="crop-id" value="">
+        
+        <app-input type="text" id="crop-name" label="ގަހުގެ ބާވަތް" required placeholder="މިސާލަކަށް: ކަރާ، މިރުސް، ކޮޕީފަތް" list="suggested-crop-names"></app-input>
+
+        <app-input type="text" id="crop-variety" label="ވޭރިއެޓީ / ވައްތަރު" placeholder="މިސާލަކަށް: ރެޑް ލޭޑީ"></app-input>
+
+        <div class="form-row-2col">
+          <app-input type="date" id="crop-planting-date" label="އިންދި ތާރީޚް" required oninput="window.app.calculateCropHarvestDate()"></app-input>
+          <app-input type="number" id="crop-harvest-days" label="ބިންނާނެ ދުވަހުގެ އަދަދު" min="1" oninput="window.app.calculateCropHarvestDate()"></app-input>
+        </div>
+
+        <div class="form-row-2col">
+          <app-input type="date" id="crop-expected-harvest" label="ލަފާކުރާ ގޮވާން ކަނޑާ ތާރީޚް" required></app-input>
+          <app-input type="number" id="crop-plants-count" label="ގަސްތަކުގެ އަދަދު" required placeholder="މިސާލަކަށް: 150"></app-input>
+        </div>
+
+        <div class="form-row-2col">
+          <app-input type="text" id="crop-batch-number" label="ބެޗް ނަންބަރު" placeholder="މިސާލަކަށް: B-26-01"></app-input>
+          <div class="form-group">
+            <label for="crop-status" data-i18n="status">ހާލަތު</label>
+            <select id="crop-status" class="form-input" required>
+              <option value="growing" data-i18n="statusGrowing">ހެދެމުންދަނީ</option>
+              <option value="completed" data-i18n="statusCompleted">ނިމިފައި</option>
+            </select>
+          </div>
+        </div>
+
+        <app-input type="textarea" id="crop-notes" label="ނޯޓް"></app-input>
+
+        <div class="btn-row">
+          <button type="button" class="btn btn-secondary" onclick="window.app.closeModal('crop')" data-i18n="cancel">ކެންސަލް</button>
+          <button type="submit" class="btn btn-primary" data-i18n="save">ރައްކާކުރަން</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- D. HARVEST RECORD MODAL -->
+  <div class="modal-overlay" id="modal-harvest">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" data-i18n="harvests">މައުސޫލު ހޮވުން</h3>
+        <button class="modal-close" onclick="window.app.closeModal('harvest')">&times;</button>
+      </div>
+      <form id="form-harvest" onsubmit="window.app.saveHarvest(event)">
+        <app-input type="date" id="harvest-date" label="ތާރީޚް" required></app-input>
+
+        <div class="form-group">
+          <label for="harvest-crop" data-i18n="crops">ގަސްތައް / ކްރޮޕްސް</label>
+          <select id="harvest-crop" class="form-input" required>
+            <!-- Dynamic crops -->
+          </select>
+        </div>
+
+        <div class="form-row-2col">
+          <app-input type="number" id="harvest-quantity" label="މިންވަރު" min="0.1" step="any" required></app-input>
+          <app-input type="text" id="harvest-unit" label="ޔުނިޓް" required placeholder="މިސާލަކަށް: ކިލޯ، އަދަދު" list="suggested-units"></app-input>
+        </div>
+
+        <div class="form-group">
+          <label for="harvest-grade">ގްރޭޑް / ކޮލިޓީ</label>
+          <select id="harvest-grade" class="form-input">
+            <option value="Grade A">Grade A (އެންމެ ރަނގަޅު)</option>
+            <option value="Grade B">Grade B (މެދު މިންވަރު)</option>
+            <option value="Grade C">Grade C (ދަށް މިންވަރު)</option>
+          </select>
+        </div>
+
+        <app-input type="text" id="harvest-buyer" label="ވިއްކި ފަރާތް (ގަތް މީހާ)" placeholder="މިސާލަކަށް: ރިސޯޓް، މާރުކޭޓް" list="suggested-buyers"></app-input>
+        <app-input type="number" id="harvest-price" label="ވިއްކި ޖުމްލަ އަގު (ރުފިޔާ)" min="0"></app-input>
+        <app-input type="text" id="harvest-notes" label="ނޯޓް"></app-input>
+
+        <div class="btn-row">
+          <button type="button" class="btn btn-secondary" onclick="window.app.closeModal('harvest')" data-i18n="cancel">ކެންސަލް</button>
+          <button type="submit" class="btn btn-primary" data-i18n="save">ރައްކާކުރަން</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- E. INVENTORY MODAL -->
+  <div class="modal-overlay" id="modal-inventory">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">އިންވެންޓްރީ ސާމާނު އިތުރުކުރަން</h3>
+        <button class="modal-close" onclick="window.app.closeModal('inventory')">&times;</button>
+      </div>
+      <form id="form-inventory" onsubmit="window.app.saveInventory(event)">
+        <input type="hidden" id="inventory-id" value="">
+
+        <div class="form-group">
+          <label for="inv-category">ބާވަތް (Category)</label>
+          <select id="inv-category" class="form-input" required>
+            <option value="Fertilizer">ކާދު (Fertilizer)</option>
+            <option value="Seeds">އޮށް (Seeds)</option>
+            <option value="Chemicals">ބޭސް (Chemicals)</option>
+            <option value="Equipment">ސާމާނު (Equipment)</option>
+          </select>
+        </div>
+
+        <app-input type="text" id="inv-name" label="ސާމާނުގެ ނަން" required placeholder="މިސާލަކަށް: އެން.ޕީ.ކޭ ކާދު، ޔޫރިއާ"></app-input>
+
+        <div class="form-row-2col">
+          <app-input type="number" id="inv-stock" label="މިހާރު ހުރި އަދަދު" min="0" step="any" required></app-input>
+          <app-input type="text" id="inv-unit" label="ޔުނިޓް" required placeholder="މިސާލަކަށް: ކިލޯ، ޕެކެޓް، ބަސްތާ" list="suggested-units"></app-input>
+        </div>
+
+        <app-input type="number" id="inv-min-stock" label="މަދުވެގެން ހުންނަންޖެހޭ މިންވަރު (ލޯ-ސްޓޮކް އެލާޓަށް)" min="0" step="any" required></app-input>
+
+        <div class="btn-row">
+          <button type="button" class="btn btn-secondary" onclick="window.app.closeModal('inventory')" data-i18n="cancel">ކެންސަލް</button>
+          <button type="submit" class="btn btn-primary" data-i18n="save">ރައްކާކުރަން</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- F. STAFF MODAL -->
+  <div class="modal-overlay" id="modal-staff">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-staff-title">މުވައްޒަފަކު އިތުރުކުރަން</h3>
+        <button class="modal-close" onclick="window.app.closeModal('staff')">&times;</button>
+      </div>
+      <form id="form-staff" onsubmit="window.app.saveStaff(event)">
+        <input type="hidden" id="staff-id" value="">
+        <input type="hidden" id="staff-status" value="active">
+
+        <app-input type="text" id="staff-name-input" label="މުވައްޒަފުގެ ނަން" required></app-input>
+        <app-input type="text" id="staff-phone" label="ފޯނު ނަންބަރު" required></app-input>
+        <app-input type="text" id="staff-username-input" label="ޔޫޒަރނޭމް (ލޮގިންވުމަށް)" required autocomplete="username"></app-input>
+        <app-input type="text" id="staff-password-input" label="ޕާސްވޯޑް" required autocomplete="new-password"></app-input>
+
+        <div class="btn-row">
+          <button type="button" class="btn btn-secondary" onclick="window.app.closeModal('staff')" data-i18n="cancel">ކެންސަލް</button>
+          <button type="submit" class="btn btn-primary" data-i18n="save">ރައްކާކުރަން</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- G. PLATFORM ADMIN CREATE FARM MODAL -->
+  <div class="modal-overlay" id="modal-create-farm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">އަލަށް ދަނޑެއް ރަޖިސްޓްރީ ކުރުން</h3>
+        <button class="modal-close" onclick="window.app.closeModal('create-farm')">&times;</button>
+      </div>
+      <form id="form-create-farm" onsubmit="window.app.saveNewFarm(event)">
+        <app-input type="text" id="farm-name-input" label="ދަނޑުގެ ނަން" required placeholder="މިސާލަކަށް: ބަންޑާރަ ދަނޑު"></app-input>
+        <app-input type="text" id="farm-owner-input" label="ވެރިފަރާތުގެ ނަން" required></app-input>
+        <app-input type="text" id="farm-island-input" label="ރަށް" required placeholder="މިސާލަކަށް: ތޮއްޑޫ"></app-input>
+        <app-input type="text" id="farm-size-input" label="ދަނޑުގެ ބޮޑުމިން (އަކަފޫޓު)" required></app-input>
+        <app-input type="text" id="farm-contact-input" label="ގުޅޭނެ ފޯނު ނަންބަރު" required></app-input>
+
+        <div style="margin-block-start: 18px; border-block-start: 1px solid var(--border-color); padding-block-start: 12px;">
+          <h4 style="font-weight: 700; margin-block-end: 10px;" class="text-success">ދަނޑުގެ އެޑްމިން ޔޫޒަރ</h4>
+          <app-input type="text" id="farm-admin-username" label="އެޑްމިން ޔޫޒަރނޭމް" required></app-input>
+          <app-input type="text" id="farm-admin-password" label="އެޑްމިން ޕާސްވޯޑް" required></app-input>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn btn-secondary" onclick="window.app.closeModal('create-farm')" data-i18n="cancel">ކެންސަލް</button>
+          <button type="submit" class="btn btn-primary">ރަޖިސްޓްރީ ކުރަން</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main JavaScript File -->
+  <script type="module" src="/app.js?v=1.1.8"></script>
+</body>
+</html>
