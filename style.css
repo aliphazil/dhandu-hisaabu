@@ -5,14 +5,14 @@
 /* Web Fonts for Dhivehi (Thaana) support on Mobile */
 @font-face {
   font-family: 'MV Waheed';
-  src: url('/fonts/Waheed.otf') format('opentype');
+  src: url('./fonts/Waheed.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'MV Waheed';
-  src: url('/fonts/Waheed.otf') format('opentype');
+  src: url('./fonts/Waheed.otf') format('opentype');
   font-weight: bold;
   font-style: normal;
   font-display: swap;
@@ -20,14 +20,14 @@
 
 @font-face {
   font-family: 'Faruma';
-  src: url('/fonts/Faruma.ttf') format('truetype');
+  src: url('./fonts/Faruma.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Faruma';
-  src: url('/fonts/Faruma.ttf') format('truetype');
+  src: url('./fonts/Faruma.ttf') format('truetype');
   font-weight: bold;
   font-style: normal;
   font-display: swap;
@@ -35,14 +35,14 @@
 
 @font-face {
   font-family: 'MV Faseyha';
-  src: url('/fonts/Faseyha.ttf') format('truetype');
+  src: url('./fonts/Faseyha.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'MV Faseyha';
-  src: url('/fonts/Faseyha.ttf') format('truetype');
+  src: url('./fonts/Faseyha.ttf') format('truetype');
   font-weight: bold;
   font-style: normal;
   font-display: swap;
