@@ -32,6 +32,19 @@ function format2DP(val) {
   return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+// Helper to choose the best emoji for a crop based on name keywords (supporting English and Dhivehi)
+function getCropEmoji(cropName) {
+  const name = (cropName || '').toLowerCase();
+  if (name.includes('watermelon') || name.includes('ކަރާ')) return '🍉';
+  if (name.includes('melon') || name.includes('މެލަން')) return '🍈';
+  if (name.includes('cucumber') || name.includes('ކެކުރި') || name.includes('ކިޔުކަންބާ')) return '🥒';
+  if (name.includes('pumpkin') || name.includes('ބަރަބޯ')) return '🎃';
+  if (name.includes('banana') || name.includes('ކެޔޮ') || name.includes('ދޮންކެޔޮ')) return '🍌';
+  if (name.includes('papaya') || name.includes('ފަޅޯ')) return '🥭';
+  if (name.includes('mango') || name.includes('އަނބު') || name.includes('ހިތަދޫ')) return '🥭';
+  return '🌱';
+}
+
 // Reusable DhivehiInput Web Component
 class DhivehiInput extends HTMLElement {
   connectedCallback() {
@@ -724,10 +737,14 @@ class App {
       upcoming.forEach(c => {
         const item = document.createElement('div');
         item.className = 'activity-item';
+        const emoji = getCropEmoji(c.name);
         item.innerHTML = `
-          <div class="activity-details">
-            <span class="activity-title">${t(c.name)} (${c.variety})</span>
-            <span class="activity-meta">އިންދީ: <span class="date-num">${c.plantingDate}</span> • ސަރަހައްދު: ${c.area}</span>
+          <div class="activity-details" style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.5rem; flex-shrink: 0;">${emoji}</span>
+            <div>
+              <span class="activity-title" style="font-weight: 700;">${t(c.name)} (${c.variety})</span>
+              <span class="activity-meta" style="display: block; margin-block-start: 2px;">އިންދީ: <span class="date-num">${c.plantingDate}</span> • ސަރަހައްދު: ${c.area}</span>
+            </div>
           </div>
           <div style="text-align: end;">
             <div class="badge badge-growing" data-i18n="expectedHarvest">ލަފާކުރާ ތާރީޚް</div>
@@ -906,11 +923,7 @@ class App {
       const card = document.createElement('div');
       card.className = 'card high-contrast-card';
       
-      const emoji = crop.name === 'Watermelon' ? '🍉' : 
-                    crop.name === 'Melon' ? '🍈' : 
-                    crop.name === 'Cucumber' ? '🥒' : 
-                    crop.name === 'Pumpkin' ? '🎃' : 
-                    crop.name === 'Banana' ? '🍌' : '🥭';
+      const emoji = getCropEmoji(crop.name);
       
       card.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: start; margin-block-end: 12px;">
