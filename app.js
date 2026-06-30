@@ -678,12 +678,13 @@ class App {
         </button>
         <button class="nav-item" onclick="window.app.showView('crops')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22v-8" />
-            <path d="M12 14c2.5-1.5 6-1.5 6-5s-3.5-3.5-6-1.5" />
-            <path d="M12 14c-2.5-1.5-6-1.5-6-5s3.5-3.5 6-1.5" />
-            <path d="M12 14V8" />
-            <path d="M12 8c1.5-1 3-2 3-3.5 0-1.5-1.5-2-3-1" />
-            <path d="M12 8c-1.5-1-3-2-3-3.5 0-1.5 1.5-2 3-1" />
+            <path d="M3 20c3-3 6-4 9-4s6 1 9 4" />
+            <path d="M12 16V9" />
+            <path d="M12 9c-2-1.5-3-4.5 0-7 3 2.5 2 5.5 0 7z" />
+            <path d="M12 16c-2-2-4-3-5-3.5" />
+            <path d="M7 12.5c-2-.5-4-2.5-4.5-4.5 2 0 4 1.5 4.5 4.5z" />
+            <path d="M12 16c2-2 4-3 5-3.5" />
+            <path d="M17 12.5c2-.5 4-2.5 4.5-4.5-2 0-4 1.5-4.5 4.5z" />
           </svg>
           <span data-i18n="crops">ގަސްތައް</span>
         </button>
