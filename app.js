@@ -22,7 +22,7 @@ import {
   registerFarmSelf,
   toggleFarmStatus,
   resetPassword
-} from './database.js?v=1.5.0';
+} from './database.js?v=1.5.2';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {

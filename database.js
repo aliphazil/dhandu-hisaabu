@@ -252,6 +252,13 @@ export async function pullFromFirestore() {
     }
 
     if (hasData) {
+      if (!serverDB.users) serverDB.users = [];
+      DEFAULT_USERS.forEach(defUser => {
+        const exists = serverDB.users.some(u => u.username === defUser.username);
+        if (!exists) {
+          serverDB.users.push(defUser);
+        }
+      });
       localStorage.setItem("dhandu_hisaabu_server_db", JSON.stringify(serverDB));
       const outbox = getOutbox();
       if (outbox.length === 0) {
@@ -261,7 +268,7 @@ export async function pullFromFirestore() {
           window.app.navigate(window.app.currentView);
         }
       }
-      console.log("Pulled fresh state from Firestore.");
+      console.log("Pulled fresh state from Firestore (preserved default users).");
     } else {
       console.log("Firestore is empty. Seeding with default data...");
       await pushAllToFirestore();
