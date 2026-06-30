@@ -749,8 +749,6 @@ class App {
       profitEl.className = "stats-value profit-negative";
     }
     
-    document.getElementById('dash-active-crops').textContent = activeCropsCount;
-    
     // Upcoming Harvests (Crops due to harvest in next 30 days)
     const upcomingHarvestList = document.getElementById('dash-harvests-list');
     upcomingHarvestList.innerHTML = '';
