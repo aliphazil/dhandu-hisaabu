@@ -902,6 +902,17 @@
         </form>
       </div>
 
+      <!-- Change Password Card -->
+      <div class="card high-contrast-card" style="margin-block-start: 24px;">
+        <h3 class="section-title" style="margin-block-end: 16px;">ޕާސްވޯޑް ބަދަލުކުރުން</h3>
+        <form id="change-password-form" onsubmit="window.app.changeUserPassword(event)">
+          <app-input type="password" id="change-pwd-current" label="މިހާރުގެ ޕާސްވޯޑް" required autocomplete="current-password"></app-input>
+          <app-input type="password" id="change-pwd-new" label="އާ ޕާސްވޯޑް" required autocomplete="new-password"></app-input>
+          <app-input type="password" id="change-pwd-confirm" label="އާ ޕާސްވޯޑް ކޮންފަރމް ކުރުން" required autocomplete="new-password"></app-input>
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-block-start: 12px;">ޕާސްވޯޑް ބަދަލުކުރަން</button>
+        </form>
+      </div>
+
       <!-- Lists Management -->
       <div class="card high-contrast-card" style="margin-block-start: 24px;">
         <h3 class="section-title" style="margin-block-end: 16px;">ލިސްޓުތައް ބެލެހެއްޓުން (ޔުނިޓް، ގަންނަ ފަރާތް، ސަޕްލަޔަރު، ގޮވާން، ޚަރަދުގެ ކެޓަގަރީ)</h3>
@@ -1281,6 +1292,6 @@
     </div>
   </div>
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=1.5.3"></script>
+  <script type="module" src="app.js?v=1.5.4"></script>
 </body>
 </html>

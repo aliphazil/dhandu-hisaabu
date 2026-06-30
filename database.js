@@ -899,3 +899,39 @@ export function recoverPassword(username, email, newPassword) {
   logAuditEvent("FORGOT_PASSWORD_RESET", `Password self-reset for user: ${username}`, user.role === "platform_admin");
   return { success: true };
 }
+
+// Change password for currently logged in user
+export function changePassword(currentPassword, newPassword) {
+  const currentUser = getActiveUser();
+  if (!currentUser) throw new Error("Unauthorized.");
+
+  const serverDB = getStore("server");
+  const localDB = getStore("local");
+
+  const serverUserIdx = serverDB.users.findIndex(u => u.username === currentUser.username);
+  if (serverUserIdx === -1) {
+    throw new Error("ޔޫޒަރ ފެންނާކަށް ނެތް.");
+  }
+
+  const user = serverDB.users[serverUserIdx];
+  if (user.password !== currentPassword) {
+    throw new Error("މިހާރުގެ ޕާސްވޯޑް ރަނގަޅެއް ނޫން.");
+  }
+
+  // Update password
+  serverDB.users[serverUserIdx].password = newPassword;
+  
+  const localUserIdx = localDB.users.findIndex(u => u.username === currentUser.username);
+  if (localUserIdx !== -1) {
+    localDB.users[localUserIdx].password = newPassword;
+  }
+
+  saveStore(serverDB, "server");
+  saveStore(localDB, "local");
+
+  // Push to Firestore
+  pushAllToFirestore();
+
+  logAuditEvent("CHANGE_PASSWORD", `Password changed by user: ${currentUser.username}`, currentUser.role === "platform_admin");
+  return { success: true };
+}

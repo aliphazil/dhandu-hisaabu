@@ -22,8 +22,9 @@ import {
   registerFarmSelf,
   toggleFarmStatus,
   resetPassword,
-  recoverPassword
-} from './database.js?v=1.5.2';
+  recoverPassword,
+  changePassword
+} from './database.js?v=1.5.4';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -2039,6 +2040,26 @@ class App {
     updateRecord('farms', user.farmId, updatedFields, this.isOnline);
     this.showToast("ދަނޑުގެ ޕްރޮފައިލް އަޕްޑޭޓް ކުރެވިއްޖެ!");
     this.showView(this.currentView);
+  }
+
+  changeUserPassword(e) {
+    e.preventDefault();
+    const currentPassword = document.getElementById('change-pwd-current').value;
+    const newPassword = document.getElementById('change-pwd-new').value;
+    const confirmPassword = document.getElementById('change-pwd-confirm').value;
+
+    if (newPassword !== confirmPassword) {
+      alert("އާ ދެ ޕާސްވޯޑް ދިމައެއް ނުވޭ.");
+      return;
+    }
+
+    try {
+      changePassword(currentPassword, newPassword);
+      this.showToast("ޕާސްވޯޑް ކާމިޔާބުކަމާއެކު ބަދަލުކުރެވިއްޖެ!");
+      document.getElementById('change-password-form').reset();
+    } catch (err) {
+      alert(err.message);
+    }
   }
 
   saveNewFarm(e) {
