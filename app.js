@@ -571,7 +571,8 @@ class App {
       'staff', 
       'reports', 
       'logs', 
-      'profile'
+      'profile',
+      'treatments'
     ];
     
     views.forEach(v => {
