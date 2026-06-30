@@ -154,10 +154,10 @@ const DEFAULT_TREATMENT_APPLICATIONS = [
   }
 ];
 
-// Initialize Simulated Server Database
 export function initDB() {
+  let serverDB;
   if (!localStorage.getItem("dhandu_hisaabu_server_db")) {
-    const serverDB = {
+    serverDB = {
       farms: DEFAULT_FARMS,
       users: DEFAULT_USERS,
       crops: DEFAULT_CROPS,
@@ -170,11 +170,33 @@ export function initDB() {
       treatment_applications: DEFAULT_TREATMENT_APPLICATIONS
     };
     localStorage.setItem("dhandu_hisaabu_server_db", JSON.stringify(serverDB));
+  } else {
+    serverDB = JSON.parse(localStorage.getItem("dhandu_hisaabu_server_db") || "{}");
+    if (serverDB.users) {
+      DEFAULT_USERS.forEach(defUser => {
+        const exists = serverDB.users.some(u => u.username === defUser.username);
+        if (!exists) {
+          serverDB.users.push(defUser);
+        }
+      });
+      localStorage.setItem("dhandu_hisaabu_server_db", JSON.stringify(serverDB));
+    }
   }
   
   // Local cache mirrors server db initially
   if (!localStorage.getItem("dhandu_hisaabu_local_db")) {
     localStorage.setItem("dhandu_hisaabu_local_db", localStorage.getItem("dhandu_hisaabu_server_db"));
+  } else {
+    const localDB = JSON.parse(localStorage.getItem("dhandu_hisaabu_local_db") || "{}");
+    if (localDB.users) {
+      DEFAULT_USERS.forEach(defUser => {
+        const exists = localDB.users.some(u => u.username === defUser.username);
+        if (!exists) {
+          localDB.users.push(defUser);
+        }
+      });
+      localStorage.setItem("dhandu_hisaabu_local_db", JSON.stringify(localDB));
+    }
   }
   
   // Pending synchronizations outbox
