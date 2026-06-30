@@ -613,17 +613,6 @@ class App {
     else if (viewId === 'logs') this.loadLogs();
     else if (viewId === 'profile') this.loadProfile();
     else if (viewId === 'treatments') this.loadTreatments();
-    // Show/hide floating action buttons bar
-    const bar = document.getElementById('quick-record-bar');
-    if (bar) {
-      const hideViews = ['login', 'platform-dashboard'];
-      const activeUser = getActiveUser();
-      if (activeUser && !hideViews.includes(viewId)) {
-        bar.classList.remove('hidden');
-      } else {
-        bar.classList.add('hidden');
-      }
-    }
     
     translateDOM();
   }
