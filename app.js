@@ -1215,10 +1215,9 @@ class App {
       document.getElementById('profile-farm-name').value = myFarm.name;
       document.getElementById('profile-owner-name').value = myFarm.owner;
       document.getElementById('profile-island').value = myFarm.island;
-      document.getElementById('profile-address').value = myFarm.address;
+      document.getElementById('profile-email').value = myFarm.email || '';
       document.getElementById('profile-size').value = myFarm.size;
       document.getElementById('profile-contact').value = myFarm.contact;
-      document.getElementById('profile-gps').value = myFarm.gpsLocation || '';
     }
     this.initSuggestedUnits();
   }
@@ -1998,19 +1997,17 @@ class App {
     const name = document.getElementById('profile-farm-name').value;
     const owner = document.getElementById('profile-owner-name').value;
     const island = document.getElementById('profile-island').value;
-    const address = document.getElementById('profile-address').value;
+    const email = document.getElementById('profile-email').value;
     const size = document.getElementById('profile-size').value;
     const contact = document.getElementById('profile-contact').value;
-    const gpsLocation = document.getElementById('profile-gps').value;
     
     const updatedFields = {
       name,
       owner,
       island,
-      address,
+      email,
       size,
-      contact,
-      gpsLocation
+      contact
     };
     
     updateRecord('farms', user.farmId, updatedFields, this.isOnline);
