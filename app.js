@@ -2318,7 +2318,6 @@ class App {
     const productSelect = document.getElementById('t-app-product');
     const unitInput = document.getElementById('t-app-unit');
     const ratioInput = document.getElementById('t-app-ratio');
-    const costInput = document.getElementById('t-app-cost');
     if (!productSelect || !unitInput) return;
 
     const localDB = JSON.parse(localStorage.getItem('dhandu_hisaabu_local_db') || '{}');
@@ -2326,8 +2325,6 @@ class App {
     if (product) {
       unitInput.value = product.defaultUnit || '';
       ratioInput.value = product.defaultDosage || '';
-      const qty = Number(document.getElementById('t-app-qty').value) || 0;
-      costInput.value = product.costPerUnit ? (product.costPerUnit * qty).toFixed(2) : '';
     }
   }
 
@@ -2589,15 +2586,13 @@ class App {
           <td><strong>${item.name}</strong></td>
           <td>${t(item.category)}</td>
           <td>${item.brand || '-'}</td>
-          <td>${item.activeIngredient || '-'}</td>
           <td>${item.defaultDosage || '-'}</td>
-          <td style="text-align: end; font-weight: bold;">${format2DP(item.costPerUnit)} ${item.defaultUnit}</td>
           <td>${item.preHarvestInterval || '-'}</td>
           <td><span class="${statusClass}" style="font-weight: bold;">${statusText}</span></td>
           ${actions}
         </tr>
       `;
-    }).join('') : `<tr><td colspan="9" class="text-center text-muted">އެއްވެސް ބާވަތެއް މާސްޓަރ ލިސްޓުގައި ނެތް.</td></tr>`;
+    }).join('') : `<tr><td colspan="7" class="text-center text-muted">އެއްވެސް ބާވަތެއް މާސްޓަރ ލިސްޓުގައި ނެތް.</td></tr>`;
   }
 
   saveTreatmentProduct(event) {
@@ -2609,20 +2604,15 @@ class App {
     const name = document.getElementById('t-prod-name').value;
     const brand = document.getElementById('t-prod-brand').value;
     const category = document.getElementById('t-prod-cat').value;
-    const ingredient = document.getElementById('t-prod-ingredient').value;
-    const formulation = document.getElementById('t-prod-formulation').value;
     const unit = document.getElementById('t-prod-unit').value;
     const dosage = document.getElementById('t-prod-dosage').value;
-    const supplier = document.getElementById('t-prod-supplier').value;
-    const cost = Number(document.getElementById('t-prod-cost').value) || 0;
-    const safety = document.getElementById('t-prod-safety').value;
     const phi = document.getElementById('t-prod-phi').value;
     const status = document.getElementById('t-prod-status').value;
 
     if (id) {
       const updatedFields = {
-        name, brand, category, activeIngredient: ingredient, formulation, defaultUnit: unit, defaultDosage: dosage,
-        supplier, costPerUnit: cost, safetyInterval: safety, preHarvestInterval: phi, status,
+        name, brand, category, defaultUnit: unit, defaultDosage: dosage,
+        preHarvestInterval: phi, status,
         updatedDate: new Date().toISOString()
       };
       try {
@@ -2638,8 +2628,8 @@ class App {
       const newProd = {
         id: "p_" + Date.now(),
         farmId: user.farmId,
-        name, brand, category, activeIngredient: ingredient, formulation, defaultUnit: unit, defaultDosage: dosage,
-        supplier, costPerUnit: cost, safetyInterval: safety, preHarvestInterval: phi, status,
+        name, brand, category, defaultUnit: unit, defaultDosage: dosage,
+        preHarvestInterval: phi, status,
         createdDate: new Date().toISOString(),
         updatedDate: new Date().toISOString()
       };
@@ -2663,13 +2653,8 @@ class App {
     document.getElementById('t-prod-name').value = p.name;
     document.getElementById('t-prod-brand').value = p.brand || '';
     document.getElementById('t-prod-cat').value = p.category;
-    document.getElementById('t-prod-ingredient').value = p.activeIngredient || '';
-    document.getElementById('t-prod-formulation').value = p.formulation || '';
     document.getElementById('t-prod-unit').value = p.defaultUnit || '';
     document.getElementById('t-prod-dosage').value = p.defaultDosage || '';
-    document.getElementById('t-prod-supplier').value = p.supplier || '';
-    document.getElementById('t-prod-cost').value = p.costPerUnit || '';
-    document.getElementById('t-prod-safety').value = p.safetyInterval || '';
     document.getElementById('t-prod-phi').value = p.preHarvestInterval || '';
     document.getElementById('t-prod-status').value = p.status;
     
