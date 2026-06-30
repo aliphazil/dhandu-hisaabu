@@ -612,16 +612,15 @@ class App {
     else if (viewId === 'reports') this.loadReports();
     else if (viewId === 'logs') this.loadLogs();
     else if (viewId === 'profile') this.loadProfile();
-    // Show/hide floating action button
-    const fab = document.getElementById('quick-record-fab');
-    if (fab) {
-      this.closeFabMenu();
-      const hideFabViews = ['login', 'platform-dashboard'];
+    // Show/hide floating action buttons bar
+    const bar = document.getElementById('quick-record-bar');
+    if (bar) {
+      const hideViews = ['login', 'platform-dashboard'];
       const activeUser = getActiveUser();
-      if (activeUser && !hideFabViews.includes(viewId)) {
-        fab.classList.remove('hidden');
+      if (activeUser && !hideViews.includes(viewId)) {
+        bar.classList.remove('hidden');
       } else {
-        fab.classList.add('hidden');
+        bar.classList.add('hidden');
       }
     }
     
@@ -1548,19 +1547,7 @@ class App {
     const modal = document.getElementById(`modal-${modalId}`);
     if (modal) modal.classList.remove('show');
   }
-
-  toggleFabMenu() {
-    const fab = document.getElementById('quick-record-fab');
-    if (fab) fab.classList.toggle('open');
-  }
-
-  closeFabMenu() {
-    const fab = document.getElementById('quick-record-fab');
-    if (fab) fab.classList.remove('open');
-  }
-
   openRecordModal(type) {
-    this.closeFabMenu();
     const modalTitle = document.getElementById('modal-transaction-title');
     const form = document.getElementById('form-transaction');
     form.reset();
