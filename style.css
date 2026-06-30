@@ -1035,3 +1035,117 @@ input[lang="en"], textarea[lang="en"] {
     gap: 0px; /* Reduces gaps when stacked vertically */
   }
 }
+
+/* Floating Action Button (FAB) Speed Dial */
+.fab-container {
+  position: fixed;
+  bottom: 80px; /* Positioned above the bottom navigation bar */
+  left: 20px;   /* Left side for easy thumb access in RTL layout */
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.fab-main-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  font-size: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.fab-main-btn:active {
+  transform: scale(0.9);
+}
+
+.fab-container.open .fab-main-btn {
+  transform: rotate(45deg);
+  background: var(--text-muted);
+}
+
+.fab-options {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px) scale(0.8);
+  transform-origin: bottom left;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.fab-container.open .fab-options {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.fab-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  flex-direction: row; /* Icon left, label right */
+}
+
+.fab-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  color: white;
+  transition: transform 0.2s;
+}
+
+.fab-option:active .fab-icon {
+  transform: scale(0.9);
+}
+
+/* Green for Income, Red for Expense */
+.fab-income .fab-icon {
+  background: #2e7d32; /* Green */
+}
+
+.fab-expense .fab-icon {
+  background: #d32f2f; /* Red */
+}
+
+.fab-label {
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.2s;
+  pointer-events: none;
+}
+
+.fab-container.open .fab-option:hover .fab-label,
+.fab-container.open .fab-option:active .fab-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+

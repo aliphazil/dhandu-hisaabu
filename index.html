@@ -896,7 +896,24 @@
     </div>
   </div>
 
+  <!-- Floating Action Button (Speed Dial) for Quick Recording -->
+  <div id="quick-record-fab" class="fab-container hidden">
+    <div class="fab-options">
+      <button class="fab-option fab-expense" onclick="window.app.openRecordModal('expense')">
+        <span class="fab-icon">💸</span>
+        <span class="fab-label">ޚަރަދު ރެކޯޑްކުރަން</span>
+      </button>
+      <button class="fab-option fab-income" onclick="window.app.openRecordModal('income')">
+        <span class="fab-icon">💰</span>
+        <span class="fab-label">އާމްދަނީ ރެކޯޑްކުރަން</span>
+      </button>
+    </div>
+    <button class="fab-main-btn" onclick="window.app.toggleFabMenu()">
+      <span class="fab-main-icon">＋</span>
+    </button>
+  </div>
+
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=1.2.6"></script>
+  <script type="module" src="app.js?v=1.2.7"></script>
 </body>
 </html>
