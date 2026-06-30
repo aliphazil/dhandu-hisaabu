@@ -8,7 +8,7 @@ export const translations = {
     crops: "ގަސްތައް / ކްރޮޕްސް",
     expenses: "ޚަރަދު",
     income: "އާމްދަނީ",
-    fertilizer: "ކާދު އެޅުން",
+    fertilizer: "ގަސްކާނާ އެޅުން",
     harvests: "މައުސޫލު ހޮވުން",
     inventory: "އިންވެންޓްރީ",
     staff: "މުވައްޒަފުން",
@@ -57,7 +57,7 @@ export const translations = {
     
     // Staff UI
     recordIncome: "އާމްދަނީ ރެކޯޑްކުރަން",
-    recordFertilizer: "ކާދު އެޅުން ރެކޯޑްކުރަން",
+    recordFertilizer: "ގަސްކާނާ އެޅުން ރެކޯޑްކުރަން",
     myActivity: "މިއަދުގެ މަސައްކަތްތައް",
     myRecentActivity: "ފަހުގެ މަސައްކަތްތައް",
     todayEntries: "މިއަދުގެ އެންޓްރީތައް",
@@ -108,7 +108,7 @@ export const translations = {
     Papaya: "ފަޅޯ",
     
     // Fertilizer application methods
-    fertMethod: "ކާދު އަޅާ ގޮތް",
+    fertMethod: "ގަސްކާނާ އަޅާ ގޮތް",
     fertSoil: "ފަސްގަނޑަށް އެޅުން",
     fertFoliar: "ފަތަށް ޖެހުން",
     fertDrip: "ފެންދޭ ނިޒާމުން",
@@ -118,7 +118,7 @@ export const translations = {
     dailyExpenses: "ދުވަހުގެ ޚަރަދު",
     profitAndLoss: "ފައިދާ އާއި ގެއްލުމުގެ ރިޕޯޓް",
     cropPerformance: "ގަސްތަކުގެ ރިޕޯޓް",
-    fertilizerUsage: "ކާދު ބޭނުންކުރި މިންވަރު",
+    fertilizerUsage: "ގަސްކާނާ ބޭނުންކުރި މިންވަރު",
     harvestSummary: "މައުސޫލު ހޮވުމުގެ ޚުލާސާ",
     expenseByCategory: "ޚަރަދުތައް ކެޓަގަރީން",
     exportExcel: "އެކްސެލް އަށް އެކްސްޕޯޓް",
@@ -126,7 +126,7 @@ export const translations = {
     
     // Categories
     Seeds: "އޮށް / އޮށުވައި",
-    Fertilizer: "ކާދު",
+    Fertilizer: "ގަސްކާނާ",
     Fuel: "ތެޔޮ",
     Labour: "މަސައްކަތު މީހުން",
     Equipment: "ހާލަތު ސާމާނު",
