@@ -855,3 +855,47 @@ export function resetPassword(username, newPassword) {
   
   throw new Error("User not found.");
 }
+
+// Password recovery via registered email validation
+export function recoverPassword(username, email, newPassword) {
+  const serverDB = getStore("server");
+  const localDB = getStore("local");
+
+  const user = serverDB.users.find(u => u.username === username);
+  if (!user) {
+    throw new Error("މި ޔޫޒަރނޭމްގެ އެކައުންޓެއް ނެތް.");
+  }
+
+  let matched = false;
+  if (user.role === "platform_admin") {
+    // Default email for platform admin
+    if (email.toLowerCase() === "admin@example.com" || email.toLowerCase() === "sysadmin@example.com") {
+      matched = true;
+    }
+  } else {
+    const farm = serverDB.farms.find(f => f.id === user.farmId);
+    if (farm && farm.email && farm.email.toLowerCase() === email.toLowerCase()) {
+      matched = true;
+    }
+  }
+
+  if (!matched) {
+    throw new Error("ޔޫޒަރނޭމް ނުވަތަ އީމެއިލް އެޑްރެސް ދިމައެއް ނުވޭ.");
+  }
+
+  // Update password in server and local DBs
+  const serverUserIdx = serverDB.users.findIndex(u => u.username === username);
+  if (serverUserIdx !== -1) serverDB.users[serverUserIdx].password = newPassword;
+
+  const localUserIdx = localDB.users.findIndex(u => u.username === username);
+  if (localUserIdx !== -1) localDB.users[localUserIdx].password = newPassword;
+
+  saveStore(serverDB, "server");
+  saveStore(localDB, "local");
+
+  // Push to Firestore
+  pushAllToFirestore();
+
+  logAuditEvent("FORGOT_PASSWORD_RESET", `Password self-reset for user: ${username}`, user.role === "platform_admin");
+  return { success: true };
+}

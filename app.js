@@ -21,7 +21,8 @@ import {
   createFarm,
   registerFarmSelf,
   toggleFarmStatus,
-  resetPassword
+  resetPassword,
+  recoverPassword
 } from './database.js?v=1.5.2';
 
 // Global 2 decimal places number formatter
@@ -1743,6 +1744,31 @@ class App {
     const form = document.getElementById('form-create-farm');
     form.reset();
     this.openModal('create-farm');
+  }
+
+  openForgotPasswordModal(e) {
+    if (e) e.preventDefault();
+    const form = document.getElementById('form-forgot-password');
+    if (form) form.reset();
+    this.openModal('forgot-password');
+  }
+
+  handleForgotPassword(e) {
+    e.preventDefault();
+    const username = document.getElementById('forgot-username').value;
+    const email = document.getElementById('forgot-email').value;
+    const newPassword = document.getElementById('forgot-new-password').value;
+
+    try {
+      recoverPassword(username, email, newPassword);
+      this.closeModal('forgot-password');
+      this.showToast("ޕާސްވޯޑް ކާމިޔާބުކަމާއެކު ބަދަލުކުރެވިއްޖެ! ލޮގިންވެވަޑައިގަންނަވާ.");
+      // Auto-fill login credentials
+      document.getElementById('login-username').value = username;
+      document.getElementById('login-password').value = newPassword;
+    } catch (err) {
+      alert(err.message);
+    }
   }
 
   // Record Form Calculations & Math

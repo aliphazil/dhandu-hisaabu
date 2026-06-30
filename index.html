@@ -76,6 +76,9 @@
       <form id="login-form" onsubmit="window.app.handleLogin(event)">
         <app-input type="text" id="login-username" label="ޔޫޒަރނޭމް" required autocomplete="username"></app-input>
         <app-input type="password" id="login-password" label="ޕާސްވޯޑް" required autocomplete="current-password"></app-input>
+        <div style="text-align: right; margin-block-end: 14px; margin-block-start: -8px;">
+          <a href="#" onclick="window.app.openForgotPasswordModal(event)" style="font-size: 0.85rem; color: var(--primary-color); text-decoration: none; font-weight: 500;">ޕާސްވޯޑް ހަނދާންނެތުނީ؟</a>
+        </div>
         
         <div id="login-error" class="text-danger hidden" style="margin-block-end: 12px; font-weight: bold; text-align: center;" data-i18n="incorrectPassword">
           ޕާސްވޯޑް ނުވަތަ ޔޫޒަރނޭމް ދިމާނުވޭ
@@ -1228,6 +1231,27 @@
     </div>
   </div>
 
+  <!-- H. FORGOT PASSWORD MODAL -->
+  <div class="modal-overlay" id="modal-forgot-password">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">ޕާސްވޯޑް ރިސެޓް ކުރުން</h3>
+        <button class="modal-close" onclick="window.app.closeModal('forgot-password')">&times;</button>
+      </div>
+      <form id="form-forgot-password" onsubmit="window.app.handleForgotPassword(event)">
+        <p class="text-muted" style="font-size: 0.85rem; margin-block-end: 14px;">ޕާސްވޯޑް ބަދަލުކުރުމަށް ތިރީގައިވާ މައުލޫމާތު ފުރިހަމަކުރައްވާށެވެ.</p>
+        <app-input type="text" id="forgot-username" label="ޔޫޒަރނޭމް" required placeholder="މިސާލަކަށް: villa_admin"></app-input>
+        <app-input type="email" id="forgot-email" label="ރަޖިސްޓްރީކުރި އީމެއިލް އެޑްރެސް" required placeholder="މިސާލަކަށް: email@example.com"></app-input>
+        <app-input type="password" id="forgot-new-password" label="އާ ޕާސްވޯޑް" required placeholder="މިސާލަކަށް: 123456"></app-input>
+
+        <div class="btn-row" style="margin-block-start: 16px;">
+          <button type="button" class="btn btn-secondary" onclick="window.app.closeModal('forgot-password')" data-i18n="cancel">ކެންސަލް</button>
+          <button type="submit" class="btn btn-primary">ޕާސްވޯޑް ބަދަލުކުރަން</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- G. PLATFORM ADMIN CREATE FARM MODAL -->
   <div class="modal-overlay" id="modal-create-farm">
     <div class="modal-content">
@@ -1257,6 +1281,6 @@
     </div>
   </div>
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=1.5.2"></script>
+  <script type="module" src="app.js?v=1.5.3"></script>
 </body>
 </html>
