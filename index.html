@@ -731,12 +731,12 @@
       <div id="t-tab-content-products" class="t-tab-content hidden">
         <!-- Add New Product (Admin Only) -->
         <div class="card high-contrast-card admin-only" id="t-product-form-container" style="margin-block-end: 20px;">
-          <h3 class="section-title" style="margin-block-end: 15px;">އާ ބޭސް/ކާނާ އިތުރުކުރަން (Product Master List)</h3>
+          <h3 class="section-title" style="margin-block-end: 15px;">އާ ބޭސް/ކާނާ އިތުރުކުރަން</h3>
           <form id="treatment-product-form" onsubmit="window.app.saveTreatmentProduct(event)">
             <input type="hidden" id="t-prod-id">
             
             <div class="form-row-2col">
-              <app-input type="text" id="t-prod-name" label="ނަން (Product Name)" required></app-input>
+              <app-input type="text" id="t-prod-name" label="ނަން" required></app-input>
               <app-input type="text" id="t-prod-brand" label="ބްރޭންޑް"></app-input>
             </div>
 
@@ -744,29 +744,29 @@
               <div class="form-group">
                 <label for="t-prod-cat">ކެޓަގަރީ</label>
                 <select id="t-prod-cat" class="form-input" required>
-                  <option value="Fertilizer">ގަސްކާނާ (Fertilizer)</option>
-                  <option value="Insecticide">ސޫފި މަރާ ބޭސް (Insecticide)</option>
-                  <option value="Fungicide">ފަންގަސް މަރާ ބޭސް (Fungicide)</option>
-                  <option value="Pesticide">ބޭސް (Pesticide)</option>
-                  <option value="Herbicide">ވިނަ މަރާ ބޭސް (Herbicide)</option>
-                  <option value="Foliar Nutrient">ފަތަށް އަޅާ ކާނާ (Foliar Nutrient)</option>
+                  <option value="Fertilizer">ގަސްކާނާ</option>
+                  <option value="Insecticide">ސޫފި މަރާ ބޭސް</option>
+                  <option value="Fungicide">ފަންގަސް މަރާ ބޭސް</option>
+                  <option value="Pesticide">ބޭސް</option>
+                  <option value="Herbicide">ވިނަ މަރާ ބޭސް</option>
+                  <option value="Foliar Nutrient">ފަތަށް އަޅާ ކާނާ</option>
                   <option value="Growth Regulator">ގަސް ހެއްދުމަށް ބޭނުންކުރާ އެއްޗެހި</option>
-                  <option value="Soil Amendment">ވެލި ރަނގަޅުކުރާ އެއްޗެހި (Soil Amendment)</option>
+                  <option value="Soil Amendment">ވެލި ރަނގަޅުކުރާ އެއްޗެހި</option>
                   <option value="Biological Control">ބަޔޮލޮޖިކަލް ކޮންޓްރޯލް</option>
                   <option value="Other">އެހެނިހެން</option>
                 </select>
               </div>
-              <app-input type="text" id="t-prod-unit" label="ޑިފޯލްޓް ޔުނިޓް" placeholder="މިސާލު: kg, L, g" required></app-input>
+              <app-input type="text" id="t-prod-unit" label="ޑިފޯލްޓް ޔުނިޓް" placeholder="މިސާލު: ކިލޯ، ލީޓަރު، ގްރާމް" required></app-input>
             </div>
 
             <div class="form-row-2col">
-              <app-input type="text" id="t-prod-dosage" label="ޑިފޯލްޓް ޑޯސޭޖް (Dosage)" placeholder="މިސާލު: 2g/L"></app-input>
-              <app-input type="text" id="t-prod-phi" label="ކަނޑާ މުއްދަތު (PHI)" placeholder="މިސާލު: 7 Days"></app-input>
+              <app-input type="text" id="t-prod-dosage" label="ޑިފޯލްޓް ޑޯސޭޖް" placeholder="މިސާލު: 2ގ/ލީ"></app-input>
+              <app-input type="text" id="t-prod-phi" label="ކަނޑާ މުއްދަތު" placeholder="މިސާލު: 7 ދުވަސް"></app-input>
             </div>
 
             <div class="form-row-2col">
               <div class="form-group">
-                <label for="t-prod-status">ހާލަތު (Status)</label>
+                <label for="t-prod-status">ހާލަތު</label>
                 <select id="t-prod-status" class="form-input" required>
                   <option value="active">އެކްޓިވް</option>
                   <option value="inactive">އިންއެކްޓިވް</option>
@@ -1264,6 +1264,6 @@
     </div>
   </div>
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=1.3.4"></script>
+  <script type="module" src="app.js?v=1.3.5"></script>
 </body>
 </html>
