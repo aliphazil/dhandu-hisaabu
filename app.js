@@ -2343,8 +2343,7 @@ class App {
     const ratio = document.getElementById('t-app-ratio').value;
     const water = document.getElementById('t-app-water').value;
     const method = document.getElementById('t-app-method').value;
-    const nextDate = document.getElementById('t-app-next-date').value;
-    const cost = Number(document.getElementById('t-app-cost').value) || 0;
+    const nextDays = Number(document.getElementById('t-app-next-days').value) || 0;
     const remarks = document.getElementById('t-app-remarks').value;
     const photoFile = document.getElementById('t-app-photo-file').files[0];
 
@@ -2357,10 +2356,17 @@ class App {
     const crop = (localDB.crops || []).find(c => c.id === cropId);
     const product = (localDB.treatment_products || []).find(p => p.id === productId);
 
+    let nextScheduledDate = null;
+    if (nextDays > 0 && date) {
+      const d = new Date(date);
+      d.setDate(d.getDate() + nextDays);
+      nextScheduledDate = d.toISOString().split('T')[0];
+    }
+
     if (this.editingApplicationId) {
       const updatedFields = {
         date, cropId, plot, growthStage, productId, quantityUsed: qty, unit, mixRatio: ratio, waterVolume: water,
-        applicationMethod: method, nextScheduledDate: nextDate || null, cost, remarks, photo: photoBase64 || undefined,
+        applicationMethod: method, nextScheduledDate, remarks, photo: photoBase64 || undefined,
         updatedDate: new Date().toISOString()
       };
       if (!photoBase64) delete updatedFields.photo;
@@ -2396,8 +2402,7 @@ class App {
       waterVolume: water,
       applicationMethod: method,
       appliedBy: user.username,
-      cost,
-      nextScheduledDate: nextDate || null,
+      nextScheduledDate,
       remarks,
       photo: photoBase64,
       status: user.role === 'farm_admin' ? 'approved' : 'pending_approval',
@@ -2542,8 +2547,12 @@ class App {
     document.getElementById('t-app-ratio').value = app.mixRatio || '';
     document.getElementById('t-app-water').value = app.waterVolume || '';
     document.getElementById('t-app-method').value = app.applicationMethod;
-    document.getElementById('t-app-next-date').value = app.nextScheduledDate || '';
-    document.getElementById('t-app-cost').value = app.cost || '';
+    let intervalDays = '';
+    if (app.nextScheduledDate && app.date) {
+      const diffTime = Math.abs(new Date(app.nextScheduledDate) - new Date(app.date));
+      intervalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+    document.getElementById('t-app-next-days').value = intervalDays;
     document.getElementById('t-app-remarks').value = app.remarks || '';
   }
 
