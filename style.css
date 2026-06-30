@@ -48,6 +48,15 @@
   font-display: swap;
 }
 
+/* Custom MV Faseyha Rufiyaa Symbol wrapper */
+.mvr-symbol {
+  font-family: 'MV Faseyha', sans-serif !important;
+  direction: ltr !important;
+  display: inline-block;
+  font-size: 1.15rem;
+  font-weight: normal !important;
+}
+
 :root {
   /* Color Palette - Vibrant Agricultural Theme */
   --primary: hsl(150, 75%, 28%);        /* Emerald Green */

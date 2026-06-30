@@ -32,6 +32,8 @@ function format2DP(val) {
   return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+const CURRENCY_HTML = ' <span class="mvr-symbol">$</span>';
+
 // Helper to choose the best emoji for a crop based on name keywords (supporting English and Dhivehi)
 function getCropEmoji(cropName) {
   const name = (cropName || '').toLowerCase();
@@ -713,11 +715,11 @@ class App {
     const activeCropsCount = crops.filter(c => c.status === 'growing').length;
     
     // Set UI values
-    document.getElementById('dash-today-income').textContent = `${format2DP(todayIncome)} ރ`;
-    document.getElementById('dash-today-expense').textContent = `${format2DP(todayExpense)} ރ`;
+    document.getElementById('dash-today-income').innerHTML = `${format2DP(todayIncome)}${CURRENCY_HTML}`;
+    document.getElementById('dash-today-expense').innerHTML = `${format2DP(todayExpense)}${CURRENCY_HTML}`;
     
     const profitEl = document.getElementById('dash-net-profit');
-    profitEl.textContent = `${format2DP(netProfit)} ރ`;
+    profitEl.innerHTML = `${format2DP(netProfit)}${CURRENCY_HTML}`;
     if (netProfit >= 0) {
       profitEl.className = "stats-value profit-positive";
     } else {
@@ -850,7 +852,7 @@ class App {
               <span class="activity-title">💰 އާމްދަނީ: ${t(act.crop)} (${act.quantity} ${act.unit})</span>
               <span class="activity-meta">${act.buyer} • ޕޭމަންޓް: <span class="badge ${act.paymentStatus === 'paid' ? 'badge-paid' : 'badge-pending'}">${act.paymentStatus === 'paid' ? 'ދައްކާފައި' : 'ނުދައްކާ'}</span></span>
             </div>
-            <div class="activity-amount text-success">+${format2DP(act.amount)} ރ</div>
+            <div class="activity-amount text-success">+${format2DP(act.amount)}${CURRENCY_HTML}</div>
           `;
         } else {
           item.innerHTML = `
@@ -858,7 +860,7 @@ class App {
               <span class="activity-title">🌿 ކާދު އެޅުން: ${act.fertilizerName}</span>
               <span class="activity-meta">ގަސް: ${t(act.crop)} • މިންވަރު: ${format2DP(act.quantity)} ${act.unit} (${t(act.applicationMethod)})</span>
             </div>
-            <div class="activity-amount text-danger" style="font-size: 0.85rem;">${act.cost > 0 ? `-${format2DP(act.cost)} ރ` : ''}</div>
+            <div class="activity-amount text-danger" style="font-size: 0.85rem;">${act.cost > 0 ? `-${format2DP(act.cost)}${CURRENCY_HTML}` : ''}</div>
           `;
         }
         staffActivityList.appendChild(item);
@@ -1062,7 +1064,7 @@ class App {
         <td style="font-weight: 700;">${t(h.crop)}</td>
         <td class="date-num">${format2DP(h.quantity)} ${h.unit}</td>
         <td><span class="badge badge-growing">${t(h.grade)}</span></td>
-        <td class="date-num" style="font-weight: 700;">${h.sellingPrice ? format2DP(h.sellingPrice) : '-'} ރ</td>
+        <td class="date-num" style="font-weight: 700;">${h.sellingPrice ? format2DP(h.sellingPrice) + CURRENCY_HTML : '-'}</td>
         <td>
           <button class="btn btn-secondary" style="padding: 4px 8px; min-height:30px; font-size:0.75rem;" onclick="window.app.deleteRecord('harvest_records', '${h.id}')" data-i18n="delete">ޑިލީޓް</button>
         </td>
@@ -1259,8 +1261,7 @@ class App {
         </tr>
         <tr style="border-block-start: 2px solid var(--border-color);">
           <td style="font-weight: 700; font-size: 1.1rem;">ސާފު ފައިދާ</td>
-          <td class="date-num ${net >= 0 ? 'text-success' : 'text-danger'}" style="text-align: end; font-weight: 700; font-size: 1.1rem;">
-            ${net >= 0 ? '+' : ''}${format2DP(net)} ރ
+            ${net >= 0 ? '+' : ''}${format2DP(net)}${CURRENCY_HTML}
           </td>
         </tr>
       `;
@@ -1390,7 +1391,7 @@ class App {
       trTotal.style.borderBlockStart = "2px solid var(--border-color)";
       trTotal.innerHTML = `
         <td colspan="4" style="font-weight:700;">ޖުމްލަ ޚަރަދު</td>
-        <td class="date-num" style="text-align: end; font-weight:700;">${format2DP(grandTotal)} ރ</td>
+        <td class="date-num" style="text-align: end; font-weight:700;">${format2DP(grandTotal)}${CURRENCY_HTML}</td>
       `;
       tableBody.appendChild(trTotal);
       
@@ -1432,7 +1433,7 @@ class App {
       trTotal.innerHTML = `
         <td colspan="3" style="font-weight:700;">ޖުމްލަ</td>
         <td class="date-num" style="text-align: end; font-weight:700;">${format2DP(grandTotalHarvest)} ކިލޯ</td>
-        <td class="date-num text-success" style="text-align: end; font-weight:700;">${format2DP(grandTotalIncome)} ރ</td>
+        <td class="date-num text-success" style="text-align: end; font-weight:700;">${format2DP(grandTotalIncome)}${CURRENCY_HTML}</td>
       `;
       tableBody.appendChild(trTotal);
       
