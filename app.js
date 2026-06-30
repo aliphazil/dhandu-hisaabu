@@ -2025,6 +2025,7 @@ class App {
     const island = document.getElementById('farm-island-input').value;
     const size = document.getElementById('farm-size-input').value;
     const contact = document.getElementById('farm-contact-input').value;
+    const email = document.getElementById('farm-email-input').value;
     const adminUsername = document.getElementById('farm-admin-username').value;
     const adminPassword = document.getElementById('farm-admin-password').value;
     
@@ -2038,6 +2039,7 @@ class App {
           island,
           size,
           contact,
+          email,
           adminUsername,
           adminPassword
         });
@@ -2052,6 +2054,7 @@ class App {
           island,
           size,
           contact,
+          email,
           adminUsername,
           adminPassword
         });

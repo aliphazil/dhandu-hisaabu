@@ -672,6 +672,7 @@ export function createFarm(farmData) {
     password: farmData.adminPassword,
     role: "farm_admin",
     name: farmData.owner + " (Admin)",
+    email: farmData.email || "",
     farmId: newFarmId,
     status: "active"
   };
@@ -709,6 +710,7 @@ export function registerFarmSelf(farmData) {
     island: farmData.island,
     size: farmData.size,
     contact: farmData.contact,
+    email: farmData.email || "",
     gpsLocation: farmData.gpsLocation || ""
   };
   
@@ -718,6 +720,7 @@ export function registerFarmSelf(farmData) {
     password: farmData.adminPassword,
     role: "farm_admin",
     name: farmData.owner + " (Admin)",
+    email: farmData.email || "",
     farmId: newFarmId,
     status: "active"
   };
