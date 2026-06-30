@@ -2206,13 +2206,6 @@ class App {
     const todayApps = apps.filter(a => a.date === todayStr);
     document.getElementById('t-dash-today-count').textContent = todayApps.length;
 
-    // 2. Cost This Month
-    const currentMonth = new Date().toISOString().substring(0, 7); // YYYY-MM
-    const monthlyCost = apps
-      .filter(a => a.date && a.date.startsWith(currentMonth))
-      .reduce((sum, a) => sum + (Number(a.cost) || 0), 0);
-    document.getElementById('t-dash-month-cost').innerHTML = `${format2DP(monthlyCost)}${CURRENCY_HTML}`;
-
     // 3. Overdue & Upcoming List logic
     let overdueCount = 0;
     const overdueItems = [];
@@ -2811,7 +2804,6 @@ class App {
           <th>މިންވަރު</th>
           <th>މެތަޑް</th>
           <th>ޖެހި މީހާ</th>
-          <th style="text-align: end;">ޚަރަދު</th>
         </tr>
       `;
 
@@ -2823,9 +2815,8 @@ class App {
           <td>${item.quantityUsed} ${item.unit}</td>
           <td>${t(item.applicationMethod)}</td>
           <td>${item.appliedBy}</td>
-          <td style="text-align: end; font-weight: bold;">${format2DP(item.cost)} ${CURRENCY_HTML}</td>
         </tr>
-      `).join('') : `<tr><td colspan="7" class="text-center text-muted">އެއްވެސް ރެކޯޑެއް ފެންނާކަށް ނެތް.</td></tr>`;
+      `).join('') : `<tr><td colspan="6" class="text-center text-muted">އެއްވެސް ރެކޯޑެއް ފެންނާކަށް ނެތް.</td></tr>`;
 
     } else if (reportType === 'summary') {
       resultTitle.textContent = "މަހުގެ ފަރުވާގެ ޚުލާސާ";
@@ -2848,32 +2839,7 @@ class App {
         </tr>
       `).join('') : `<tr><td colspan="2" class="text-center text-muted">އެއްވެސް ރެކޯޑެއް ފެންނާކަށް ނެތް.</td></tr>`;
 
-    } else if (reportType === 'cost') {
-      resultTitle.textContent = "ބޭސް އަދި ކާނާގެ ޚަރަދު ތަޙުލީލު";
-      const prodCost = {};
-      apps.forEach(a => {
-        if (!prodCost[a.productName]) {
-          prodCost[a.productName] = { qty: 0, unit: a.unit, cost: 0 };
-        }
-        prodCost[a.productName].qty += a.quantityUsed;
-        prodCost[a.productName].cost += Number(a.cost) || 0;
-      });
 
-      headersHTML = `
-        <tr>
-          <th>ބޭނުންކުރި އެއްޗެއް</th>
-          <th style="text-align: end;">ބޭނުންކުރި ޖުމްލަ މިންވަރު</th>
-          <th style="text-align: end;">ޖުމްލަ ޚަރަދު</th>
-        </tr>
-      `;
-
-      bodyHTML = Object.keys(prodCost).length ? Object.keys(prodCost).map(name => `
-        <tr>
-          <td><strong>${name}</strong></td>
-          <td style="text-align: end; font-weight: bold;">${prodCost[name].qty} ${prodCost[name].unit}</td>
-          <td style="text-align: end; font-weight: bold;">${format2DP(prodCost[name].cost)} ${CURRENCY_HTML}</td>
-        </tr>
-      `).join('') : `<tr><td colspan="3" class="text-center text-muted">އެއްވެސް ރެކޯޑެއް ފެންނާކަށް ނެތް.</td></tr>`;
 
     } else if (reportType === 'crop-history') {
       resultTitle.textContent = "ގަސްތަކުގެ ފަރުވާގެ ތާރީޚް";

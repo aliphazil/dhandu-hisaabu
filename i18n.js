@@ -176,18 +176,18 @@ export const translations = {
     "Biological Control": "ބަޔޮލޮޖިކަލް ކޮންޓްރޯލް",
     
     // Growth Stages
-    Seedling: "ކުދި ގަސް (Seedling)",
-    Vegetative: "ގަސް ހެދޭ މަރުހަލާ (Vegetative)",
-    Flowering: "މާ އަޅާ މަރުހަލާ (Flowering)",
-    Fruiting: "މޭވާ އަޅާ މަރުހަލާ (Fruiting)",
-    Harvest: "ކަނޑާ މަރުހަލާ (Harvest)",
+    Seedling: "ކުދި ގަސް",
+    Vegetative: "ގަސް ހެދޭ މަރުހަލާ",
+    Flowering: "މާ އަޅާ މަރުހަލާ",
+    Fruiting: "މޭވާ އަޅާ މަރުހަލާ",
+    Harvest: "ކަނޑާ މަރުހަލާ",
     
     // Methods
-    "Foliar Spray": "ފަތަށް ޖެހުން (Foliar Spray)",
-    "Soil Drench": "މުލަށް އެޅުން (Soil Drench)",
+    "Foliar Spray": "ފަތަށް ޖެހުން",
+    "Soil Drench": "މުލަށް އެޅުން",
     "Drip Irrigation": "ތިކި ޖައްސައިގެން ފެންދިނުން",
     "Side Dressing": "އަރިމަތީގައި އެޅުން",
-    Broadcasting: "ބުރުވުން (Broadcasting)",
+    Broadcasting: "ބުރުވުން",
     "Seed Treatment": "އޮށަށް ބޭސް ޖެހުން",
     Manual: "އަތުން އެޅުން"
   }

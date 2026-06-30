@@ -550,10 +550,6 @@
             <div class="stats-value" id="t-dash-today-count">0</div>
           </div>
           <div class="card">
-            <div class="card-title">މިމަހުގެ ޚަރަދު (ބޭސް/ކާނާ)</div>
-            <div class="stats-value" id="t-dash-month-cost">0</div>
-          </div>
-          <div class="card">
             <div class="card-title">އޯވަރޑިއު ޓްރީޓްމަންޓް</div>
             <div class="stats-value text-danger" id="t-dash-overdue-count">0</div>
           </div>
@@ -597,7 +593,7 @@
 
             <div class="form-row-2col">
               <app-input type="text" id="t-app-variety" label="ވައްތަރު" readonly></app-input>
-              <app-input type="text" id="t-app-plot" label="ދަނޑުގެ ސަރަހައްދު / ޕްލޮޓް" required></app-input>
+              <app-input type="text" id="t-app-plot" label="ދަނޑުގެ ސަރަހައްދު / ޕްލޮޓް"></app-input>
             </div>
 
             <div class="form-row-2col">
@@ -616,40 +612,37 @@
             <hr style="margin: 20px 0; border: none; border-block-start: 1px solid var(--border-color);">
 
             <div class="form-group">
-              <label for="t-app-product">ބޭސް / ކާނާގެ ބާވަތް (Product)</label>
+              <label for="t-app-product">ބޭސް / ކާނާގެ ބާވަތް</label>
               <select id="t-app-product" class="form-input" required onchange="window.app.onTreatmentProductChange()">
                 <!-- Populated dynamically -->
               </select>
             </div>
 
             <div class="form-row-2col">
-              <app-input type="number" id="t-app-qty" label="މިންވަރު (Quantity)" step="any" required></app-input>
+              <app-input type="number" id="t-app-qty" label="މިންވަރު" step="any" required></app-input>
               <app-input type="text" id="t-app-unit" label="ޔުނިޓް" required></app-input>
             </div>
 
             <div class="form-row-2col">
-              <app-input type="text" id="t-app-ratio" label="މިކްސް ރޭޝިއޯ (Mix Ratio)" placeholder="މިސާލު: 2g/L"></app-input>
-              <app-input type="text" id="t-app-water" label="ފެނުގެ މިންވަރު (Water Volume)" placeholder="މިސާލު: 20L"></app-input>
+              <app-input type="text" id="t-app-ratio" label="މިކްސް ރޭޝިއޯ" placeholder="މިސާލު: 2ގ/ލީ"></app-input>
+              <app-input type="text" id="t-app-water" label="ފެނުގެ މިންވަރު" placeholder="މިސާލު: 20ލީ"></app-input>
             </div>
 
             <div class="form-group">
-              <label for="t-app-method">ބޭނުންކުރި ގޮތް (Application Method)</label>
+              <label for="t-app-method">ބޭނުންކުރި ގޮތް</label>
               <select id="t-app-method" class="form-input" required>
-                <option value="Foliar Spray" data-i18n="Foliar Spray">ފަތަށް ޖެހުން (Foliar Spray)</option>
-                <option value="Soil Drench" data-i18n="Soil Drench">މުލަށް އެޅުން (Soil Drench)</option>
+                <option value="Foliar Spray" data-i18n="Foliar Spray">ފަތަށް ޖެހުން</option>
+                <option value="Soil Drench" data-i18n="Soil Drench">މުލަށް އެޅުން</option>
                 <option value="Drip Irrigation" data-i18n="Drip Irrigation">ތިކި ޖައްސައިގެން ފެންދިނުން</option>
                 <option value="Side Dressing" data-i18n="Side Dressing">އަރިމަތީގައި އެޅުން</option>
-                <option value="Broadcasting" data-i18n="Broadcasting">ބުރުވުން (Broadcasting)</option>
+                <option value="Broadcasting" data-i18n="Broadcasting">ބުރުވުން</option>
                 <option value="Seed Treatment" data-i18n="Seed Treatment">އޮށަށް ބޭސް ޖެހުން</option>
                 <option value="Manual" data-i18n="Manual">އަތުން އެޅުން</option>
                 <option value="Other" data-i18n="Other">އެހެނިހެން</option>
               </select>
             </div>
 
-            <div class="form-row-2col">
-              <app-input type="date" id="t-app-next-date" label="ދެން ޖަހަންޖެހޭ ތާރީޚް (Next Scheduled)"></app-input>
-              <app-input type="number" id="t-app-cost" label="ޚަރަދު (Cost MVR)" step="any"></app-input>
-            </div>
+            <app-input type="date" id="t-app-next-date" label="ދެން ޖަހަންޖެހޭ ތާރީޚް"></app-input>
 
             <div class="form-group">
               <label for="t-app-remarks">އިތުރު ނޯޓް</label>
@@ -838,11 +831,10 @@
             <div class="form-group">
               <label for="t-rep-type">ރިޕޯޓްގެ ބާވަތް</label>
               <select id="t-rep-type" class="form-input" required>
-                <option value="fertilizer">ގަސްކާނާ ބޭނުންކުރި މިންވަރު (Fertilizer Usage)</option>
-                <option value="pesticide">ބޭސް ބޭނުންކުރި މިންވަރު (Pesticide/Protection Usage)</option>
-                <option value="summary">މަހުގެ ފަރުވާގެ ޚުލާސާ (Monthly Treatment Summary)</option>
-                <option value="cost">ބޭސް އަދި ކާނާގެ ޚަރަދު (Product Cost Analysis)</option>
-                <option value="crop-history">ގަސްތަކުގެ ފަރުވާގެ ތާރީޚް (Treatment History by Crop)</option>
+                <option value="fertilizer">ގަސްކާނާ ބޭނުންކުރި މިންވަރު</option>
+                <option value="pesticide">ބޭސް ބޭނުންކުރި މިންވަރު</option>
+                <option value="summary">މަހުގެ ފަރުވާގެ ޚުލާސާ</option>
+                <option value="crop-history">ގަސްތަކުގެ ފަރުވާގެ ތާރީޚް</option>
               </select>
             </div>
 
@@ -1263,6 +1255,6 @@
     </div>
   </div>
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=1.3.6"></script>
+  <script type="module" src="app.js?v=1.3.7"></script>
 </body>
 </html>
