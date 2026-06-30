@@ -5,7 +5,7 @@ export const translations = {
     // Nav
     appName: "ދަނޑު ހިސާބު",
     dashboard: "ޑޭޝްބޯޑް",
-    crops: "ގަސްތައް / ކްރޮޕްސް",
+    crops: "ގަސްތައް",
     expenses: "ޚަރަދު",
     income: "އާމްދަނީ",
     fertilizer: "ގަސްކާނާ އެޅުން",

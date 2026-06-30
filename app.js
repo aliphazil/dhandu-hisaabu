@@ -677,7 +677,12 @@ class App {
           <span data-i18n="treatments">ބޭސް/ކާނާ</span>
         </button>
         <button class="nav-item" onclick="window.app.showView('crops')">
-          <svg viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707.707M12 5a7 7 0 100 14 7 7 0 000-14z"></path></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22V10" />
+            <path d="M12 14c4-1 6-4 6-8-4 0-7 2-8 6" />
+            <path d="M12 18c-4-1-6-4-6-8 4 0 7 2 8 6" />
+            <path d="M12 10V2" />
+          </svg>
           <span data-i18n="crops">ގަސްތައް</span>
         </button>
         <button class="nav-item" onclick="window.app.showView('reports')">
