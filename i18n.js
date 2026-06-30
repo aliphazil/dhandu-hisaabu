@@ -70,6 +70,7 @@ export const translations = {
     netProfit: "ސާފު ފައިދާ",
     activeCropsCount: "ހުރި ގަސްތައް",
     recentActivity: "ފަހުގެ ހަރަކާތްތައް",
+    recentTransactions: "ފަހުގެ މުއާމަލާތްތައް",
     upcomingHarvests: "ކަނޑަންވެފަ ހުރި ބާވަތްތައް",
     lowStockAlert: "އިންވެންޓްރީ މަދުވުން!",
     

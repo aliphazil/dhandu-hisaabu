@@ -765,34 +765,31 @@ class App {
       });
     }
     
-    // Recent activity list
+    // Recent transactions list
     const recentActivityList = document.getElementById('dash-activities-list');
     recentActivityList.innerHTML = '';
     
-    const logs = queryTable('audit_logs').sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5);
+    const txs = (queryTable('transactions') || []).sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
     
-    if (logs.length === 0) {
-      recentActivityList.innerHTML = `<div class="text-muted" style="text-align: center; padding: 12px 0;">އެއްވެސް ހަރަކާތެއް ރެކޯޑް ކުރެވިފައެއް ނެތް.</div>`;
+    if (txs.length === 0) {
+      recentActivityList.innerHTML = `<div class="text-muted" style="text-align: center; padding: 12px 0;">އެއްވެސް މުއާމަލާތެއް ރެކޯޑް ކުރެވިފައެއް ނެތް.</div>`;
     } else {
-      logs.forEach(log => {
+      txs.forEach(tx => {
         const item = document.createElement('div');
         item.className = 'activity-item';
         
-        let emoji = '⚙️';
-        if (log.eventType === 'LOGIN') emoji = '👤';
-        else if (log.eventType.includes('INCOME')) emoji = '💰';
-        else if (log.eventType.includes('EXPENSE')) emoji = '💸';
-        else if (log.eventType.includes('FERTILIZER')) emoji = '🌿';
-        else if (log.eventType.includes('CROP')) emoji = '🌱';
-        else if (log.eventType.includes('HARVEST')) emoji = '🍎';
-        
-        const localTime = new Date(log.timestamp).toLocaleString();
+        const emoji = tx.type === 'income' ? '💰' : '💸';
+        const titleText = tx.type === 'income' ? `${t(tx.crop)} (އާމްދަނީ)` : `${t(tx.category) || tx.category} (ޚަރަދު)`;
+        const partner = tx.type === 'income' ? tx.buyer : tx.supplier;
         
         item.innerHTML = `
           <div style="font-size: 1.5rem; padding-inline-end: 8px;">${emoji}</div>
           <div class="activity-details">
-            <span class="activity-title">${log.message}</span>
-            <span class="activity-meta">${log.username} • <span class="date-num">${localTime}</span></span>
+            <span class="activity-title" style="font-weight: 700;">${titleText}</span>
+            <span class="activity-meta">ތާރީޚް: <span class="date-num">${tx.date}</span> ${partner ? `• ${partner}` : ''}</span>
+          </div>
+          <div class="activity-amount ${tx.type === 'income' ? 'text-success' : 'text-danger'}" style="font-weight: 700; text-align: end; white-space: nowrap;">
+            ${tx.type === 'income' ? '+' : '-'}${format2DP(tx.amount)}${CURRENCY_HTML}
           </div>
         `;
         recentActivityList.appendChild(item);
