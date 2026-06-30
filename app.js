@@ -818,6 +818,41 @@ class App {
         recentActivityList.appendChild(item);
       });
     }
+
+    // Upcoming Treatments (Next 7 Days)
+    const upcomingTreatmentsList = document.getElementById('dash-treatments-list');
+    if (upcomingTreatmentsList) {
+      upcomingTreatmentsList.innerHTML = '';
+      const treatmentApps = queryTable('treatment_applications') || [];
+      const next7DaysStr = new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0];
+      const upcomingApps = treatmentApps.filter(app => 
+        app.nextScheduledDate && 
+        app.nextScheduledDate >= todayStr && 
+        app.nextScheduledDate <= next7DaysStr
+      ).sort((a,b) => new Date(a.nextScheduledDate) - new Date(b.nextScheduledDate));
+
+      if (upcomingApps.length === 0) {
+        upcomingTreatmentsList.innerHTML = `<div class="text-muted" style="text-align: center; padding: 12px 0;">ކުރިއަށް އޮތް 7 ދުވަހު ތާވަލުކުރެވިފައިވާ ފަރުވާއެއް ނެތް.</div>`;
+      } else {
+        upcomingApps.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'activity-item';
+          div.style.borderInlineStart = '4px solid var(--primary)';
+          div.style.padding = '8px 12px';
+          div.style.marginBlockEnd = '8px';
+          div.style.background = 'white';
+          div.style.borderRadius = '6px';
+          div.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)';
+          div.innerHTML = `
+            <div style="font-weight: bold; color: var(--primary); font-size: 0.85rem;">ތާވަލު ތާރީޚް: ${item.nextScheduledDate}</div>
+            <div style="font-size: 0.95rem; margin-block-start: 4px;">
+              <strong>${t(item.category)}: ${item.productName}</strong> (ބެޗް: ${item.crop} - ${item.plot || '-'})
+            </div>
+          `;
+          upcomingTreatmentsList.appendChild(div);
+        });
+      }
+    }
     
     // Inventory low stock alert trigger
     const inventory = queryTable('inventory');
