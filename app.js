@@ -2286,8 +2286,6 @@ class App {
     if (!user) return;
 
     document.getElementById('t-app-date').value = new Date().toISOString().split('T')[0];
-    const now = new Date();
-    document.getElementById('t-app-time').value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
     const localDB = JSON.parse(localStorage.getItem('dhandu_hisaabu_local_db') || '{}');
     const crops = (localDB.crops || []).filter(c => c.farmId === user.farmId && c.status === 'growing');
@@ -2343,7 +2341,6 @@ class App {
     if (!user) return;
 
     const date = document.getElementById('t-app-date').value;
-    const time = document.getElementById('t-app-time').value;
     const cropId = document.getElementById('t-app-crop').value;
     const plot = document.getElementById('t-app-plot').value;
     const growthStage = document.getElementById('t-app-stage').value;
@@ -2369,7 +2366,7 @@ class App {
 
     if (this.editingApplicationId) {
       const updatedFields = {
-        date, time, cropId, plot, growthStage, productId, quantityUsed: qty, unit, mixRatio: ratio, waterVolume: water,
+        date, cropId, plot, growthStage, productId, quantityUsed: qty, unit, mixRatio: ratio, waterVolume: water,
         applicationMethod: method, nextScheduledDate: nextDate || null, cost, remarks, photo: photoBase64 || undefined,
         updatedDate: new Date().toISOString()
       };
@@ -2394,7 +2391,6 @@ class App {
       productId,
       userId: user.username,
       date,
-      time,
       crop: crop ? crop.name : '',
       variety: crop ? crop.variety : '',
       plot,
@@ -2544,7 +2540,6 @@ class App {
     this.switchTreatmentTab('new-app');
 
     document.getElementById('t-app-date').value = app.date;
-    document.getElementById('t-app-time').value = app.time || '';
     document.getElementById('t-app-crop').value = app.cropId;
     document.getElementById('t-app-plot').value = app.plot;
     document.getElementById('t-app-stage').value = app.growthStage;

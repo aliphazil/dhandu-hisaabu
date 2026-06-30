@@ -587,21 +587,20 @@
           <form id="treatment-app-form" onsubmit="window.app.saveTreatmentApplication(event)">
             <div class="form-row-2col">
               <app-input type="date" id="t-app-date" label="ތާރީޚް" required></app-input>
-              <app-input type="time" id="t-app-time" label="ގަޑި" required></app-input>
-            </div>
-
-            <div class="form-row-2col">
               <div class="form-group">
                 <label for="t-app-crop">ބެޗް / ގަސް</label>
                 <select id="t-app-crop" class="form-input" required onchange="window.app.onTreatmentCropChange()">
                   <!-- Populated dynamically -->
                 </select>
               </div>
-              <app-input type="text" id="t-app-variety" label="ވައްތަރު" readonly></app-input>
             </div>
 
             <div class="form-row-2col">
+              <app-input type="text" id="t-app-variety" label="ވައްތަރު" readonly></app-input>
               <app-input type="text" id="t-app-plot" label="ދަނޑުގެ ސަރަހައްދު / ޕްލޮޓް" required></app-input>
+            </div>
+
+            <div class="form-row-2col">
               <div class="form-group">
                 <label for="t-app-stage" data-i18n="growthStage">ހެދިފައިވާ މަރުހަލާ</label>
                 <select id="t-app-stage" class="form-input" required>
@@ -1264,6 +1263,6 @@
     </div>
   </div>
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=1.3.5"></script>
+  <script type="module" src="app.js?v=1.3.6"></script>
 </body>
 </html>
