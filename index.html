@@ -523,7 +523,388 @@
       </div>
     </section>
 
-    <!-- 13. FARM PROFILE -->
+    <!-- 13. CROP TREATMENTS MODULE -->
+    <section id="view-treatments" class="hidden">
+      <div style="margin-block-end: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h2 style="font-weight: 700; color: var(--primary-dark);" data-i18n="treatments">ބޭސް އަދި ކާނާ</h2>
+          <p class="text-muted">ގަސްތަކަށް ޖަހާ ބޭހާއި ކާނާގެ ރެކޯޑްތައް ބެލެހެއްޓުން</p>
+        </div>
+      </div>
+
+      <!-- Scrollable Sub-tabs Navigation -->
+      <div class="treatment-tabs">
+        <button class="t-tab-btn active" onclick="window.app.switchTreatmentTab('dashboard')" data-i18n="dashboard">ޑޭޝްބޯޑް</button>
+        <button class="t-tab-btn" onclick="window.app.switchTreatmentTab('new-app')" data-i18n="newTreatment">ބޭސް/ކާނާ ޖެހުން</button>
+        <button class="t-tab-btn" onclick="window.app.switchTreatmentTab('records')" data-i18n="treatmentRecords">ޖެހި ރެކޯޑްތައް</button>
+        <button class="t-tab-btn" id="t-tab-btn-products" onclick="window.app.switchTreatmentTab('products')" data-i18n="treatmentProducts">ބޭސް/ކާނާ ލިސްޓް</button>
+        <button class="t-tab-btn" onclick="window.app.switchTreatmentTab('calendar')" data-i18n="treatmentCalendar">ކަލަންޑަރު</button>
+        <button class="t-tab-btn" id="t-tab-btn-reports" onclick="window.app.switchTreatmentTab('reports')" data-i18n="reports">ރިޕޯޓްތައް</button>
+      </div>
+
+      <!-- Tab Content: Dashboard -->
+      <div id="t-tab-content-dashboard" class="t-tab-content">
+        <div class="dashboard-grid" style="margin-block-end: 20px;">
+          <div class="card">
+            <div class="card-title">މިއަދު ކުރި ޓްރީޓްމަންޓް</div>
+            <div class="stats-value" id="t-dash-today-count">0</div>
+          </div>
+          <div class="card">
+            <div class="card-title">މިމަހުގެ ޚަރަދު (ބޭސް/ކާނާ)</div>
+            <div class="stats-value" id="t-dash-month-cost">0</div>
+          </div>
+          <div class="card">
+            <div class="card-title">އޯވަރޑިއު ޓްރީޓްމަންޓް</div>
+            <div class="stats-value text-danger" id="t-dash-overdue-count">0</div>
+          </div>
+          <div class="card">
+            <div class="card-title">އެންމެ ގިނައިން ބޭނުންކުރި ބާވަތް</div>
+            <div class="stats-value" id="t-dash-most-used" style="font-size: 1.25rem; font-weight:700; height: 38px; display:flex; align-items:center;">-</div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr; gap: 20px; margin-block-end: 20px;">
+          <!-- Overdue Treatments Banner List -->
+          <div class="card alert-card hidden" id="t-dash-overdue-banner" style="background-color: var(--danger-bg); border: 1px solid var(--danger);">
+            <h3 class="section-title text-danger" style="margin-block-end: 10px;">⚠️ ސަމާލުކަމަށް: އޯވަރޑިއު ވެފައިވާ ޓްރީޓްމަންޓްތައް!</h3>
+            <div id="t-dash-overdue-list" class="activity-list"></div>
+          </div>
+
+          <!-- Upcoming Treatments List -->
+          <div class="card">
+            <h3 class="section-title" style="margin-block-end: 15px;">ކުރިއަށް ހުރި ޓްރީޓްމަންޓްތައް (ކުރިއަށް އޮތް 7 ދުވަސް)</h3>
+            <div id="t-dash-upcoming-list" class="activity-list">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content: New Application Form -->
+      <div id="t-tab-content-new-app" class="t-tab-content hidden">
+        <div class="card high-contrast-card">
+          <h3 class="section-title" style="margin-block-end: 20px;" data-i18n="newTreatment">ބޭސް/ކާނާ ޖެހުން</h3>
+          <form id="treatment-app-form" onsubmit="window.app.saveTreatmentApplication(event)">
+            <div class="form-row-2col">
+              <app-input type="date" id="t-app-date" label="ތާރީޚް" required></app-input>
+              <app-input type="time" id="t-app-time" label="ގަޑި" required></app-input>
+            </div>
+
+            <div class="form-row-2col">
+              <div class="form-group">
+                <label for="t-app-crop">ބެޗް / ގަސް</label>
+                <select id="t-app-crop" class="form-input" required onchange="window.app.onTreatmentCropChange()">
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+              <app-input type="text" id="t-app-variety" label="ވައްތަރު" readonly></app-input>
+            </div>
+
+            <div class="form-row-2col">
+              <app-input type="text" id="t-app-plot" label="ދަނޑުގެ ސަރަހައްދު / ޕްލޮޓް" required></app-input>
+              <div class="form-group">
+                <label for="t-app-stage" data-i18n="growthStage">ހެދިފައިވާ މަރުހަލާ</label>
+                <select id="t-app-stage" class="form-input" required>
+                  <option value="Seedling" data-i18n="Seedling">ކުދި ގަސް</option>
+                  <option value="Vegetative" data-i18n="Vegetative">ގަސް ހެދޭ މަރުހަލާ</option>
+                  <option value="Flowering" data-i18n="Flowering">މާ އަޅާ މަރުހަލާ</option>
+                  <option value="Fruiting" data-i18n="Fruiting">މޭވާ އަޅާ މަރުހަލާ</option>
+                  <option value="Harvest" data-i18n="Harvest">ކަނޑާ މަރުހަލާ</option>
+                </select>
+              </div>
+            </div>
+
+            <hr style="margin: 20px 0; border: none; border-block-start: 1px solid var(--border-color);">
+
+            <div class="form-group">
+              <label for="t-app-product">ބޭސް / ކާނާގެ ބާވަތް (Product)</label>
+              <select id="t-app-product" class="form-input" required onchange="window.app.onTreatmentProductChange()">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <div class="form-row-2col">
+              <app-input type="number" id="t-app-qty" label="މިންވަރު (Quantity)" step="any" required></app-input>
+              <app-input type="text" id="t-app-unit" label="ޔުނިޓް" required></app-input>
+            </div>
+
+            <div class="form-row-2col">
+              <app-input type="text" id="t-app-ratio" label="މިކްސް ރޭޝިއޯ (Mix Ratio)" placeholder="މިސާލު: 2g/L"></app-input>
+              <app-input type="text" id="t-app-water" label="ފެނުގެ މިންވަރު (Water Volume)" placeholder="މިސާލު: 20L"></app-input>
+            </div>
+
+            <div class="form-group">
+              <label for="t-app-method">ބޭނުންކުރި ގޮތް (Application Method)</label>
+              <select id="t-app-method" class="form-input" required>
+                <option value="Foliar Spray" data-i18n="Foliar Spray">ފަތަށް ޖެހުން (Foliar Spray)</option>
+                <option value="Soil Drench" data-i18n="Soil Drench">މުލަށް އެޅުން (Soil Drench)</option>
+                <option value="Drip Irrigation" data-i18n="Drip Irrigation">ތިކި ޖައްސައިގެން ފެންދިނުން</option>
+                <option value="Side Dressing" data-i18n="Side Dressing">އަރިމަތީގައި އެޅުން</option>
+                <option value="Broadcasting" data-i18n="Broadcasting">ބުރުވުން (Broadcasting)</option>
+                <option value="Seed Treatment" data-i18n="Seed Treatment">އޮށަށް ބޭސް ޖެހުން</option>
+                <option value="Manual" data-i18n="Manual">އަތުން އެޅުން</option>
+                <option value="Other" data-i18n="Other">އެހެނިހެން</option>
+              </select>
+            </div>
+
+            <div class="form-row-2col">
+              <app-input type="date" id="t-app-next-date" label="ދެން ޖަހަންޖެހޭ ތާރީޚް (Next Scheduled)"></app-input>
+              <app-input type="number" id="t-app-cost" label="ޚަރަދު (Cost MVR)" step="any"></app-input>
+            </div>
+
+            <div class="form-group">
+              <label for="t-app-remarks">އިތުރު ނޯޓް</label>
+              <textarea id="t-app-remarks" class="form-input" rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="t-app-photo-file">ފޮޓޯ އަޕްލޯޑް</label>
+              <input type="file" id="t-app-photo-file" class="form-input" accept="image/*">
+            </div>
+
+            <div class="btn-row" style="margin-block-start: 20px;">
+              <button type="button" class="btn btn-secondary" onclick="window.app.switchTreatmentTab('dashboard')" data-i18n="cancel">ކެންސަލް</button>
+              <button type="submit" class="btn btn-primary" data-i18n="save">ރައްކާކުރަން</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Tab Content: Records List -->
+      <div id="t-tab-content-records" class="t-tab-content hidden">
+        <div class="card high-contrast-card" style="margin-block-end: 20px; padding: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; align-items: end;">
+            <div class="form-group" style="margin:0;">
+              <label for="t-records-search" style="font-size:0.8rem; margin-block-end:4px;">ހޯދަން</label>
+              <input type="text" id="t-records-search" class="form-input" placeholder="ގަސް ނުވަތަ ބޭހުގެ ނަން..." oninput="window.app.loadTreatmentRecords()">
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label for="t-records-filter-cat" style="font-size:0.8rem; margin-block-end:4px;">ކެޓަގަރީ</label>
+              <select id="t-records-filter-cat" class="form-input" onchange="window.app.loadTreatmentRecords()">
+                <option value="">ހުރިހާ ބާވަތެއް</option>
+                <option value="Fertilizer">ކާދު (Fertilizer)</option>
+                <option value="Insecticide">ސޫފި މަރާ ބޭސް</option>
+                <option value="Fungicide">ފަންގަސް މަރާ ބޭސް</option>
+                <option value="Pesticide">ބޭސް</option>
+                <option value="Herbicide">ވިނަ މަރާ ބޭސް</option>
+                <option value="Foliar Nutrient">ފަތަށް އަޅާ ކާނާ</option>
+                <option value="Growth Regulator">ގަސް ހެއްދުމަށް ބޭނުންކުރާ އެއްޗެހި</option>
+                <option value="Soil Amendment">ވެލި ރަނގަޅުކުރާ އެއްޗެހި</option>
+                <option value="Biological Control">ބަޔޮލޮޖިކަލް ކޮންޓްރޯލް</option>
+                <option value="Other">އެހެނިހެން</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label for="t-records-filter-crop" style="font-size:0.8rem; margin-block-end:4px;">ގަސް</label>
+              <select id="t-records-filter-crop" class="form-input" onchange="window.app.loadTreatmentRecords()">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card high-contrast-card">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>ތާރީޚް</th>
+                  <th>ގަސް</th>
+                  <th>ބޭނުންކުރި އެއްޗެއް</th>
+                  <th>ކެޓަގަރީ</th>
+                  <th style="text-align: end;">މިންވަރު</th>
+                  <th>ޖެހި މީހާ</th>
+                  <th>ދެން ޖަހަންޖެހޭ ތާރީޚް</th>
+                  <th>ހާލަތު</th>
+                  <th>އަމަލުތައް</th>
+                </tr>
+              </thead>
+              <tbody id="t-records-table-body">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content: Product Master List -->
+      <div id="t-tab-content-products" class="t-tab-content hidden">
+        <!-- Add New Product (Admin Only) -->
+        <div class="card high-contrast-card admin-only" id="t-product-form-container" style="margin-block-end: 20px;">
+          <h3 class="section-title" style="margin-block-end: 15px;">އާ ބޭސް/ކާނާ އިތުރުކުރަން (Product Master List)</h3>
+          <form id="treatment-product-form" onsubmit="window.app.saveTreatmentProduct(event)">
+            <input type="hidden" id="t-prod-id">
+            
+            <div class="form-row-2col">
+              <app-input type="text" id="t-prod-name" label="ނަން (Product Name)" required></app-input>
+              <app-input type="text" id="t-prod-brand" label="ބްރޭންޑް"></app-input>
+            </div>
+
+            <div class="form-row-2col">
+              <div class="form-group">
+                <label for="t-prod-cat">ކެޓަގަރީ</label>
+                <select id="t-prod-cat" class="form-input" required>
+                  <option value="Fertilizer">ކާދު (Fertilizer)</option>
+                  <option value="Insecticide">ސޫފި މަރާ ބޭސް (Insecticide)</option>
+                  <option value="Fungicide">ފަންގަސް މަރާ ބޭސް (Fungicide)</option>
+                  <option value="Pesticide">ބޭސް (Pesticide)</option>
+                  <option value="Herbicide">ވިނަ މަރާ ބޭސް (Herbicide)</option>
+                  <option value="Foliar Nutrient">ފަތަށް އަޅާ ކާނާ (Foliar Nutrient)</option>
+                  <option value="Growth Regulator">ގަސް ހެއްދުމަށް ބޭނުންކުރާ އެއްޗެހި</option>
+                  <option value="Soil Amendment">ވެލި ރަނގަޅުކުރާ އެއްޗެހި (Soil Amendment)</option>
+                  <option value="Biological Control">ބަޔޮލޮޖިކަލް ކޮންޓްރޯލް</option>
+                  <option value="Other">އެހެނިހެން</option>
+                </select>
+              </div>
+              <app-input type="text" id="t-prod-ingredient" label="އެކްޓިވް އިންގްރިޑިއަންޓް (Active Ingredient)"></app-input>
+            </div>
+
+            <div class="form-row-2col">
+              <app-input type="text" id="t-prod-formulation" label="ފޯމިއުލޭޝަން (Formulation)" placeholder="މިސާލު: WP, EC, Granular"></app-input>
+              <app-input type="text" id="t-prod-unit" label="ޑިފޯލްޓް ޔުނިޓް" placeholder="މިސާލު: kg, L, g" required></app-input>
+            </div>
+
+            <div class="form-row-2col">
+              <app-input type="text" id="t-prod-dosage" label="ޑިފޯލްޓް ޑޯސޭޖް (Dosage)" placeholder="މިސާލު: 2g/L"></app-input>
+              <app-input type="text" id="t-prod-supplier" label="ސަޕްލަޔަރ"></app-input>
+            </div>
+
+            <div class="form-row-2col">
+              <app-input type="number" id="t-prod-cost" label="ޔުނިޓެއްގެ އަގު (Cost per Unit MVR)" step="any"></app-input>
+              <app-input type="text" id="t-prod-safety" label="ރީ-އެންޓްރީ އިންޓަވަލް (REI)" placeholder="މިސާލު: 24 Hours"></app-input>
+            </div>
+
+            <div class="form-row-2col">
+              <app-input type="text" id="t-prod-phi" label="ކަނޑާ މުއްދަތު (PHI)" placeholder="މިސާލު: 7 Days"></app-input>
+              <div class="form-group">
+                <label for="t-prod-status">ހާލަތު (Status)</label>
+                <select id="t-prod-status" class="form-input" required>
+                  <option value="active">އެކްޓިވް</option>
+                  <option value="inactive">އިންއެކްޓިވް</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="btn-row" style="margin-block-start: 15px;">
+              <button type="button" class="btn btn-secondary" onclick="document.getElementById('treatment-product-form').reset(); document.getElementById('t-prod-id').value='';" data-i18n="cancel">ކެންސަލް</button>
+              <button type="submit" class="btn btn-primary" data-i18n="save">ރައްކާކުރަން</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card high-contrast-card">
+          <h3 class="section-title" style="margin-block-end: 15px;">ބޭސް އަދި ކާނާގެ މާސްޓަރ ލިސްޓް</h3>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>ބާވަތް</th>
+                  <th>ކެޓަގަރީ</th>
+                  <th>ބްރޭންޑް</th>
+                  <th>އެކްޓިވް އިންގްރިޑިއަންޓް</th>
+                  <th>ޑޯސޭޖް</th>
+                  <th style="text-align: end;">އަގު</th>
+                  <th>PHI</th>
+                  <th>ހާލަތު</th>
+                  <th class="admin-only">އަމަލުތައް</th>
+                </tr>
+              </thead>
+              <tbody id="t-products-table-body">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content: Calendar -->
+      <div id="t-tab-content-calendar" class="t-tab-content hidden">
+        <div class="card high-contrast-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-block-end:20px;">
+            <button class="btn btn-secondary" style="padding:6px 12px; min-height:auto;" onclick="window.app.changeTreatmentMonth(-1)">&larr;</button>
+            <h3 id="t-cal-month-title" style="font-weight:700; margin:0;">ޖޫން 2026</h3>
+            <button class="btn btn-secondary" style="padding:6px 12px; min-height:auto;" onclick="window.app.changeTreatmentMonth(1)">&rarr;</button>
+          </div>
+
+          <!-- Calendar Days Grid -->
+          <div class="t-calendar-container">
+            <div class="t-calendar-weekdays">
+              <div>ހޮނިހިރު</div>
+              <div>އާދީއްތަ</div>
+              <div>ހޯމަ</div>
+              <div>އަންގާރަ</div>
+              <div>ބުދަ</div>
+              <div>ބުރާސްފަތި</div>
+              <div>ހުކުރު</div>
+            </div>
+            <div id="t-cal-days-grid" class="t-calendar-days">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content: Reports -->
+      <div id="t-tab-content-reports" class="t-tab-content hidden">
+        <div class="card high-contrast-card" style="margin-block-end: 20px;">
+          <h3 class="section-title" style="margin-block-end: 15px;">ރިޕޯޓް ޕެރާމީޓަރުތައް</h3>
+          <form id="treatment-report-form" onsubmit="window.app.generateTreatmentReport(event)">
+            <div class="form-group">
+              <label for="t-rep-type">ރިޕޯޓްގެ ބާވަތް</label>
+              <select id="t-rep-type" class="form-input" required>
+                <option value="fertilizer">ކާދު ބޭނުންކުރި މިންވަރު (Fertilizer Usage)</option>
+                <option value="pesticide">ބޭސް ބޭނުންކުރި މިންވަރު (Pesticide/Protection Usage)</option>
+                <option value="summary">މަހުގެ ފަރުވާގެ ޚުލާސާ (Monthly Treatment Summary)</option>
+                <option value="cost">ބޭސް އަދި ކާނާގެ ޚަރަދު (Product Cost Analysis)</option>
+                <option value="crop-history">ގަސްތަކުގެ ފަރުވާގެ ތާރީޚް (Treatment History by Crop)</option>
+              </select>
+            </div>
+
+            <div class="form-row-2col">
+              <app-input type="date" id="t-rep-from" label="ފެށޭ ތާރީޚް" required></app-input>
+              <app-input type="date" id="t-rep-to" label="ނިމޭ ތާރީޚް" required></app-input>
+            </div>
+
+            <div class="form-row-2col">
+              <div class="form-group">
+                <label for="t-rep-crop">ގަސް</label>
+                <select id="t-rep-crop" class="form-input">
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="t-rep-staff">މުވައްޒަފު</label>
+                <select id="t-rep-staff" class="form-input">
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+            </div>
+
+            <div class="btn-row" style="margin-block-start: 15px;">
+              <button type="submit" class="btn btn-primary">ރިޕޯޓް ހަދަން</button>
+              <button type="button" class="btn btn-secondary" onclick="window.app.exportTreatmentReport('excel')">އެކްސެލް އެކްސްޕޯޓް</button>
+              <button type="button" class="btn btn-secondary" onclick="window.app.exportTreatmentReport('pdf')">ޕްރިންޓް ޕީ.ޑީ.އެފް</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card high-contrast-card hidden" id="t-rep-result-container">
+          <h3 class="section-title" id="t-rep-result-title" style="margin-block-end: 15px;">ރިޕޯޓް</h3>
+          <div class="table-responsive">
+            <table id="t-rep-result-table">
+              <thead>
+                <!-- Populated dynamically -->
+              </thead>
+              <tbody id="t-rep-result-body">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14. FARM PROFILE -->
     <section id="view-profile" class="hidden">
       <h2 style="font-weight: 700; margin-block-end: 20px;" data-i18n="profile">ދަނޑުގެ ޕްރޮފައިލް</h2>
       <div class="card high-contrast-card">

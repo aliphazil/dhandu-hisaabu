@@ -612,6 +612,7 @@ class App {
     else if (viewId === 'reports') this.loadReports();
     else if (viewId === 'logs') this.loadLogs();
     else if (viewId === 'profile') this.loadProfile();
+    else if (viewId === 'treatments') this.loadTreatments();
     // Show/hide floating action buttons bar
     const bar = document.getElementById('quick-record-bar');
     if (bar) {
@@ -647,6 +648,10 @@ class App {
           <svg viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
           <span data-i18n="dashboard">ޑޭޝްބޯޑް</span>
         </button>
+        <button class="nav-item" onclick="window.app.showView('treatments')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          <span data-i18n="treatments">ބޭސް/ކާނާ</span>
+        </button>
       `;
     } else {
       // Farm Admin Nav
@@ -658,6 +663,10 @@ class App {
         <button class="nav-item" onclick="window.app.showView('crops')">
           <svg viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707.707M12 5a7 7 0 100 14 7 7 0 000-14z"></path></svg>
           <span data-i18n="crops">ގަސްތައް</span>
+        </button>
+        <button class="nav-item" onclick="window.app.showView('treatments')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          <span data-i18n="treatments">ބޭސް/ކާނާ</span>
         </button>
         <button class="nav-item nav-item-income" onclick="window.app.showView('income')">
           <svg viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -2123,6 +2132,825 @@ class App {
   // Set up modal helpers inside the form view for staff recording
   openRecordModalForStaff(type) {
     this.openRecordModal(type);
+  }
+
+  // CROP TREATMENTS MODULE IMPLEMENTATION
+  switchTreatmentTab(tabId) {
+    this.currentTreatmentTab = tabId;
+    
+    // Toggle active buttons
+    const btns = document.querySelectorAll('.t-tab-btn');
+    btns.forEach(btn => {
+      if (btn.getAttribute('onclick').includes(tabId)) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    // Toggle tab content visibility
+    const contents = document.querySelectorAll('.t-tab-content');
+    contents.forEach(el => {
+      if (el.id === `t-tab-content-${tabId}`) {
+        el.classList.remove('hidden');
+      } else {
+        el.classList.add('hidden');
+      }
+    });
+
+    // Load content
+    if (tabId === 'dashboard') this.loadTreatmentsDashboard();
+    else if (tabId === 'new-app') this.loadNewTreatmentApplicationForm();
+    else if (tabId === 'records') this.loadTreatmentRecords();
+    else if (tabId === 'products') this.loadTreatmentProducts();
+    else if (tabId === 'calendar') this.loadTreatmentCalendar();
+    else if (tabId === 'reports') this.loadTreatmentReports();
+  }
+
+  loadTreatments() {
+    const user = getActiveUser();
+    if (!user) return;
+
+    // Show/hide admin blocks
+    const adminElements = document.querySelectorAll('.admin-only');
+    if (user.role === 'staff') {
+      adminElements.forEach(el => el.classList.add('hidden'));
+      const prodTab = document.getElementById('t-tab-btn-products');
+      if (prodTab) prodTab.classList.add('hidden');
+      const repTab = document.getElementById('t-tab-btn-reports');
+      if (repTab) repTab.classList.add('hidden');
+    } else {
+      adminElements.forEach(el => el.classList.remove('hidden'));
+      const prodTab = document.getElementById('t-tab-btn-products');
+      if (prodTab) prodTab.classList.remove('hidden');
+      const repTab = document.getElementById('t-tab-btn-reports');
+      if (repTab) repTab.classList.remove('hidden');
+    }
+
+    if (!this.currentTreatmentTab) this.currentTreatmentTab = 'dashboard';
+    this.switchTreatmentTab(this.currentTreatmentTab);
+  }
+
+  loadTreatmentsDashboard() {
+    const user = getActiveUser();
+    if (!user) return;
+
+    const localDB = JSON.parse(localStorage.getItem('dhandu_hisaabu_local_db') || '{}');
+    const apps = (localDB.treatment_applications || []).filter(a => a.farmId === user.farmId);
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    // 1. Applications Today
+    const todayApps = apps.filter(a => a.date === todayStr);
+    document.getElementById('t-dash-today-count').textContent = todayApps.length;
+
+    // 2. Cost This Month
+    const currentMonth = new Date().toISOString().substring(0, 7); // YYYY-MM
+    const monthlyCost = apps
+      .filter(a => a.date && a.date.startsWith(currentMonth))
+      .reduce((sum, a) => sum + (Number(a.cost) || 0), 0);
+    document.getElementById('t-dash-month-cost').innerHTML = `${format2DP(monthlyCost)}${CURRENCY_HTML}`;
+
+    // 3. Overdue & Upcoming List logic
+    let overdueCount = 0;
+    const overdueItems = [];
+    apps.forEach(app => {
+      if (app.nextScheduledDate && app.nextScheduledDate < todayStr) {
+        const hasLater = apps.some(a => 
+          a.cropId === app.cropId && 
+          a.category === app.category && 
+          a.date >= app.nextScheduledDate
+        );
+        if (!hasLater) {
+          overdueCount++;
+          overdueItems.push(app);
+        }
+      }
+    });
+    document.getElementById('t-dash-overdue-count').textContent = overdueCount;
+
+    const banner = document.getElementById('t-dash-overdue-banner');
+    const overdueList = document.getElementById('t-dash-overdue-list');
+    if (overdueCount > 0) {
+      banner.classList.remove('hidden');
+      overdueList.innerHTML = overdueItems.map(item => `
+        <div class="activity-item" style="border-inline-start: 4px solid var(--danger); padding: 8px 12px; margin-block-end: 8px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+          <div style="font-weight: bold; color: var(--danger); font-size: 0.85rem;">ޖަހަންޖެހޭ ތާރީޚް ފާއިތުވެއްޖެ: ${item.nextScheduledDate}</div>
+          <div style="font-size: 0.95rem; margin-block-start: 4px;">
+            <strong>${t(item.category)}: ${item.productName}</strong> (ބެޗް: ${item.crop} - ${item.plot})
+          </div>
+        </div>
+      `).join('');
+    } else {
+      banner.classList.add('hidden');
+    }
+
+    // Upcoming Treatments
+    const next7DaysStr = new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0];
+    const upcomingApps = apps.filter(app => 
+      app.nextScheduledDate && 
+      app.nextScheduledDate >= todayStr && 
+      app.nextScheduledDate <= next7DaysStr
+    );
+    document.getElementById('t-dash-upcoming-list').innerHTML = upcomingApps.length ? upcomingApps.map(item => `
+      <div class="activity-item" style="border-inline-start: 4px solid var(--primary); padding: 8px 12px; margin-block-end: 8px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+        <div style="font-weight: bold; color: var(--primary); font-size: 0.85rem;">ތާވަލު ތާރީޚް: ${item.nextScheduledDate}</div>
+        <div style="font-size: 0.95rem; margin-block-start: 4px;">
+          <strong>${t(item.category)}: ${item.productName}</strong> (ބެޗް: ${item.crop} - ${item.plot})
+        </div>
+      </div>
+    `).join('') : '<div class="text-muted" style="padding: 10px;">ކުރިއަށް އޮތް 7 ދުވަހު ތާވަލުކުރެވިފައިވާ ފަރުވާއެއް ނެތް.</div>';
+
+    // 4. Most Used Product
+    const counts = {};
+    apps.forEach(a => {
+      if (a.productName) {
+        counts[a.productName] = (counts[a.productName] || 0) + 1;
+      }
+    });
+    let mostUsed = '-';
+    let maxVal = 0;
+    for (const prod in counts) {
+      if (counts[prod] > maxVal) {
+        maxVal = counts[prod];
+        mostUsed = prod;
+      }
+    }
+    document.getElementById('t-dash-most-used').textContent = mostUsed;
+  }
+
+  loadNewTreatmentApplicationForm() {
+    const user = getActiveUser();
+    if (!user) return;
+
+    document.getElementById('t-app-date').value = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    document.getElementById('t-app-time').value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    const localDB = JSON.parse(localStorage.getItem('dhandu_hisaabu_local_db') || '{}');
+    const crops = (localDB.crops || []).filter(c => c.farmId === user.farmId && c.status === 'growing');
+    const cropSelect = document.getElementById('t-app-crop');
+    cropSelect.innerHTML = crops.map(c => `<option value="${c.id}">${c.name} (${c.batchNumber})</option>`).join('');
+    
+    const products = (localDB.treatment_products || []).filter(p => p.farmId === user.farmId && p.status === 'active');
+    const productSelect = document.getElementById('t-app-product');
+    productSelect.innerHTML = products.map(p => `<option value="${p.id}">${p.name} (${t(p.category)})</option>`).join('');
+
+    this.onTreatmentCropChange();
+    this.onTreatmentProductChange();
+  }
+
+  onTreatmentCropChange() {
+    const cropSelect = document.getElementById('t-app-crop');
+    const varietyInput = document.getElementById('t-app-variety');
+    if (!cropSelect || !varietyInput) return;
+
+    const localDB = JSON.parse(localStorage.getItem('dhandu_hisaabu_local_db') || '{}');
+    const crop = (localDB.crops || []).find(c => c.id === cropSelect.value);
+    if (crop) {
+      varietyInput.value = crop.variety || '';
+    }
+  }
+
+  onTreatmentProductChange() {
+    const productSelect = document.getElementById('t-app-product');
+    const unitInput = document.getElementById('t-app-unit');
+    const ratioInput = document.getElementById('t-app-ratio');
+    const costInput = document.getElementById('t-app-cost');
+    if (!productSelect || !unitInput) return;
+
+    const localDB = JSON.parse(localStorage.getItem('dhandu_hisaabu_local_db') || '{}');
+    const product = (localDB.treatment_products || []).find(p => p.id === productSelect.value);
+    if (product) {
+      unitInput.value = product.defaultUnit || '';
+      ratioInput.value = product.defaultDosage || '';
+      const qty = Number(document.getElementById('t-app-qty').value) || 0;
+      costInput.value = product.costPerUnit ? (product.costPerUnit * qty).toFixed(2) : '';
+    }
+  }
+
+  async fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async saveTreatmentApplication(event) {
+    event.preventDefault();
+    const user = getActiveUser();
+    if (!user) return;
+
+    const date = document.getElementById('t-app-date').value;
+    const time = document.getElementById('t-app-time').value;
+    const cropId = document.getElementById('t-app-crop').value;
+    const plot = document.getElementById('t-app-plot').value;
+    const growthStage = document.getElementById('t-app-stage').value;
+    const productId = document.getElementById('t-app-product').value;
+    const qty = Number(document.getElementById('t-app-qty').value) || 0;
+    const unit = document.getElementById('t-app-unit').value;
+    const ratio = document.getElementById('t-app-ratio').value;
+    const water = document.getElementById('t-app-water').value;
+    const method = document.getElementById('t-app-method').value;
+    const nextDate = document.getElementById('t-app-next-date').value;
+    const cost = Number(document.getElementById('t-app-cost').value) || 0;
+    const remarks = document.getElementById('t-app-remarks').value;
+    const photoFile = document.getElementById('t-app-photo-file').files[0];
+
+    let photoBase64 = null;
+    if (photoFile) {
+      photoBase64 = await this.fileToBase64(photoFile);
+    }
+
+    const localDB = JSON.parse(localStorage.getItem('dhandu_hisaabu_local_db') || '{}');
+    const crop = (localDB.crops || []).find(c => c.id === cropId);
+    const product = (localDB.treatment_products || []).find(p => p.id === productId);
+
+    if (this.editingApplicationId) {
+      const updatedFields = {
+        date, time, cropId, plot, growthStage, productId, quantityUsed: qty, unit, mixRatio: ratio, waterVolume: water,
+        applicationMethod: method, nextScheduledDate: nextDate || null, cost, remarks, photo: photoBase64 || undefined,
+        updatedDate: new Date().toISOString()
+      };
+      if (!photoBase64) delete updatedFields.photo;
+      
+      try {
+        updateRecord('treatment_applications', this.editingApplicationId, updatedFields, this.isOnline);
+        this.editingApplicationId = null;
+        this.showToast("ފަރުވާގެ ރެކޯޑް ބަދަލުކުރެވިއްޖެ!");
+        document.getElementById('treatment-app-form').reset();
+        this.switchTreatmentTab('records');
+      } catch (err) {
+        alert(err.message);
+      }
+      return;
+    }
+
+    const newApp = {
+      id: "ta_" + Date.now(),
+      farmId: user.farmId,
+      cropId,
+      productId,
+      userId: user.username,
+      date,
+      time,
+      crop: crop ? crop.name : '',
+      variety: crop ? crop.variety : '',
+      plot,
+      growthStage,
+      category: product ? product.category : '',
+      productName: product ? product.name : '',
+      quantityUsed: qty,
+      unit,
+      mixRatio: ratio,
+      waterVolume: water,
+      applicationMethod: method,
+      appliedBy: user.username,
+      cost,
+      nextScheduledDate: nextDate || null,
+      remarks,
+      photo: photoBase64,
+      status: user.role === 'farm_admin' ? 'approved' : 'pending_approval',
+      createdDate: new Date().toISOString(),
+      updatedDate: new Date().toISOString()
+    };
+
+    try {
+      insertRecord('treatment_applications', newApp, this.isOnline);
+      
+      const logEntry = {
+        id: "log_" + Date.now(),
+        farmId: user.farmId,
+        timestamp: new Date().toISOString(),
+        username: user.username,
+        eventType: "RECORD_TREATMENT",
+        message: `${user.name} ޖެހީ: ${t(newApp.category)} - ${newApp.productName} (ގަސް: ${newApp.crop})`,
+        type: "farm"
+      };
+      insertRecord('audit_logs', logEntry, this.isOnline);
+
+      this.showToast("ފަރުވާގެ ރެކޯޑް ކާމިޔާކުރެވިއްޖެ!");
+      document.getElementById('treatment-app-form').reset();
+      this.switchTreatmentTab('dashboard');
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  loadTreatmentRecords() {
+    const user = getActiveUser();
+    if (!user) return;
+
+    const localDB = JSON.parse(localStorage.getItem('dhandu_hisaabu_local_db') || '{}');
+    const apps = (localDB.treatment_applications || []).filter(a => a.farmId === user.farmId);
+    
+    apps.sort((a,b) => {
+      const d1 = `${a.date}T${a.time || '00:00'}`;
+      const d2 = `${b.date}T${b.time || '00:00'}`;
+      return d2.localeCompare(d1);
+    });
+
+    const filterCropSelect = document.getElementById('t-records-filter-crop');
+    const prevVal = filterCropSelect.value;
+    const crops = (localDB.crops || []).filter(c => c.farmId === user.farmId);
+    filterCropSelect.innerHTML = `<option value="">ހުރިހާ ގަހެއް</option>` + 
+      crops.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    filterCropSelect.value = prevVal;
+
+    const searchVal = document.getElementById('t-records-search').value.toLowerCase();
+    const categoryFilter = document.getElementById('t-records-filter-cat').value;
+    const cropFilter = document.getElementById('t-records-filter-crop').value;
+
+    const filtered = apps.filter(a => {
+      const matchSearch = !searchVal || 
+        a.productName.toLowerCase().includes(searchVal) || 
+        a.crop.toLowerCase().includes(searchVal) || 
+        (a.remarks && a.remarks.toLowerCase().includes(searchVal));
+      const matchCategory = !categoryFilter || a.category === categoryFilter;
+      const matchCrop = !cropFilter || a.crop === cropFilter;
+      return matchSearch && matchCategory && matchCrop;
+    });
+
+    const tbody = document.getElementById('t-records-table-body');
+    tbody.innerHTML = filtered.length ? filtered.map(item => {
+      const statusClass = item.status === 'approved' ? 't-status-approved' : 't-status-pending';
+      const statusText = item.status === 'approved' ? 'ހުއްދަދެވިފައި' : 'ހުއްދަ ނޫން';
+      
+      let actions = '';
+      if (user.role === 'farm_admin') {
+        if (item.status === 'pending_approval') {
+          actions += `<button class="btn btn-primary" style="padding:4px 8px; font-size:0.75rem; min-height:auto; margin-inline-end:4px;" onclick="window.app.approveTreatmentApplication('${item.id}')">ހުއްދަދޭން</button>`;
+        }
+        actions += `<button class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem; min-height:auto; margin-inline-end:4px;" onclick="window.app.editTreatmentApplication('${item.id}')">ބަދަލުކުރަން</button>`;
+        actions += `<button class="btn btn-danger" style="padding:4px 8px; font-size:0.75rem; min-height:auto; background:#d32f2f; color:white;" onclick="window.app.deleteTreatmentApplication('${item.id}')">ފޮހެލަން</button>`;
+      } else {
+        if (item.appliedBy === user.username && item.status === 'pending_approval') {
+          actions += `<button class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem; min-height:auto;" onclick="window.app.editTreatmentApplication('${item.id}')">ބަދަލުކުރަން</button>`;
+        } else {
+          actions += `<span class="text-muted" style="font-size:0.75rem;">ބަދަލެއް ނުގެނެވޭނެ</span>`;
+        }
+      }
+
+      let photoHTML = '';
+      if (item.photo) {
+        photoHTML = ` <button class="btn btn-secondary" style="padding:2px 6px; font-size:0.7rem; min-height:auto;" onclick="const w = window.open(); w.document.write('<img src=\x22${item.photo}\x22 style=\x22max-width:100%;\x22>');">📷</button>`;
+      }
+
+      return `
+        <tr>
+          <td>${item.date} ${item.time || ''}</td>
+          <td><strong>${item.crop}</strong> (${item.plot})${photoHTML}</td>
+          <td>${item.productName}</td>
+          <td>${t(item.category)}</td>
+          <td style="text-align: end; font-weight: bold;">${item.quantityUsed} ${item.unit}</td>
+          <td>${item.appliedBy}</td>
+          <td>${item.nextScheduledDate || '-'}</td>
+          <td><span class="t-status-badge ${statusClass}">${statusText}</span></td>
+          <td>${actions}</td>
+        </tr>
+      `;
+    }).join('') : `<tr><td colspan="9" class="text-center text-muted">އެއްވެސް ރެކޯޑެއް ފެންނާކަށް ނެތް.</td></tr>`;
+  }
+
+  approveTreatmentApplication(id) {
+    try {
+      updateRecord('treatment_applications', id, { status: 'approved' }, this.isOnline);
+      this.showToast("ފަރުވާ ރެކޯޑަށް ހުއްދަ ދެވިއްޖެ!");
+      this.loadTreatmentRecords();
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  deleteTreatmentApplication(id) {
+    if (confirm("މި ފަރުވާގެ ރެކޯޑް ފޮހެލަން ބޭނުންތަ؟")) {
+      try {
+        deleteRecord('treatment_applications', id, this.isOnline);
+        this.showToast("ރެކޯޑް ފޮހެލެވިއްޖެ!");
+        this.loadTreatmentRecords();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+  }
+
+  editTreatmentApplication(id) {
+    const localDB = JSON.parse(localStorage.getItem('dhandu_hisaabu_local_db') || '{}');
+    const app = (localDB.treatment_applications || []).find(a => a.id === id);
+    if (!app) return;
+
+    this.editingApplicationId = id;
+    this.switchTreatmentTab('new-app');
+
+    document.getElementById('t-app-date').value = app.date;
+    document.getElementById('t-app-time').value = app.time || '';
+    document.getElementById('t-app-crop').value = app.cropId;
+    document.getElementById('t-app-plot').value = app.plot;
+    document.getElementById('t-app-stage').value = app.growthStage;
+    document.getElementById('t-app-product').value = app.productId;
+    document.getElementById('t-app-qty').value = app.quantityUsed;
+    document.getElementById('t-app-unit').value = app.unit;
+    document.getElementById('t-app-ratio').value = app.mixRatio || '';
+    document.getElementById('t-app-water').value = app.waterVolume || '';
+    document.getElementById('t-app-method').value = app.applicationMethod;
+    document.getElementById('t-app-next-date').value = app.nextScheduledDate || '';
+    document.getElementById('t-app-cost').value = app.cost || '';
+    document.getElementById('t-app-remarks').value = app.remarks || '';
+  }
+
+  loadTreatmentProducts() {
+    const user = getActiveUser();
+    if (!user) return;
+
+    const localDB = JSON.parse(localStorage.getItem('dhandu_hisaabu_local_db') || '{}');
+    const products = (localDB.treatment_products || []).filter(p => p.farmId === user.farmId);
+
+    const tbody = document.getElementById('t-products-table-body');
+    tbody.innerHTML = products.length ? products.map(item => {
+      const statusText = item.status === 'active' ? 'އެކްޓިވް' : 'އިންއެކްޓިވް';
+      const statusClass = item.status === 'active' ? 'text-success' : 'text-muted';
+      
+      let actions = '';
+      if (user.role === 'farm_admin') {
+        actions = `
+          <td>
+            <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem; min-height:auto; margin-inline-end:4px;" onclick="window.app.editTreatmentProduct('${item.id}')">ބަދަލުކުރަން</button>
+            <button class="btn btn-danger" style="padding:4px 8px; font-size:0.75rem; min-height:auto; background:#d32f2f; color:white;" onclick="window.app.deleteTreatmentProduct('${item.id}')">ފޮހެލަން</button>
+          </td>
+        `;
+      }
+
+      return `
+        <tr>
+          <td><strong>${item.name}</strong></td>
+          <td>${t(item.category)}</td>
+          <td>${item.brand || '-'}</td>
+          <td>${item.activeIngredient || '-'}</td>
+          <td>${item.defaultDosage || '-'}</td>
+          <td style="text-align: end; font-weight: bold;">${format2DP(item.costPerUnit)} ${item.defaultUnit}</td>
+          <td>${item.preHarvestInterval || '-'}</td>
+          <td><span class="${statusClass}" style="font-weight: bold;">${statusText}</span></td>
+          ${actions}
+        </tr>
+      `;
+    }).join('') : `<tr><td colspan="9" class="text-center text-muted">އެއްވެސް ބާވަތެއް މާސްޓަރ ލިސްޓުގައި ނެތް.</td></tr>`;
+  }
+
+  saveTreatmentProduct(event) {
+    event.preventDefault();
+    const user = getActiveUser();
+    if (!user) return;
+
+    const id = document.getElementById('t-prod-id').value;
+    const name = document.getElementById('t-prod-name').value;
+    const brand = document.getElementById('t-prod-brand').value;
+    const category = document.getElementById('t-prod-cat').value;
+    const ingredient = document.getElementById('t-prod-ingredient').value;
+    const formulation = document.getElementById('t-prod-formulation').value;
+    const unit = document.getElementById('t-prod-unit').value;
+    const dosage = document.getElementById('t-prod-dosage').value;
+    const supplier = document.getElementById('t-prod-supplier').value;
+    const cost = Number(document.getElementById('t-prod-cost').value) || 0;
+    const safety = document.getElementById('t-prod-safety').value;
+    const phi = document.getElementById('t-prod-phi').value;
+    const status = document.getElementById('t-prod-status').value;
+
+    if (id) {
+      const updatedFields = {
+        name, brand, category, activeIngredient: ingredient, formulation, defaultUnit: unit, defaultDosage: dosage,
+        supplier, costPerUnit: cost, safetyInterval: safety, preHarvestInterval: phi, status,
+        updatedDate: new Date().toISOString()
+      };
+      try {
+        updateRecord('treatment_products', id, updatedFields, this.isOnline);
+        this.showToast("ބާވަތުގެ މަޢުލޫމާތު ބަދަލުކުރެވިއްޖެ!");
+        document.getElementById('treatment-product-form').reset();
+        document.getElementById('t-prod-id').value = '';
+        this.loadTreatmentProducts();
+      } catch (err) {
+        alert(err.message);
+      }
+    } else {
+      const newProd = {
+        id: "p_" + Date.now(),
+        farmId: user.farmId,
+        name, brand, category, activeIngredient: ingredient, formulation, defaultUnit: unit, defaultDosage: dosage,
+        supplier, costPerUnit: cost, safetyInterval: safety, preHarvestInterval: phi, status,
+        createdDate: new Date().toISOString(),
+        updatedDate: new Date().toISOString()
+      };
+      try {
+        insertRecord('treatment_products', newProd, this.isOnline);
+        this.showToast("އާ ބާވަތެއް މާސްޓަރ ލިސްޓަށް އިތުރުކުރެވިއްޖެ!");
+        document.getElementById('treatment-product-form').reset();
+        this.loadTreatmentProducts();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+  }
+
+  editTreatmentProduct(id) {
+    const localDB = JSON.parse(localStorage.getItem('dhandu_hisaabu_local_db') || '{}');
+    const p = (localDB.treatment_products || []).find(prod => prod.id === id);
+    if (!p) return;
+
+    document.getElementById('t-prod-id').value = p.id;
+    document.getElementById('t-prod-name').value = p.name;
+    document.getElementById('t-prod-brand').value = p.brand || '';
+    document.getElementById('t-prod-cat').value = p.category;
+    document.getElementById('t-prod-ingredient').value = p.activeIngredient || '';
+    document.getElementById('t-prod-formulation').value = p.formulation || '';
+    document.getElementById('t-prod-unit').value = p.defaultUnit || '';
+    document.getElementById('t-prod-dosage').value = p.defaultDosage || '';
+    document.getElementById('t-prod-supplier').value = p.supplier || '';
+    document.getElementById('t-prod-cost').value = p.costPerUnit || '';
+    document.getElementById('t-prod-safety').value = p.safetyInterval || '';
+    document.getElementById('t-prod-phi').value = p.preHarvestInterval || '';
+    document.getElementById('t-prod-status').value = p.status;
+    
+    document.getElementById('t-product-form-container').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  deleteTreatmentProduct(id) {
+    if (confirm("މި ބާވަތް މާސްޓަރ ލިސްޓުން ފޮހެލަން ބޭނުންތަ؟")) {
+      try {
+        deleteRecord('treatment_products', id, this.isOnline);
+        this.showToast("ބާވަތް ފޮހެލެވިއްޖެ!");
+        this.loadTreatmentProducts();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+  }
+
+  changeTreatmentMonth(offset) {
+    if (!this.currentCalendarMonth) {
+      this.currentCalendarMonth = new Date();
+    }
+    this.currentCalendarMonth.setMonth(this.currentCalendarMonth.getMonth() + offset);
+    this.loadTreatmentCalendar();
+  }
+
+  loadTreatmentCalendar() {
+    if (!this.currentCalendarMonth) {
+      this.currentCalendarMonth = new Date();
+    }
+    const user = getActiveUser();
+    if (!user) return;
+
+    const year = this.currentCalendarMonth.getFullYear();
+    const month = this.currentCalendarMonth.getMonth();
+
+    const monthsDhivehi = ["ޖެނުއަރީ", "ފެބްރުއަރީ", "މާރޗް", "އެޕްރީލް", "މޭ", "ޖޫން", "ޖުލައި", "އޮގަސްޓް", "ސެޕްޓެމްބަރ", "އޮކްޓޯބަރ", "ނޮވެމްބަރ", "ޑިސެމްބަރ"];
+    document.getElementById('t-cal-month-title').textContent = `${monthsDhivehi[month]} ${year}`;
+
+    const firstDayIndex = new Date(year, month, 1).getDay();
+    const adjustedOffset = (firstDayIndex + 1) % 7; 
+    const totalDays = new Date(year, month + 1, 0).getDate();
+
+    const localDB = JSON.parse(localStorage.getItem('dhandu_hisaabu_local_db') || '{}');
+    const apps = (localDB.treatment_applications || []).filter(a => a.farmId === user.farmId);
+
+    const daysGrid = document.getElementById('t-cal-days-grid');
+    daysGrid.innerHTML = '';
+
+    for (let i = 0; i < adjustedOffset; i++) {
+      daysGrid.innerHTML += `<div class="t-cal-day-cell empty"></div>`;
+    }
+
+    const todayLocalStr = new Date().toISOString().split('T')[0];
+
+    for (let day = 1; day <= totalDays; day++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const scheduledTreatments = apps.filter(a => a.nextScheduledDate === dateStr);
+      
+      let eventsHTML = '';
+      if (scheduledTreatments.length > 0) {
+        eventsHTML = `
+          <div class="t-cal-events-container">
+            ${scheduledTreatments.map(tApp => {
+              const dotClass = `t-dot-${tApp.category.toLowerCase().replace(' ', '')}`;
+              let isOverdue = false;
+              if (dateStr < todayLocalStr) {
+                const hasLater = apps.some(a => 
+                  a.cropId === tApp.cropId && 
+                  a.category === tApp.category && 
+                  a.date >= dateStr
+                );
+                if (!hasLater) isOverdue = true;
+              }
+              const statusClass = isOverdue ? 't-cal-overdue' : (dateStr === todayLocalStr ? 't-cal-due-today' : '');
+              return `<span class="t-cal-event-dot ${dotClass} ${statusClass}" title="${t(tApp.category)}: ${tApp.productName} (${tApp.crop})" onclick="alert('${t(tApp.category)}: ${tApp.productName}\\nގަސް: ${tApp.crop}\\nޕްލޮޓް: ${tApp.plot}')"></span>`;
+            }).join('')}
+          </div>
+        `;
+      }
+
+      const isToday = dateStr === todayLocalStr ? 'today' : '';
+
+      daysGrid.innerHTML += `
+        <div class="t-cal-day-cell ${isToday}">
+          <div class="t-cal-day-number">${day}</div>
+          ${eventsHTML}
+        </div>
+      `;
+    }
+  }
+
+  loadTreatmentReports() {
+    const user = getActiveUser();
+    if (!user) return;
+
+    const localDB = JSON.parse(localStorage.getItem('dhandu_hisaabu_local_db') || '{}');
+    const now = new Date();
+    document.getElementById('t-rep-from').value = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    document.getElementById('t-rep-to').value = now.toISOString().split('T')[0];
+
+    const crops = (localDB.crops || []).filter(c => c.farmId === user.farmId);
+    const cropSelect = document.getElementById('t-rep-crop');
+    cropSelect.innerHTML = `<option value="">ހުރިހާ ގަހެއް</option>` + 
+      crops.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+
+    const users = (localDB.users || []).filter(u => u.farmId === user.farmId);
+    const staffSelect = document.getElementById('t-rep-staff');
+    staffSelect.innerHTML = `<option value="">ހުރިހާ މުވައްޒަފުން</option>` + 
+      users.map(u => `<option value="${u.username}">${u.name}</option>`).join('');
+  }
+
+  generateTreatmentReport(event) {
+    if (event) event.preventDefault();
+    const user = getActiveUser();
+    if (!user) return;
+
+    const reportType = document.getElementById('t-rep-type').value;
+    const fromDate = document.getElementById('t-rep-from').value;
+    const toDate = document.getElementById('t-rep-to').value;
+    const cropFilter = document.getElementById('t-rep-crop').value;
+    const staffFilter = document.getElementById('t-rep-staff').value;
+
+    const localDB = JSON.parse(localStorage.getItem('dhandu_hisaabu_local_db') || '{}');
+    let apps = (localDB.treatment_applications || []).filter(a => 
+      a.farmId === user.farmId && 
+      a.date >= fromDate && 
+      a.date <= toDate
+    );
+
+    if (cropFilter) apps = apps.filter(a => a.crop === cropFilter);
+    if (staffFilter) apps = apps.filter(a => a.appliedBy === staffFilter);
+
+    const resultContainer = document.getElementById('t-rep-result-container');
+    const resultTitle = document.getElementById('t-rep-result-title');
+    const resultTable = document.getElementById('t-rep-result-table');
+    
+    resultContainer.classList.remove('hidden');
+
+    let headersHTML = '';
+    let bodyHTML = '';
+
+    if (reportType === 'fertilizer' || reportType === 'pesticide') {
+      const catFilter = reportType === 'fertilizer' ? 'Fertilizer' : null;
+      let displayApps = apps;
+      if (catFilter) {
+        displayApps = apps.filter(a => a.category === 'Fertilizer');
+        resultTitle.textContent = "ކާދު ބޭނުންކުރި މިންވަރުގެ ރިޕޯޓް";
+      } else {
+        displayApps = apps.filter(a => a.category !== 'Fertilizer');
+        resultTitle.textContent = "ބޭސް ބޭނުންކުރި މިންވަރުގެ ރިޕޯޓް";
+      }
+
+      headersHTML = `
+        <tr>
+          <th>ތާރީޚް</th>
+          <th>ގަސް</th>
+          <th>އެއްޗެއް</th>
+          <th>މިންވަރު</th>
+          <th>މެތަޑް</th>
+          <th>ޖެހި މީހާ</th>
+          <th style="text-align: end;">ޚަރަދު</th>
+        </tr>
+      `;
+
+      bodyHTML = displayApps.length ? displayApps.map(item => `
+        <tr>
+          <td>${item.date}</td>
+          <td>${item.crop} (${item.plot})</td>
+          <td>${item.productName}</td>
+          <td>${item.quantityUsed} ${item.unit}</td>
+          <td>${t(item.applicationMethod)}</td>
+          <td>${item.appliedBy}</td>
+          <td style="text-align: end; font-weight: bold;">${format2DP(item.cost)} ${CURRENCY_HTML}</td>
+        </tr>
+      `).join('') : `<tr><td colspan="7" class="text-center text-muted">އެއްވެސް ރެކޯޑެއް ފެންނާކަށް ނެތް.</td></tr>`;
+
+    } else if (reportType === 'summary') {
+      resultTitle.textContent = "މަހުގެ ފަރުވާގެ ޚުލާސާ";
+      const summary = {};
+      apps.forEach(a => {
+        summary[a.category] = (summary[a.category] || 0) + 1;
+      });
+
+      headersHTML = `
+        <tr>
+          <th>ކެޓަގަރީ</th>
+          <th style="text-align: end;">ޖެހި ޖުމްލަ ޢަދަދު (Applications Count)</th>
+        </tr>
+      `;
+
+      bodyHTML = Object.keys(summary).length ? Object.keys(summary).map(cat => `
+        <tr>
+          <td><strong>${t(cat)}</strong></td>
+          <td style="text-align: end; font-weight: bold;">${summary[cat]}</td>
+        </tr>
+      `).join('') : `<tr><td colspan="2" class="text-center text-muted">އެއްވެސް ރެކޯޑެއް ފެންނާކަށް ނެތް.</td></tr>`;
+
+    } else if (reportType === 'cost') {
+      resultTitle.textContent = "ބޭސް އަދި ކާނާގެ ޚަރަދު ތަޙުލީލު";
+      const prodCost = {};
+      apps.forEach(a => {
+        if (!prodCost[a.productName]) {
+          prodCost[a.productName] = { qty: 0, unit: a.unit, cost: 0 };
+        }
+        prodCost[a.productName].qty += a.quantityUsed;
+        prodCost[a.productName].cost += Number(a.cost) || 0;
+      });
+
+      headersHTML = `
+        <tr>
+          <th>ބޭނުންކުރި އެއްޗެއް</th>
+          <th style="text-align: end;">ބޭނުންކުރި ޖުމްލަ މިންވަރު</th>
+          <th style="text-align: end;">ޖުމްލަ ޚަރަދު</th>
+        </tr>
+      `;
+
+      bodyHTML = Object.keys(prodCost).length ? Object.keys(prodCost).map(name => `
+        <tr>
+          <td><strong>${name}</strong></td>
+          <td style="text-align: end; font-weight: bold;">${prodCost[name].qty} ${prodCost[name].unit}</td>
+          <td style="text-align: end; font-weight: bold;">${format2DP(prodCost[name].cost)} ${CURRENCY_HTML}</td>
+        </tr>
+      `).join('') : `<tr><td colspan="3" class="text-center text-muted">އެއްވެސް ރެކޯޑެއް ފެންނާކަށް ނެތް.</td></tr>`;
+
+    } else if (reportType === 'crop-history') {
+      resultTitle.textContent = "ގަސްތަކުގެ ފަރުވާގެ ތާރީޚް";
+      headersHTML = `
+        <tr>
+          <th>ގަސް</th>
+          <th>ތާރީޚް</th>
+          <th>ފަރުވާ</th>
+          <th>މިންވަރު</th>
+          <th>އިތުރު ނޯޓް</th>
+        </tr>
+      `;
+
+      bodyHTML = apps.length ? apps.map(item => `
+        <tr>
+          <td><strong>${item.crop}</strong> (${item.plot})</td>
+          <td>${item.date}</td>
+          <td>${t(item.category)}: ${item.productName}</td>
+          <td>${item.quantityUsed} ${item.unit}</td>
+          <td>${item.remarks || '-'}</td>
+        </tr>
+      `).join('') : `<tr><td colspan="5" class="text-center text-muted">އެއްވެސް ރެކޯޑެއް ފެންނާކަށް ނެތް.</td></tr>`;
+    }
+
+    resultTable.querySelector('thead').innerHTML = headersHTML;
+    document.getElementById('t-rep-result-body').innerHTML = bodyHTML;
+  }
+
+  exportTreatmentReport(format) {
+    this.generateTreatmentReport();
+    
+    const title = document.getElementById('t-rep-result-title').textContent;
+    const table = document.getElementById('t-rep-result-table');
+    
+    if (format === 'excel') {
+      let csvContent = '\uFEFF'; 
+      const rows = table.querySelectorAll('tr');
+      rows.forEach(row => {
+        const cols = row.querySelectorAll('th, td');
+        const rowData = [];
+        cols.forEach(col => {
+          let text = col.textContent.replace(/"/g, '""').trim();
+          rowData.push(`"${text}"`);
+        });
+        csvContent += rowData.join(',') + '\r\n';
+      });
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `${title.replace(/\s+/g, '_')}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      this.showToast("އެކްސެލް ފައިލް ޑައުންލޯޑް ކުރެވިއްޖެ!");
+    } else if (format === 'pdf') {
+      window.print();
+    }
   }
 }
 

@@ -141,7 +141,55 @@ export const translations = {
     syncSuccess: "ޑޭޓާ ސިންކް ކުރެވިއްޖެ!",
     pendingSync: "ސިންކް ނުވެ ހުރި ރެކޯޑްތައް: ",
     noPendingSync: "ހުރިހާ ޑޭޓާއެއް ހުރީ ސިންކްވެފައި",
-    syncing: "ސިންކްވަނީ..."
+    syncing: "ސިންކްވަނީ...",
+    
+    // Treatments Module Translations
+    treatments: "ބޭސް އަދި ކާނާ",
+    treatmentCalendar: "ކަލަންޑަރު",
+    treatmentProducts: "ބޭސް/ކާނާ ލިސްޓް",
+    treatmentDashboard: "ބޭސް ޑޭޝްބޯޑް",
+    treatmentRecords: "ޖެހި ރެކޯޑްތައް",
+    newTreatment: "ބޭސް/ކާނާ ޖެހުން",
+    
+    // Product fields
+    brand: "ބްރޭންޑް",
+    activeIngredient: "އެކްޓިވް އިންގްރިޑިއަންޓް",
+    formulation: "ފޯމިއުލޭޝަން",
+    defaultUnit: "ޑިފޯލްޓް ޔުނިޓް",
+    defaultDosage: "ޑިފޯލްޓް ޑޯސޭޖް",
+    costPerUnit: "ޔުނިޓެއްގެ އަގު",
+    safetyInterval: "ރީ-އެންޓްރީ އިންޓަވަލް (REI)",
+    preHarvestInterval: "ކަނޑާ މުއްދަތު (PHI)",
+    growthStage: "ހެދިފައިވާ މަރުހަލާ",
+    appliedBy: "ޖެހި މީހާ",
+    mixRatio: "މިކްސް ރޭޝިއޯ",
+    waterVolume: "ފެނުގެ މިންވަރު",
+    
+    // Product Categories
+    Insecticide: "ސޫފި މަރާ ބޭސް",
+    Fungicide: "ފަންގަސް މަރާ ބޭސް",
+    Pesticide: "ބޭސް",
+    Herbicide: "ވިނަ މަރާ ބޭސް",
+    "Foliar Nutrient": "ފަތަށް އަޅާ ކާނާ",
+    "Growth Regulator": "ގަސް ހެއްދުމަށް ބޭނުންކުރާ އެއްޗެހި",
+    "Soil Amendment": "ވެލި ރަނގަޅުކުރާ އެއްޗެހި",
+    "Biological Control": "ބަޔޮލޮޖިކަލް ކޮންޓްރޯލް",
+    
+    // Growth Stages
+    Seedling: "ކުދި ގަސް (Seedling)",
+    Vegetative: "ގަސް ހެދޭ މަރުހަލާ (Vegetative)",
+    Flowering: "މާ އަޅާ މަރުހަލާ (Flowering)",
+    Fruiting: "މޭވާ އަޅާ މަރުހަލާ (Fruiting)",
+    Harvest: "ކަނޑާ މަރުހަލާ (Harvest)",
+    
+    // Methods
+    "Foliar Spray": "ފަތަށް ޖެހުން (Foliar Spray)",
+    "Soil Drench": "މުލަށް އެޅުން (Soil Drench)",
+    "Drip Irrigation": "ތިކި ޖައްސައިގެން ފެންދިނުން",
+    "Side Dressing": "އަރިމަތީގައި އެޅުން",
+    Broadcasting: "ބުރުވުން (Broadcasting)",
+    "Seed Treatment": "އޮށަށް ބޭސް ޖެހުން",
+    Manual: "އަތުން އެޅުން"
   }
 };
 

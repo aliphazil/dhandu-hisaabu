@@ -84,6 +84,76 @@ const DEFAULT_AUDIT_LOGS = [
   { id: "log_3", farmId: "farm_1", timestamp: "2026-06-29T10:05:00Z", username: "villa_worker", eventType: "RECORD_INCOME", message: "މުވައްޒަފު މެލަން އާމްދަނީ ރެކޯޑް ކޮށްފި (15,000 MVR)", type: "farm" }
 ];
 
+const DEFAULT_TREATMENT_PRODUCTS = [
+  {
+    id: "p_1",
+    farmId: "farm_1",
+    name: "NPK 15-15-15",
+    brand: "YaraMila",
+    category: "Fertilizer",
+    activeIngredient: "Nitrogen, Phosphorus, Potassium",
+    formulation: "Granular",
+    defaultUnit: "kg",
+    defaultDosage: "50g/plant",
+    supplier: "އެގްރޯ ބާޒާރު",
+    costPerUnit: 25.00,
+    safetyInterval: "24 Hours",
+    preHarvestInterval: "7 Days",
+    status: "active",
+    createdDate: "2026-06-01T08:00:00Z",
+    updatedDate: "2026-06-01T08:00:00Z"
+  },
+  {
+    id: "p_2",
+    farmId: "farm_1",
+    name: "Copper Oxychloride",
+    brand: "Coptox",
+    category: "Fungicide",
+    activeIngredient: "Copper Oxychloride 50% WP",
+    formulation: "Wettable Powder",
+    defaultUnit: "g",
+    defaultDosage: "2g/L",
+    supplier: "ލޯކަލް ފިހާރަ",
+    costPerUnit: 0.15,
+    safetyInterval: "48 Hours",
+    preHarvestInterval: "14 Days",
+    status: "active",
+    createdDate: "2026-06-01T08:00:00Z",
+    updatedDate: "2026-06-01T08:00:00Z"
+  }
+];
+
+const DEFAULT_TREATMENT_APPLICATIONS = [
+  {
+    id: "ta_1",
+    farmId: "farm_1",
+    cropId: "crop_1",
+    productId: "p_1",
+    userId: "villa_worker",
+    date: "2026-06-25",
+    time: "08:30",
+    crop: "Watermelon",
+    variety: "Hithadhoo Black",
+    plot: "Field A-1",
+    growthStage: "Vegetative",
+    category: "Fertilizer",
+    productName: "NPK 15-15-15",
+    quantityUsed: 10,
+    unit: "kg",
+    mixRatio: "Direct Soil",
+    waterVolume: "N/A",
+    applicationMethod: "Side Dressing",
+    appliedBy: "villa_worker",
+    cost: 250.00,
+    nextScheduledDate: "2026-07-02",
+    remarks: "ގަސްތަކަށް ކާނާ އެޅުން ރަނގަޅަށް ކުރެވުނު.",
+    photo: null,
+    status: "approved",
+    createdDate: "2026-06-25T09:00:00Z",
+    updatedDate: "2026-06-25T09:00:00Z"
+  }
+];
+
 // Initialize Simulated Server Database
 export function initDB() {
   if (!localStorage.getItem("dhandu_hisaabu_server_db")) {
@@ -95,7 +165,9 @@ export function initDB() {
       fertilizer_records: DEFAULT_FERTILIZERS,
       harvest_records: DEFAULT_HARVESTS,
       inventory: DEFAULT_INVENTORY,
-      audit_logs: DEFAULT_AUDIT_LOGS
+      audit_logs: DEFAULT_AUDIT_LOGS,
+      treatment_products: DEFAULT_TREATMENT_PRODUCTS,
+      treatment_applications: DEFAULT_TREATMENT_APPLICATIONS
     };
     localStorage.setItem("dhandu_hisaabu_server_db", JSON.stringify(serverDB));
   }
@@ -119,7 +191,7 @@ export async function pushAllToFirestore() {
   if (!db) return;
   try {
     const serverDB = getStore("server");
-    const tables = ["farms", "users", "crops", "transactions", "fertilizer_records", "harvest_records", "inventory", "audit_logs"];
+    const tables = ["farms", "users", "crops", "transactions", "fertilizer_records", "harvest_records", "inventory", "audit_logs", "treatment_products", "treatment_applications"];
     for (const table of tables) {
       const records = serverDB[table] || [];
       for (const record of records) {
@@ -139,7 +211,7 @@ export async function pushAllToFirestore() {
 export async function pullFromFirestore() {
   if (!db) return;
   try {
-    const tables = ["farms", "users", "crops", "transactions", "fertilizer_records", "harvest_records", "inventory", "audit_logs"];
+    const tables = ["farms", "users", "crops", "transactions", "fertilizer_records", "harvest_records", "inventory", "audit_logs", "treatment_products", "treatment_applications"];
     const serverDB = {};
     for (const table of tables) {
       const querySnapshot = await getDocs(collection(db, table));
@@ -210,7 +282,7 @@ function validateSecurity(table, action) {
   if (!user) throw new Error("Security Exception: Unauthorized access. Please log in.");
   
   const platformAdminOnly = ["farms"];
-  const farmBusinessOnly = ["crops", "transactions", "fertilizer_records", "harvest_records", "inventory"];
+  const farmBusinessOnly = ["crops", "transactions", "fertilizer_records", "harvest_records", "inventory", "treatment_products", "treatment_applications"];
   
   // 1. Platform Admin restrictions
   if (user.role === "platform_admin") {
@@ -233,9 +305,9 @@ function validateSecurity(table, action) {
     
     // 3. Staff specific write restrictions
     if (user.role === "staff" && action === "write") {
-      // Staff can ONLY write Income or Fertilizer
-      if (!["transactions", "fertilizer_records"].includes(table)) {
-        throw new Error("Security Exception: Staff can only record Income and Fertilizer records.");
+      // Staff can ONLY write Income, Fertilizer, and Treatment Applications
+      if (!["transactions", "fertilizer_records", "treatment_applications"].includes(table)) {
+        throw new Error("Security Exception: Staff can only record Income, Fertilizer, and Treatment applications.");
       }
     }
   }
