@@ -2508,15 +2508,15 @@ class App {
       let actions = '';
       if (user.role === 'farm_admin') {
         if (item.status === 'pending_approval') {
-          actions += `<button class="btn btn-primary" style="padding:4px 8px; font-size:0.9rem; min-height:auto; margin-inline-end:4px;" onclick="window.app.approveTreatmentApplication('${item.id}')" title="ހުއްދަދޭން">✅</button>`;
+          actions += `<button class="btn" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; min-height:auto; border-radius:50%; background:#2e7d32; border:none; color:white; cursor:pointer;" onclick="window.app.approveTreatmentApplication('${item.id}')" title="ހުއްދަދޭން"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></button>`;
         }
-        actions += `<button class="btn btn-secondary" style="padding:4px 8px; font-size:0.9rem; min-height:auto; margin-inline-end:4px;" onclick="window.app.editTreatmentApplication('${item.id}')" title="ބަދަލުކުރަން">✏️</button>`;
-        actions += `<button class="btn btn-danger" style="padding:4px 8px; font-size:0.9rem; min-height:auto; background:#d32f2f; color:white;" onclick="window.app.deleteTreatmentApplication('${item.id}')" title="ފޮހެލަން">🗑️</button>`;
+        actions += `<button class="btn" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; min-height:auto; border-radius:50%; background:#f0f0f0; border:none; color:#333; cursor:pointer;" onclick="window.app.editTreatmentApplication('${item.id}')" title="ބަދަލުކުރަން"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button>`;
+        actions += `<button class="btn" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; min-height:auto; border-radius:50%; background:#c62828; border:none; color:white; cursor:pointer;" onclick="window.app.deleteTreatmentApplication('${item.id}')" title="ފޮހެލަން"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>`;
       } else {
         if (item.appliedBy === user.username && item.status === 'pending_approval') {
-          actions += `<button class="btn btn-secondary" style="padding:4px 8px; font-size:0.9rem; min-height:auto;" onclick="window.app.editTreatmentApplication('${item.id}')" title="ބަދަލުކުރަން">✏️</button>`;
+          actions += `<button class="btn" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; min-height:auto; border-radius:50%; background:#f0f0f0; border:none; color:#333; cursor:pointer;" onclick="window.app.editTreatmentApplication('${item.id}')" title="ބަދަލުކުރަން"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button>`;
         } else {
-          actions += `<span class="text-muted" style="font-size:0.9rem;" title="ބަދަލެއް ނުގެނެވޭނެ">🔒</span>`;
+          actions += `<span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:#f5f5f5; color:#9e9e9e;" title="ބަދަލެއް ނުގެނެވޭނެ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>`;
         }
       }
 
@@ -2533,7 +2533,7 @@ class App {
           <td>${t(item.category)}</td>
           <td style="text-align: end; font-weight: bold;">${item.quantityUsed} ${item.unit}</td>
           <td>${item.nextScheduledDate || '-'}</td>
-          <td>${actions}</td>
+          <td><div style="display:flex; gap:6px; align-items:center;">${actions}</div></td>
         </tr>
       `;
     }).join('') : `<tr><td colspan="7" class="text-center text-muted">އެއްވެސް ރެކޯޑެއް ފެންނާކަށް ނެތް.</td></tr>`;
