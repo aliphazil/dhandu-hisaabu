@@ -40,13 +40,13 @@ const DEFAULT_USERS = [
 
 const DEFAULT_INVENTORY = [
   // Farm 1 Stocks
-  { id: "inv_1", farmId: "farm_1", category: "Fertilizer", name: "އެން.ޕީ.ކޭ 15-15-15 ކާދު", currentStock: 120, unit: "ކިލޯ", minimumStock: 25, createdDate: "2026-06-01T08:00:00Z" },
+  { id: "inv_1", farmId: "farm_1", category: "Fertilizer", name: "އެން.ޕީ.ކޭ 15-15-15 ގަސްކާނާ", currentStock: 120, unit: "ކިލޯ", minimumStock: 25, createdDate: "2026-06-01T08:00:00Z" },
   { id: "inv_2", farmId: "farm_1", category: "Seeds", name: "ކަރާ އޮށް", currentStock: 15, unit: "ޕެކެޓް", minimumStock: 5, createdDate: "2026-06-01T08:00:00Z" },
   { id: "inv_3", farmId: "farm_1", category: "Chemicals", name: "ކޮމްޕޯސްޓް ބޭސް", currentStock: 8, unit: "ލީޓަރު", minimumStock: 2, createdDate: "2026-06-01T08:00:00Z" },
   { id: "inv_4", farmId: "farm_1", category: "Equipment", name: "ފެންޖަހާ ބާލިދީ", currentStock: 5, unit: "އަދަދު", minimumStock: 1, createdDate: "2026-06-01T08:00:00Z" },
   
   // Farm 2 Stocks
-  { id: "inv_5", farmId: "farm_2", category: "Fertilizer", name: "އޯގަނިކް ކޮމްޕޯސްޓް ކާދު", currentStock: 200, unit: "ކިލޯ", minimumStock: 50, createdDate: "2026-06-01T08:00:00Z" },
+  { id: "inv_5", farmId: "farm_2", category: "Fertilizer", name: "އޯގަނިކް ކޮމްޕޯސްޓް ގަސްކާނާ", currentStock: 200, unit: "ކިލޯ", minimumStock: 50, createdDate: "2026-06-01T08:00:00Z" },
   { id: "inv_6", farmId: "farm_2", category: "Seeds", name: "ފަޅޯ އޮށް", currentStock: 2, unit: "ޕެކެޓް", minimumStock: 3, createdDate: "2026-06-01T08:00:00Z" }
 ];
 
@@ -71,7 +71,7 @@ const DEFAULT_TRANSACTIONS = [
 ];
 
 const DEFAULT_FERTILIZERS = [
-  { id: "f_1", farmId: "farm_1", date: "2026-06-12", crop: "ކަރާ", fertilizerName: "އެން.ޕީ.ކޭ 15-15-15 ކާދު", quantity: 20, unit: "ކިލޯ", applicationMethod: "fertSoil", appliedBy: "އަޙްމަދު ރަޝީދު", cost: 800, notes: "ފުރަތަމަ ބުރުގެ ކާދު އެޅުން", createdBy: "villa_worker", createdDate: "2026-06-12T07:30:00Z" }
+  { id: "f_1", farmId: "farm_1", date: "2026-06-12", crop: "ކަރާ", fertilizerName: "އެން.ޕީ.ކޭ 15-15-15 ގަސްކާނާ", quantity: 20, unit: "ކިލޯ", applicationMethod: "fertSoil", appliedBy: "އަޙްމަދު ރަޝީދު", cost: 800, notes: "ފުރަތަމަ ބުރުގެ ގަސްކާނާ އެޅުން", createdBy: "villa_worker", createdDate: "2026-06-12T07:30:00Z" }
 ];
 
 const DEFAULT_HARVESTS = [
@@ -724,7 +724,7 @@ export function registerFarmSelf(farmData) {
   
   // Seed default inventory
   const defaultSeeds = { id: "inv_s_" + Date.now(), farmId: newFarmId, category: "Seeds", name: "ކަރާ އޮށް", currentStock: 10, unit: "ޕެކެޓް", minimumStock: 2, createdDate: new Date().toISOString() };
-  const defaultFert = { id: "inv_f_" + Date.now(), farmId: newFarmId, category: "Fertilizer", name: "އެން.ޕީ.ކޭ 15-15-15 ކާދު", currentStock: 100, unit: "ކިލޯ", minimumStock: 20, createdDate: new Date().toISOString() };
+  const defaultFert = { id: "inv_f_" + Date.now(), farmId: newFarmId, category: "Fertilizer", name: "އެން.ޕީ.ކޭ 15-15-15 ގަސްކާނާ", currentStock: 100, unit: "ކިލޯ", minimumStock: 20, createdDate: new Date().toISOString() };
   
   // Store
   serverDB.farms.push(newFarm);

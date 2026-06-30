@@ -877,7 +877,7 @@ class App {
         } else {
           item.innerHTML = `
             <div class="activity-details">
-              <span class="activity-title">🌿 ކާދު އެޅުން: ${act.fertilizerName}</span>
+              <span class="activity-title">🌿 ގަސްކާނާ އެޅުން: ${act.fertilizerName}</span>
               <span class="activity-meta">ގަސް: ${t(act.crop)} • މިންވަރު: ${format2DP(act.quantity)} ${act.unit} (${t(act.applicationMethod)})</span>
             </div>
             <div class="activity-amount text-danger" style="font-size: 0.85rem;">${act.cost > 0 ? `-${format2DP(act.cost)}${CURRENCY_HTML}` : ''}</div>
@@ -1385,7 +1385,7 @@ class App {
         <tr>
           <th>ތާރީޚް</th>
           <th>ގަސް</th>
-          <th>ކާދުގެ ބާވަތް</th>
+          <th>ގަސްކާނާގެ ބާވަތް</th>
           <th style="text-align: end;">މިންވަރު</th>
           <th style="text-align: end;">ޚަރަދުވީ އަގު</th>
         </tr>
@@ -1781,7 +1781,7 @@ class App {
     insertRecord('fertilizer_records', data, this.isOnline);
     this.closeModal('fertilizer');
     
-    this.showToast("ކާދު އެޅުން ރެކޯޑް ކުރެވި، އިންވެންޓްރީން މަދު ކުރެވިއްޖެ!");
+    this.showToast("ގަސްކާނާ އެޅުން ރެކޯޑް ކުރެވި، އިންވެންޓްރީން މަދު ކުރެވިއްޖެ!");
     this.showView(this.currentView);
   }
 
@@ -2802,7 +2802,7 @@ class App {
       let displayApps = apps;
       if (catFilter) {
         displayApps = apps.filter(a => a.category === 'Fertilizer');
-        resultTitle.textContent = "ކާދު ބޭނުންކުރި މިންވަރުގެ ރިޕޯޓް";
+        resultTitle.textContent = "ގަސްކާނާ ބޭނުންކުރި މިންވަރުގެ ރިޕޯޓް";
       } else {
         displayApps = apps.filter(a => a.category !== 'Fertilizer');
         resultTitle.textContent = "ބޭސް ބޭނުންކުރި މިންވަރުގެ ރިޕޯޓް";

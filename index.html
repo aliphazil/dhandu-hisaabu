@@ -121,7 +121,7 @@
         </button>
         <button class="touch-btn touch-btn-fertilizer" onclick="window.app.openFertilizerModal()">
           <span class="touch-btn-icon">🌿</span>
-          <span data-i18n="recordFertilizer">ކާދު އެޅުން ރެކޯޑްކުރަން</span>
+          <span data-i18n="recordFertilizer">ގަސްކާނާ އެޅުން ރެކޯޑްކުރަން</span>
         </button>
       </div>
 
@@ -329,7 +329,7 @@
     <!-- 7. FERTILIZER RECORDS VIEW -->
     <section id="view-fertilizer" class="hidden">
       <div class="card-header-actions">
-        <h2 style="font-weight: 700;" data-i18n="fertilizer">ކާދު އެޅުން</h2>
+        <h2 style="font-weight: 700;" data-i18n="fertilizer">ގަސްކާނާ އެޅުން</h2>
         <button class="btn btn-primary" onclick="window.app.openFertilizerModal()" data-i18n="add">އަލަށް އިތުރުކުރަން</button>
       </div>
 
@@ -340,7 +340,7 @@
               <tr>
                 <th data-i18n="date">ތާރީޚް</th>
                 <th data-i18n="crops">ގަސް</th>
-                <th>ކާދުގެ ނަން</th>
+                <th>ގަސްކާނާގެ ނަން</th>
                 <th data-i18n="quantity">މިންވަރު</th>
                 <th>އެޅި ފަރާތް</th>
                 <th data-i18n="actions">އަމަލުތައް</th>
@@ -451,7 +451,7 @@
             <select id="report-select-type" class="form-input" onchange="window.app.generateReport()">
               <option value="pl" data-i18n="profitAndLoss">ފައިދާ އާއި ގެއްލުމުގެ ރިޕޯޓް</option>
               <option value="crop" data-i18n="cropPerformance">ގަސްތަކުގެ ރިޕޯޓް</option>
-              <option value="fertilizer" data-i18n="fertilizerUsage">ކާދު ބޭނުންކުރި މިންވަރު</option>
+              <option value="fertilizer" data-i18n="fertilizerUsage">ގަސްކާނާ ބޭނުންކުރި މިންވަރު</option>
               <option value="harvest" data-i18n="harvestSummary">މައުސޫލު ހޮވުމުގެ ޚުލާސާ</option>
               <option value="expense-cat" data-i18n="expenseByCategory">ޚަރަދުތައް ކެޓަގަރީން</option>
             </select>
@@ -682,7 +682,7 @@
               <label for="t-records-filter-cat" style="font-size:0.8rem; margin-block-end:4px;">ކެޓަގަރީ</label>
               <select id="t-records-filter-cat" class="form-input" onchange="window.app.loadTreatmentRecords()">
                 <option value="">ހުރިހާ ބާވަތެއް</option>
-                <option value="Fertilizer">ކާދު (Fertilizer)</option>
+                <option value="Fertilizer">ގަސްކާނާ (Fertilizer)</option>
                 <option value="Insecticide">ސޫފި މަރާ ބޭސް</option>
                 <option value="Fungicide">ފަންގަސް މަރާ ބޭސް</option>
                 <option value="Pesticide">ބޭސް</option>
@@ -744,7 +744,7 @@
               <div class="form-group">
                 <label for="t-prod-cat">ކެޓަގަރީ</label>
                 <select id="t-prod-cat" class="form-input" required>
-                  <option value="Fertilizer">ކާދު (Fertilizer)</option>
+                  <option value="Fertilizer">ގަސްކާނާ (Fertilizer)</option>
                   <option value="Insecticide">ސޫފި މަރާ ބޭސް (Insecticide)</option>
                   <option value="Fungicide">ފަންގަސް މަރާ ބޭސް (Fungicide)</option>
                   <option value="Pesticide">ބޭސް (Pesticide)</option>
@@ -839,7 +839,7 @@
             <div class="form-group">
               <label for="t-rep-type">ރިޕޯޓްގެ ބާވަތް</label>
               <select id="t-rep-type" class="form-input" required>
-                <option value="fertilizer">ކާދު ބޭނުންކުރި މިންވަރު (Fertilizer Usage)</option>
+                <option value="fertilizer">ގަސްކާނާ ބޭނުންކުރި މިންވަރު (Fertilizer Usage)</option>
                 <option value="pesticide">ބޭސް ބޭނުންކުރި މިންވަރު (Pesticide/Protection Usage)</option>
                 <option value="summary">މަހުގެ ފަރުވާގެ ޚުލާސާ (Monthly Treatment Summary)</option>
                 <option value="cost">ބޭސް އަދި ކާނާގެ ޚަރަދު (Product Cost Analysis)</option>
@@ -1042,7 +1042,7 @@
   <div class="modal-overlay" id="modal-fertilizer">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title" data-i18n="recordFertilizer">ކާދު އެޅުން ރެކޯޑްކުރަން</h3>
+        <h3 class="modal-title" data-i18n="recordFertilizer">ގަސްކާނާ އެޅުން ރެކޯޑްކުރަން</h3>
         <button class="modal-close" onclick="window.app.closeModal('fertilizer')">&times;</button>
       </div>
       <form id="form-fertilizer" onsubmit="window.app.saveFertilizer(event)">
@@ -1056,7 +1056,7 @@
         </div>
 
         <div class="form-group">
-          <label for="fert-name">ކާދުގެ ބާވަތް (ނަން)</label>
+          <label for="fert-name">ގަސްކާނާގެ ބާވަތް (ނަން)</label>
           <select id="fert-name" class="form-input" required>
             <!-- Populated from Inventory stock -->
           </select>
@@ -1068,7 +1068,7 @@
         </div>
 
         <div class="form-group">
-          <label for="fert-method" data-i18n="fertMethod">ކާދު އަޅާ ގޮތް</label>
+          <label for="fert-method" data-i18n="fertMethod">ގަސްކާނާ އަޅާ ގޮތް</label>
           <select id="fert-method" class="form-input" required>
             <option value="fertSoil" data-i18n="fertSoil">ފަސްގަނޑަށް އެޅުން</option>
             <option value="fertFoliar" data-i18n="fertFoliar">ފަތަށް ޖެހުން</option>
@@ -1076,7 +1076,7 @@
           </select>
         </div>
 
-        <app-input type="number" id="fert-cost" label="ކާދުގެ ޚަރަދު (ލަފާކުރާ)" min="0"></app-input>
+        <app-input type="number" id="fert-cost" label="ގަސްކާނާގެ ޚަރަދު (ލަފާކުރާ)" min="0"></app-input>
         <app-input type="text" id="fert-notes" label="ނޯޓް"></app-input>
 
         <div class="btn-row">
@@ -1188,14 +1188,14 @@
         <div class="form-group">
           <label for="inv-category">ބާވަތް (Category)</label>
           <select id="inv-category" class="form-input" required>
-            <option value="Fertilizer">ކާދު (Fertilizer)</option>
+            <option value="Fertilizer">ގަސްކާނާ (Fertilizer)</option>
             <option value="Seeds">އޮށް (Seeds)</option>
             <option value="Chemicals">ބޭސް (Chemicals)</option>
             <option value="Equipment">ސާމާނު (Equipment)</option>
           </select>
         </div>
 
-        <app-input type="text" id="inv-name" label="ސާމާނުގެ ނަން" required placeholder="މިސާލަކަށް: އެން.ޕީ.ކޭ ކާދު، ޔޫރިއާ"></app-input>
+        <app-input type="text" id="inv-name" label="ސާމާނުގެ ނަން" required placeholder="މިސާލަކަށް: އެން.ޕީ.ކޭ ގަސްކާނާ، ޔޫރިއާ"></app-input>
 
         <div class="form-row-2col">
           <app-input type="number" id="inv-stock" label="މިހާރު ހުރި އަދަދު" min="0" step="any" required></app-input>
@@ -1264,6 +1264,6 @@
     </div>
   </div>
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=1.3.3"></script>
+  <script type="module" src="app.js?v=1.3.4"></script>
 </body>
 </html>
