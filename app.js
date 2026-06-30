@@ -638,20 +638,13 @@ class App {
           <span data-i18n="dashboard">ޑޭޝްބޯޑް</span>
         </button>
         <button class="nav-item" onclick="window.app.showView('treatments')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 14c-1-5 2.5-10 8-11.5 5.5-1.5 11 1.5 12 7" />
-            <path d="M9 22c5-1.5 9-4.5 12-4.5M5 20c4-1.5 9-3 14-2.5" />
-            <path d="M7 21c-1.5-4-5-4.5-5-4.5s2.5 4.5 5 4.5z" />
-            <path d="M7 21c1-4.5 4-5.5 4-5.5s-1.5 5-4 5.5z" />
-            <path d="M9 13.5v4.5h4v-4.5a1.5 1.5 0 00-1.5-1.5h-1a1.5 1.5 0 00-1.5 1.5z" />
-            <path d="M10 12h2v-1h-2v1z" />
-            <path d="M10.5 11V10h1v1h-1z" />
-            <path d="M14.5 15h3.5a1 1 0 011 1v2h-4.5v-3z" />
-            <path d="M16 15v-2.5a.5.5 0 01.5-.5h.5" />
-            <path d="M17.5 12h2.5a1 1 0 011 1v.5" />
-            <circle cx="21.5" cy="10.5" r="0.5" fill="currentColor" />
-            <circle cx="22.5" cy="11.5" r="0.5" fill="currentColor" />
-            <circle cx="22" cy="12.5" r="0.5" fill="currentColor" />
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11V6a1 1 0 011-1h4a1 1 0 011 1v5" />
+            <path d="M7 11h10l1 9a2 2 0 01-2 2H8a2 2 0 01-2-2l1-9z" />
+            <path d="M14 6h3.5a1.5 1.5 0 011.5 1.5v1.5" />
+            <path d="M18.5 7.5H16.5" />
+            <path d="M21 7.5c1 0 2-.5 2-1s-1-1-2-1" />
+            <path d="M10 16c1-2.5 3-2.5 4-1s-1 3-4 1z" />
           </svg>
           <span data-i18n="treatments">ބޭސް/ކާނާ</span>
         </button>
@@ -668,20 +661,13 @@ class App {
           <span data-i18n="crops">ގަސްތައް</span>
         </button>
         <button class="nav-item" onclick="window.app.showView('treatments')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 14c-1-5 2.5-10 8-11.5 5.5-1.5 11 1.5 12 7" />
-            <path d="M9 22c5-1.5 9-4.5 12-4.5M5 20c4-1.5 9-3 14-2.5" />
-            <path d="M7 21c-1.5-4-5-4.5-5-4.5s2.5 4.5 5 4.5z" />
-            <path d="M7 21c1-4.5 4-5.5 4-5.5s-1.5 5-4 5.5z" />
-            <path d="M9 13.5v4.5h4v-4.5a1.5 1.5 0 00-1.5-1.5h-1a1.5 1.5 0 00-1.5 1.5z" />
-            <path d="M10 12h2v-1h-2v1z" />
-            <path d="M10.5 11V10h1v1h-1z" />
-            <path d="M14.5 15h3.5a1 1 0 011 1v2h-4.5v-3z" />
-            <path d="M16 15v-2.5a.5.5 0 01.5-.5h.5" />
-            <path d="M17.5 12h2.5a1 1 0 011 1v.5" />
-            <circle cx="21.5" cy="10.5" r="0.5" fill="currentColor" />
-            <circle cx="22.5" cy="11.5" r="0.5" fill="currentColor" />
-            <circle cx="22" cy="12.5" r="0.5" fill="currentColor" />
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11V6a1 1 0 011-1h4a1 1 0 011 1v5" />
+            <path d="M7 11h10l1 9a2 2 0 01-2 2H8a2 2 0 01-2-2l1-9z" />
+            <path d="M14 6h3.5a1.5 1.5 0 011.5 1.5v1.5" />
+            <path d="M18.5 7.5H16.5" />
+            <path d="M21 7.5c1 0 2-.5 2-1s-1-1-2-1" />
+            <path d="M10 16c1-2.5 3-2.5 4-1s-1 3-4 1z" />
           </svg>
           <span data-i18n="treatments">ބޭސް/ކާނާ</span>
         </button>
