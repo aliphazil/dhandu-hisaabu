@@ -638,7 +638,21 @@ class App {
           <span data-i18n="dashboard">ޑޭޝްބޯޑް</span>
         </button>
         <button class="nav-item" onclick="window.app.showView('treatments')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 14c-1-5 2.5-10 8-11.5 5.5-1.5 11 1.5 12 7" />
+            <path d="M9 22c5-1.5 9-4.5 12-4.5M5 20c4-1.5 9-3 14-2.5" />
+            <path d="M7 21c-1.5-4-5-4.5-5-4.5s2.5 4.5 5 4.5z" />
+            <path d="M7 21c1-4.5 4-5.5 4-5.5s-1.5 5-4 5.5z" />
+            <path d="M9 13.5v4.5h4v-4.5a1.5 1.5 0 00-1.5-1.5h-1a1.5 1.5 0 00-1.5 1.5z" />
+            <path d="M10 12h2v-1h-2v1z" />
+            <path d="M10.5 11V10h1v1h-1z" />
+            <path d="M14.5 15h3.5a1 1 0 011 1v2h-4.5v-3z" />
+            <path d="M16 15v-2.5a.5.5 0 01.5-.5h.5" />
+            <path d="M17.5 12h2.5a1 1 0 011 1v.5" />
+            <circle cx="21.5" cy="10.5" r="0.5" fill="currentColor" />
+            <circle cx="22.5" cy="11.5" r="0.5" fill="currentColor" />
+            <circle cx="22" cy="12.5" r="0.5" fill="currentColor" />
+          </svg>
           <span data-i18n="treatments">ބޭސް/ކާނާ</span>
         </button>
       `;
@@ -654,7 +668,21 @@ class App {
           <span data-i18n="crops">ގަސްތައް</span>
         </button>
         <button class="nav-item" onclick="window.app.showView('treatments')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 14c-1-5 2.5-10 8-11.5 5.5-1.5 11 1.5 12 7" />
+            <path d="M9 22c5-1.5 9-4.5 12-4.5M5 20c4-1.5 9-3 14-2.5" />
+            <path d="M7 21c-1.5-4-5-4.5-5-4.5s2.5 4.5 5 4.5z" />
+            <path d="M7 21c1-4.5 4-5.5 4-5.5s-1.5 5-4 5.5z" />
+            <path d="M9 13.5v4.5h4v-4.5a1.5 1.5 0 00-1.5-1.5h-1a1.5 1.5 0 00-1.5 1.5z" />
+            <path d="M10 12h2v-1h-2v1z" />
+            <path d="M10.5 11V10h1v1h-1z" />
+            <path d="M14.5 15h3.5a1 1 0 011 1v2h-4.5v-3z" />
+            <path d="M16 15v-2.5a.5.5 0 01.5-.5h.5" />
+            <path d="M17.5 12h2.5a1 1 0 011 1v.5" />
+            <circle cx="21.5" cy="10.5" r="0.5" fill="currentColor" />
+            <circle cx="22.5" cy="11.5" r="0.5" fill="currentColor" />
+            <circle cx="22" cy="12.5" r="0.5" fill="currentColor" />
+          </svg>
           <span data-i18n="treatments">ބޭސް/ކާނާ</span>
         </button>
         <button class="nav-item nav-item-income" onclick="window.app.showView('income')">
