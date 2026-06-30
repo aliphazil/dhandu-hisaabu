@@ -2508,15 +2508,15 @@ class App {
       let actions = '';
       if (user.role === 'farm_admin') {
         if (item.status === 'pending_approval') {
-          actions += `<button class="btn btn-primary" style="padding:4px 8px; font-size:0.75rem; min-height:auto; margin-inline-end:4px;" onclick="window.app.approveTreatmentApplication('${item.id}')">ހުއްދަދޭން</button>`;
+          actions += `<button class="btn btn-primary" style="padding:4px 8px; font-size:0.9rem; min-height:auto; margin-inline-end:4px;" onclick="window.app.approveTreatmentApplication('${item.id}')" title="ހުއްދަދޭން">✅</button>`;
         }
-        actions += `<button class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem; min-height:auto; margin-inline-end:4px;" onclick="window.app.editTreatmentApplication('${item.id}')">ބަދަލުކުރަން</button>`;
-        actions += `<button class="btn btn-danger" style="padding:4px 8px; font-size:0.75rem; min-height:auto; background:#d32f2f; color:white;" onclick="window.app.deleteTreatmentApplication('${item.id}')">ފޮހެލަން</button>`;
+        actions += `<button class="btn btn-secondary" style="padding:4px 8px; font-size:0.9rem; min-height:auto; margin-inline-end:4px;" onclick="window.app.editTreatmentApplication('${item.id}')" title="ބަދަލުކުރަން">✏️</button>`;
+        actions += `<button class="btn btn-danger" style="padding:4px 8px; font-size:0.9rem; min-height:auto; background:#d32f2f; color:white;" onclick="window.app.deleteTreatmentApplication('${item.id}')" title="ފޮހެލަން">🗑️</button>`;
       } else {
         if (item.appliedBy === user.username && item.status === 'pending_approval') {
-          actions += `<button class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem; min-height:auto;" onclick="window.app.editTreatmentApplication('${item.id}')">ބަދަލުކުރަން</button>`;
+          actions += `<button class="btn btn-secondary" style="padding:4px 8px; font-size:0.9rem; min-height:auto;" onclick="window.app.editTreatmentApplication('${item.id}')" title="ބަދަލުކުރަން">✏️</button>`;
         } else {
-          actions += `<span class="text-muted" style="font-size:0.75rem;">ބަދަލެއް ނުގެނެވޭނެ</span>`;
+          actions += `<span class="text-muted" style="font-size:0.9rem;" title="ބަދަލެއް ނުގެނެވޭނެ">🔒</span>`;
         }
       }
 
@@ -2528,17 +2528,15 @@ class App {
       return `
         <tr>
           <td>${item.date} ${item.time || ''}</td>
-          <td><strong>${item.crop}</strong> (${item.plot})${photoHTML}</td>
+          <td><strong>${item.crop}</strong> (${item.plot || '-'})${photoHTML}</td>
           <td>${item.productName}</td>
           <td>${t(item.category)}</td>
           <td style="text-align: end; font-weight: bold;">${item.quantityUsed} ${item.unit}</td>
-          <td>${item.appliedBy}</td>
           <td>${item.nextScheduledDate || '-'}</td>
-          <td><span class="t-status-badge ${statusClass}">${statusText}</span></td>
           <td>${actions}</td>
         </tr>
       `;
-    }).join('') : `<tr><td colspan="9" class="text-center text-muted">އެއްވެސް ރެކޯޑެއް ފެންނާކަށް ނެތް.</td></tr>`;
+    }).join('') : `<tr><td colspan="7" class="text-center text-muted">އެއްވެސް ރެކޯޑެއް ފެންނާކަށް ނެތް.</td></tr>`;
   }
 
   approveTreatmentApplication(id) {
