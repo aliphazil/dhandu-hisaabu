@@ -433,6 +433,13 @@ export function insertRecord(table, recordData, isOnline = true) {
     localDB[table].push(newRecord);
     saveStore(localDB, "local");
     
+    // Async push to Firestore
+    if (db) {
+      setDoc(doc(db, table, newRecord.id), newRecord).catch(err => {
+        console.error(`Firestore insert to ${table} failed:`, err);
+      });
+    }
+    
     logAuditEvent("INSERT_RECORD", `Inserted record in ${table} (ID: ${newRecord.id})`);
   } else {
     // Write locally to mirror cache immediately
@@ -473,6 +480,14 @@ export function updateRecord(table, id, updatedFields, isOnline = true) {
         updatedDate: new Date().toISOString()
       };
       saveStore(serverDB, "server");
+      
+      // Async push to Firestore
+      if (db) {
+        const docRef = doc(db, table, id);
+        setDoc(docRef, serverDB[table][serverIndex], { merge: true }).catch(err => {
+          console.error(`Firestore update to ${table} failed:`, err);
+        });
+      }
     }
     
     // Local DB update
@@ -530,6 +545,13 @@ export function deleteRecord(table, id, isOnline = true) {
       }
       serverDB[table].splice(serverIndex, 1);
       saveStore(serverDB, "server");
+      
+      // Async delete from Firestore
+      if (db) {
+        deleteDoc(doc(db, table, id)).catch(err => {
+          console.error(`Firestore delete from ${table} failed:`, err);
+        });
+      }
     }
     
     // Local DB delete
@@ -715,6 +737,12 @@ export function createFarm(farmData) {
   localDB.users.push(newAdmin);
   saveStore(localDB, "local");
   
+  // Async push to Firestore
+  if (db) {
+    setDoc(doc(db, "farms", newFarm.id), newFarm).catch(err => console.error(err));
+    setDoc(doc(db, "users", newAdmin.username), newAdmin).catch(err => console.error(err));
+  }
+  
   logAuditEvent("CREATE_FARM", `Created new farm: ${farmData.name} (ID: ${newFarmId})`, true);
   return { success: true, farmId: newFarmId };
 }
@@ -786,6 +814,15 @@ export function registerFarmSelf(farmData) {
   saveStore(serverDB, "server");
   saveStore(localDB, "local");
 
+  // Async push to Firestore
+  if (db) {
+    setDoc(doc(db, "farms", newFarm.id), newFarm).catch(err => console.error(err));
+    setDoc(doc(db, "users", newAdmin.username), newAdmin).catch(err => console.error(err));
+    setDoc(doc(db, "inventory", defaultSeeds.id), defaultSeeds).catch(err => console.error(err));
+    setDoc(doc(db, "inventory", defaultFert.id), defaultFert).catch(err => console.error(err));
+    setDoc(doc(db, "audit_logs", logItem.id), logItem).catch(err => console.error(err));
+  }
+
   return { success: true, farmId: newFarmId };
 }
 
@@ -818,6 +855,18 @@ export function toggleFarmStatus(farmId) {
     saveStore(serverDB, "server");
     saveStore(localDB, "local");
     
+    // Async push status changes to Firestore
+    if (db) {
+      const updatedFarm = serverDB.farms[farmIdx];
+      setDoc(doc(db, "farms", farmId), updatedFarm, { merge: true }).catch(err => console.error(err));
+      
+      serverDB.users.forEach(u => {
+        if (u.farmId === farmId) {
+          setDoc(doc(db, "users", u.username), u, { merge: true }).catch(err => console.error(err));
+        }
+      });
+    }
+    
     logAuditEvent("TOGGLE_FARM_STATUS", `Toggled farm ${farmId} status to ${newStatus}`, true);
   }
 }
@@ -848,6 +897,11 @@ export function resetPassword(username, newPassword) {
     
     saveStore(serverDB, "server");
     saveStore(localDB, "local");
+    
+    // Async push to Firestore
+    if (db) {
+      setDoc(doc(db, "users", username), serverDB.users[targetUserIdx], { merge: true }).catch(err => console.error(err));
+    }
     
     logAuditEvent("RESET_PASSWORD", `Password reset for user: ${username}`, currentUser.role === "platform_admin");
     return { success: true };

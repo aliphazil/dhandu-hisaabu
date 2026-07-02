@@ -24,7 +24,7 @@ import {
   resetPassword,
   recoverPassword,
   changePassword
-} from './database.js?v=1.5.4';
+} from './database.js?v=1.5.5';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
