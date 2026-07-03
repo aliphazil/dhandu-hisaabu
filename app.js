@@ -24,7 +24,7 @@ import {
   resetPassword,
   recoverPassword,
   changePassword
-} from './database.js?v=1.5.9';
+} from './database.js?v=1.6.0';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -397,8 +397,8 @@ class App {
     }
   }
 
-  deleteLookupItem(type, val) {
-    if (confirm(`މި ލިސްޓުން "${val}" ޑިލީޓްކޮށްލަން ބޭނުންތަ؟`)) {
+  async deleteLookupItem(type, val) {
+    if (await this.showConfirm(`މި ލިސްޓުން "${val}" ޑިލީޓްކޮށްލަން ބޭނުންތަ؟`)) {
       let stored = JSON.parse(localStorage.getItem(`dhandu_hisaabu_suggested_${type}s`) || '[]');
       stored = stored.filter(item => item !== val);
       localStorage.setItem(`dhandu_hisaabu_suggested_${type}s`, JSON.stringify(stored));
@@ -478,6 +478,97 @@ class App {
     
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
+  }
+
+  showAlert(message) {
+    return new Promise((resolve) => {
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay show';
+      overlay.style.zIndex = '9999';
+      overlay.style.backdropFilter = 'blur(8px)';
+      overlay.style.webkitBackdropFilter = 'blur(8px)';
+      overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
+      
+      const content = document.createElement('div');
+      content.className = 'modal-content';
+      content.style.maxWidth = '360px';
+      content.style.textAlign = 'center';
+      content.style.padding = '24px';
+      
+      content.innerHTML = `
+        <div style="font-size: 2.5rem; margin-bottom: 12px;">🌿</div>
+        <p style="font-size: 1rem; font-weight: 600; margin-bottom: 20px; line-height: 1.5; color: var(--text-dark); white-space: pre-line;">${message}</p>
+        <div>
+          <button class="btn btn-primary" style="min-width: 100px; padding: 8px 20px; font-weight:600; font-size:0.9rem; border-radius:20px;">އޯކޭ</button>
+        </div>
+      `;
+      
+      overlay.appendChild(content);
+      document.body.appendChild(overlay);
+      
+      const okBtn = content.querySelector('button');
+      okBtn.addEventListener('click', () => {
+        overlay.classList.remove('show');
+        setTimeout(() => {
+          overlay.remove();
+          resolve();
+        }, 150);
+      });
+    });
+  }
+
+  showConfirm(message) {
+    return new Promise((resolve) => {
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay show';
+      overlay.style.zIndex = '9999';
+      overlay.style.backdropFilter = 'blur(8px)';
+      overlay.style.webkitBackdropFilter = 'blur(8px)';
+      overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
+      
+      const content = document.createElement('div');
+      content.className = 'modal-content';
+      content.style.maxWidth = '360px';
+      content.style.textAlign = 'center';
+      content.style.padding = '24px';
+      
+      content.innerHTML = `
+        <div style="font-size: 2.5rem; margin-bottom: 12px;">❓</div>
+        <p style="font-size: 1rem; font-weight: 600; margin-bottom: 20px; line-height: 1.5; color: var(--text-dark); white-space: pre-line;">${message}</p>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+          <button class="btn btn-secondary" id="confirm-cancel" style="min-width: 90px; padding: 8px 16px; font-weight:600; font-size:0.9rem; border-radius:20px;">ކެންސަލް</button>
+          <button class="btn btn-primary" id="confirm-ok" style="min-width: 90px; padding: 8px 16px; font-weight:600; font-size:0.9rem; border-radius:20px; background-color: var(--danger); border-color: var(--danger);">ފޮހެލަން</button>
+        </div>
+      `;
+      
+      overlay.appendChild(content);
+      document.body.appendChild(overlay);
+      
+      const cancelBtn = content.querySelector('#confirm-cancel');
+      const okBtn = content.querySelector('#confirm-ok');
+      
+      if (message.includes('ޚަލާޞްކުރަން')) {
+        okBtn.style.backgroundColor = 'var(--success)';
+        okBtn.style.borderColor = 'var(--success)';
+        okBtn.textContent = 'އާނއެކޭ';
+      }
+      
+      cancelBtn.addEventListener('click', () => {
+        overlay.classList.remove('show');
+        setTimeout(() => {
+          overlay.remove();
+          resolve(false);
+        }, 150);
+      });
+      
+      okBtn.addEventListener('click', () => {
+        overlay.classList.remove('show');
+        setTimeout(() => {
+          overlay.remove();
+          resolve(true);
+        }, 150);
+      });
+    });
   }
 
   async handleLogin(e) {
@@ -1768,7 +1859,7 @@ class App {
     this.openModal('forgot-password');
   }
 
-  handleForgotPassword(e) {
+  async handleForgotPassword(e) {
     e.preventDefault();
     const username = document.getElementById('forgot-username').value;
     const email = document.getElementById('forgot-email').value;
@@ -1782,7 +1873,7 @@ class App {
       document.getElementById('login-username').value = username;
       document.getElementById('login-password').value = newPassword;
     } catch (err) {
-      alert(err.message);
+      await this.showAlert(err.message);
     }
   }
 
@@ -1988,7 +2079,7 @@ class App {
     this.showView(this.currentView);
   }
 
-  saveStaff(e) {
+  async saveStaff(e) {
     e.preventDefault();
     const id = document.getElementById('staff-id').value;
     const name = document.getElementById('staff-name-input').value;
@@ -2023,7 +2114,7 @@ class App {
       // Check duplicate
       const duplicate = localDB.users.find(u => u.username === username);
       if (duplicate) {
-        alert("މި ޔޫޒަރނޭމް މިހާރުވެސް ބޭނުންކުރެވެމުންދަނީ. އެހެން ޔޫޒަރނޭމެއް ޖައްސަވާ.");
+        await this.showAlert("މި ޔޫޒަރނޭމް މިހާރުވެސް ބޭނުންކުރެވެމުންދަނީ. އެހެން ޔޫޒަރނޭމެއް ޖައްސަވާ.");
         return;
       }
       localDB.users.push(newStaffUser);
@@ -2063,14 +2154,14 @@ class App {
     this.showView(this.currentView);
   }
 
-  changeUserPassword(e) {
+  async changeUserPassword(e) {
     e.preventDefault();
     const currentPassword = document.getElementById('change-pwd-current').value;
     const newPassword = document.getElementById('change-pwd-new').value;
     const confirmPassword = document.getElementById('change-pwd-confirm').value;
 
     if (newPassword !== confirmPassword) {
-      alert("އާ ދެ ޕާސްވޯޑް ދިމައެއް ނުވޭ.");
+      await this.showAlert("އާ ދެ ޕާސްވޯޑް ދިމައެއް ނުވޭ.");
       return;
     }
 
@@ -2079,11 +2170,11 @@ class App {
       this.showToast("ޕާސްވޯޑް ކާމިޔާބުކަމާއެކު ބަދަލުކުރެވިއްޖެ!");
       document.getElementById('change-password-form').reset();
     } catch (err) {
-      alert(err.message);
+      await this.showAlert(err.message);
     }
   }
 
-  saveNewFarm(e) {
+  async saveNewFarm(e) {
     e.preventDefault();
     const name = document.getElementById('farm-name-input').value;
     const owner = document.getElementById('farm-owner-input').value;
@@ -2124,14 +2215,14 @@ class App {
           adminPassword
         });
         this.closeModal('create-farm');
-        this.showToast("ދަނޑު ރަޖިސްޓްރީ ކުރެވިއްޖެ! ލޮގިންވެވަޑައިގަންނަވާ.");
+        this.showToast("ދަނޑު ރަޖިސްޓްރީ ކުރެވިއްޖެ! ލޮގިންވެވަައިގަންނަވާ.");
         
         // Auto-fill login credentials
         document.getElementById('login-username').value = adminUsername;
         document.getElementById('login-password').value = adminPassword;
       }
     } catch (err) {
-      alert(err.message);
+      await this.showAlert(err.message);
     }
   }
 
@@ -2274,28 +2365,26 @@ class App {
   }
 
   // Deletions Handler
-  deleteRecord(table, id) {
-    if (confirm("މި ރެކޯޑް އެއްކޮށް ޑިލީޓް ކޮށްލަން ބޭނުންތަ؟")) {
+  async deleteRecord(table, id) {
+    if (await this.showConfirm("މި ރެކޯޑް އެއްކޮށް ޑިލީޓް ކޮށްލަން ބޭނުންތަ؟")) {
       try {
         deleteRecord(table, id, this.isOnline);
         this.showToast("ރެކޯޑް ޑިލީޓް ކުރެވިއްޖެ!");
         this.showView(this.currentView);
       } catch (err) {
-        alert(err.message);
+        await this.showAlert(err.message);
       }
     }
   }
 
-
-
-  settleTransaction(txId) {
-    if (confirm("މި ޓްރާންސެކްޝަން ޚަލާޞްކުރަން (ފައިސާ ލިބިއްޖެ ކަމަށް ހަދަން) ބޭނުންތަ؟")) {
+  async settleTransaction(txId) {
+    if (await this.showConfirm("މި ޓްރާންސެކްޝަން ޚަލާޞްކުރަން (ފައިސާ ލިބިއްޖެ ކަމަށް ހަދަން) ބޭނުންތަ؟")) {
       try {
         updateRecord('transactions', txId, { paymentStatus: 'paid' }, this.isOnline);
         this.showToast("މި ޓްރާންސެކްޝަން ޚަލާޞްކުރެވިއްޖެ!");
         this.showView(this.currentView);
       } catch (err) {
-        alert(err.message);
+        await this.showAlert(err.message);
       }
     }
   }
@@ -2546,7 +2635,7 @@ class App {
         document.getElementById('treatment-app-form').reset();
         this.switchTreatmentTab('records');
       } catch (err) {
-        alert(err.message);
+        await this.showAlert(err.message);
       }
       return;
     }
@@ -2596,7 +2685,7 @@ class App {
       document.getElementById('treatment-app-form').reset();
       this.switchTreatmentTab('dashboard');
     } catch (err) {
-      alert(err.message);
+      await this.showAlert(err.message);
     }
   }
 
@@ -2673,24 +2762,24 @@ class App {
     }).join('') : `<tr><td colspan="7" class="text-center text-muted">އެއްވެސް ރެކޯޑެއް ފެންނާކަށް ނެތް.</td></tr>`;
   }
 
-  approveTreatmentApplication(id) {
+  async approveTreatmentApplication(id) {
     try {
       updateRecord('treatment_applications', id, { status: 'approved' }, this.isOnline);
       this.showToast("ފަރުވާ ރެކޯޑަށް ހުއްދަ ދެވިއްޖެ!");
       this.loadTreatmentRecords();
     } catch (err) {
-      alert(err.message);
+      await this.showAlert(err.message);
     }
   }
 
-  deleteTreatmentApplication(id) {
-    if (confirm("މި ފަރުވާގެ ރެކޯޑް ފޮހެލަން ބޭނުންތަ؟")) {
+  async deleteTreatmentApplication(id) {
+    if (await this.showConfirm("މި ފަރުވާގެ ރެކޯޑް ފޮހެލަން ބޭނުންތަ؟")) {
       try {
         deleteRecord('treatment_applications', id, this.isOnline);
         this.showToast("ރެކޯޑް ފޮހެލެވިއްޖެ!");
         this.loadTreatmentRecords();
       } catch (err) {
-        alert(err.message);
+        await this.showAlert(err.message);
       }
     }
   }
@@ -2758,7 +2847,7 @@ class App {
     }).join('') : `<tr><td colspan="7" class="text-center text-muted">އެއްވެސް ބާވަތެއް މާސްޓަރ ލިސްޓުގައި ނެތް.</td></tr>`;
   }
 
-  saveTreatmentProduct(event) {
+  async saveTreatmentProduct(event) {
     event.preventDefault();
     const user = getActiveUser();
     if (!user) return;
@@ -2785,7 +2874,7 @@ class App {
         document.getElementById('t-prod-id').value = '';
         this.loadTreatmentProducts();
       } catch (err) {
-        alert(err.message);
+        await this.showAlert(err.message);
       }
     } else {
       const newProd = {
@@ -2802,7 +2891,7 @@ class App {
         document.getElementById('treatment-product-form').reset();
         this.loadTreatmentProducts();
       } catch (err) {
-        alert(err.message);
+        await this.showAlert(err.message);
       }
     }
   }
@@ -2824,14 +2913,14 @@ class App {
     document.getElementById('t-product-form-container').scrollIntoView({ behavior: 'smooth' });
   }
 
-  deleteTreatmentProduct(id) {
-    if (confirm("މި ބާވަތް މާސްޓަރ ލިސްޓުން ފޮހެލަން ބޭނުންތަ؟")) {
+  async deleteTreatmentProduct(id) {
+    if (await this.showConfirm("މި ބާވަތް މާސްޓަރ ލިސްޓުން ފޮހެލަން ބޭނުންތަ؟")) {
       try {
         deleteRecord('treatment_products', id, this.isOnline);
         this.showToast("ބާވަތް ފޮހެލެވިއްޖެ!");
         this.loadTreatmentProducts();
       } catch (err) {
-        alert(err.message);
+        await this.showAlert(err.message);
       }
     }
   }
@@ -2893,7 +2982,7 @@ class App {
                 if (!hasLater) isOverdue = true;
               }
               const statusClass = isOverdue ? 't-cal-overdue' : (dateStr === todayLocalStr ? 't-cal-due-today' : '');
-              return `<span class="t-cal-event-dot ${dotClass} ${statusClass}" title="${t(tApp.category)}: ${tApp.productName} (${tApp.crop})" onclick="alert('${t(tApp.category)}: ${tApp.productName}\\nގަސް: ${tApp.crop}\\nޕްލޮޓް: ${tApp.plot}')"></span>`;
+              return `<span class="t-cal-event-dot ${dotClass} ${statusClass}" title="${t(tApp.category)}: ${tApp.productName} (${tApp.crop})" onclick="window.app.showAlert('${t(tApp.category)}: ${tApp.productName}\\nގަސް: ${tApp.crop}\\nޕްލޮޓް: ${tApp.plot}')"></span>`;
             }).join('')}
           </div>
         `;
