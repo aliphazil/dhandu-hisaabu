@@ -510,6 +510,13 @@ export async function authenticate(username, password) {
       });
       
       if (usersList.length > 0) {
+        // Preserve default users
+        DEFAULT_USERS.forEach(defUser => {
+          const exists = usersList.some(u => u.username === defUser.username);
+          if (!exists) {
+            usersList.push(defUser);
+          }
+        });
         serverStore.users = usersList;
         saveStore(serverStore, "server");
         
@@ -520,6 +527,11 @@ export async function authenticate(username, password) {
       
       // Try finding again with remote data
       user = usersList.find(u => u.username === username && u.password === password);
+      
+      if (user) {
+        console.log("User authenticated via remote Firestore. Pulling full database sync...");
+        await pullFromFirestore();
+      }
     } catch (err) {
       console.error("Firestore authenticate check failed:", err);
     }
