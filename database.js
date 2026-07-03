@@ -21,140 +21,34 @@ try {
 }
 
 // Seed Data
-const DEFAULT_FARMS = [
-  { id: "farm_1", name: "ހިތަދޫ ވިލާ ދަނޑު", owner: "ޢަލީ ޝަރީފް", island: "ހިތަދޫ", size: "15,000", contact: "7912345", status: "active", createdDate: "2026-01-10T08:00:00Z" },
-  { id: "farm_2", name: "ކުނަހަންދޫ ގާޑަން", owner: "މަރްޔަމް ޞާލިޙް", island: "ކުނަހަންދޫ", size: "8,500", contact: "7778912", status: "active", createdDate: "2026-02-15T09:00:00Z" }
-];
+const DEFAULT_FARMS = [];
 
 const DEFAULT_USERS = [
   // Platform Admin (No Farm ID, cannot access farm business data)
-  { username: "sysadmin", password: "sysadminpassword", role: "platform_admin", name: "ޕްލެޓްފޯމް މެނޭޖަރ", farmId: null, status: "active" },
-  
-  // Farm 1 (Hithadhoo Villa)
-  { username: "villa_admin", password: "villaadminpassword", role: "farm_admin", name: "ޢަލީ ޝަރީފް (އެޑްމިން)", farmId: "farm_1", status: "active" },
-  { username: "villa_worker", password: "villaworkerpassword", role: "staff", name: "އަޙްމަދު ރަޝީދު (މުވައްޒަފު)", farmId: "farm_1", status: "active" },
-  
-  // Farm 2 (Kunahandhoo Garden)
-  { username: "garden_admin", password: "gardenadminpassword", role: "farm_admin", name: "މަރްޔަމް ޞާލިޙް (އެޑްމިން)", farmId: "farm_2", status: "active" }
+  { username: "sysadmin", password: "sysadminpassword", role: "platform_admin", name: "ޕްލެޓްފޯމް މެނޭޖަރ", farmId: null, status: "active" }
 ];
 
-const DEFAULT_INVENTORY = [
-  // Farm 1 Stocks
-  { id: "inv_1", farmId: "farm_1", category: "Fertilizer", name: "އެން.ޕީ.ކޭ 15-15-15 ގަސްކާނާ", currentStock: 120, unit: "ކިލޯ", minimumStock: 25, createdDate: "2026-06-01T08:00:00Z" },
-  { id: "inv_2", farmId: "farm_1", category: "Seeds", name: "ކަރާ އޮށް", currentStock: 15, unit: "ޕެކެޓް", minimumStock: 5, createdDate: "2026-06-01T08:00:00Z" },
-  { id: "inv_3", farmId: "farm_1", category: "Chemicals", name: "ކޮމްޕޯސްޓް ބޭސް", currentStock: 8, unit: "ލީޓަރު", minimumStock: 2, createdDate: "2026-06-01T08:00:00Z" },
-  { id: "inv_4", farmId: "farm_1", category: "Equipment", name: "ފެންޖަހާ ބާލިދީ", currentStock: 5, unit: "އަދަދު", minimumStock: 1, createdDate: "2026-06-01T08:00:00Z" },
-  
-  // Farm 2 Stocks
-  { id: "inv_5", farmId: "farm_2", category: "Fertilizer", name: "އޯގަނިކް ކޮމްޕޯސްޓް ގަސްކާނާ", currentStock: 200, unit: "ކިލޯ", minimumStock: 50, createdDate: "2026-06-01T08:00:00Z" },
-  { id: "inv_6", farmId: "farm_2", category: "Seeds", name: "ފަޅޯ އޮށް", currentStock: 2, unit: "ޕެކެޓް", minimumStock: 3, createdDate: "2026-06-01T08:00:00Z" }
-];
-
-const DEFAULT_CROPS = [
-  { id: "crop_1", farmId: "farm_1", name: "ކަރާ", variety: "މަތިމަރަދޫ ކަރާ", plantingDate: "2026-05-10", expectedHarvest: "2026-07-15", actualHarvest: null, plantsCount: 150, batchNumber: "B-26-01", status: "growing", notes: "ގަސްތައް ވަރަށް ރަނގަޅަށް ހެދެމުންދަނީ. ރީނދޫ މާ އަޅައިފި.", createdDate: "2026-05-10T10:00:00Z" },
-  { id: "crop_2", farmId: "farm_1", name: "މެލަން", variety: "ދިވެހި ކޮމެޓް މެލަން", plantingDate: "2026-04-01", expectedHarvest: "2026-06-15", actualHarvest: "1200 ކިލޯ", plantsCount: 80, batchNumber: "B-26-02", status: "completed", notes: "މައުސޫލު ވަރަށް ރަނގަޅު. އެއްކޮށް ބިނދެ ނިމިއްޖެ.", createdDate: "2026-04-01T08:00:00Z" },
-  { id: "crop_3", farmId: "farm_2", name: "ފަޅޯ", variety: "ރެޑް ލޭޑީ ފަޅޯ", plantingDate: "2026-01-20", expectedHarvest: "2026-08-01", actualHarvest: null, plantsCount: 200, batchNumber: "B-26-03", status: "growing", notes: "ބައެއް ގަސްގަހުގައި ފަޅޯ އަޅަން ފަށައިފި.", createdDate: "2026-01-20T09:00:00Z" }
-];
-
-const DEFAULT_TRANSACTIONS = [
-  // Income Farm 1
-  { id: "t_1", farmId: "farm_1", date: "2026-06-18", type: "income", crop: "މެލަން", category: null, amount: 18000, quantity: "600", unit: "ކިލޯ", pricePerUnit: 30, buyer: "މާލޭ މާރުކޭޓް ވިޔަފާރި", description: "މެލަން ވިއްކުން", paymentStatus: "paid", createdBy: "villa_admin", createdDate: "2026-06-18T12:00:00Z" },
-  { id: "t_2", farmId: "farm_1", date: "2026-06-25", type: "income", crop: "މެލަން", category: null, amount: 15000, quantity: "500", unit: "ކިލޯ", pricePerUnit: 30, buyer: "ލޯކަލް ރިސޯޓް", description: "ދެވަނަ ބުރުގެ މެލަން ވިއްކުން", paymentStatus: "pending", createdBy: "villa_worker", createdDate: "2026-06-25T14:30:00Z" },
-  
-  // Expenses Farm 1
-  { id: "t_3", farmId: "farm_1", date: "2026-06-05", type: "expense", crop: null, category: "Seeds", amount: 2500, quantity: null, unit: null, pricePerUnit: null, supplier: "އެގްރި ސަޕްލައި", description: "ކަރާ އާއި ކެކުރި އޮށް ގަތުން", receiptPhoto: null, createdBy: "villa_admin", createdDate: "2026-06-05T09:00:00Z" },
-  { id: "t_4", farmId: "farm_1", date: "2026-06-10", type: "expense", crop: null, category: "Fertilizer", amount: 4800, quantity: null, unit: null, pricePerUnit: null, supplier: "އެސް.ޓީ.އޯ އެގްރި", description: "ކާދާއި ބޭސް ގަތުން", receiptPhoto: null, createdBy: "villa_admin", createdDate: "2026-06-10T11:00:00Z" },
-  { id: "t_5", farmId: "farm_1", date: "2026-06-20", type: "expense", crop: null, category: "Labour", amount: 6000, quantity: null, unit: null, pricePerUnit: null, supplier: "ސައިޓް މަސައްކަތު މީހުން", description: "މަސައްކަތު މީހުންގެ މުސާރަ", receiptPhoto: null, createdBy: "villa_admin", createdDate: "2026-06-20T17:00:00Z" },
-  
-  // Income Farm 2
-  { id: "t_6", farmId: "farm_2", date: "2026-06-22", type: "income", crop: "ފަޅޯ", category: null, amount: 8500, quantity: "170", unit: "ކިލޯ", pricePerUnit: 50, buyer: "ރިސޯޓް ބަޔަރ", description: "ފަޅޯ ވިއްކުން", paymentStatus: "paid", createdBy: "garden_admin", createdDate: "2026-06-22T10:00:00Z" }
-];
-
-const DEFAULT_FERTILIZERS = [
-  { id: "f_1", farmId: "farm_1", date: "2026-06-12", crop: "ކަރާ", fertilizerName: "އެން.ޕީ.ކޭ 15-15-15 ގަސްކާނާ", quantity: 20, unit: "ކިލޯ", applicationMethod: "fertSoil", appliedBy: "އަޙްމަދު ރަޝީދު", cost: 800, notes: "ފުރަތަމަ ބުރުގެ ގަސްކާނާ އެޅުން", createdBy: "villa_worker", createdDate: "2026-06-12T07:30:00Z" }
-];
-
-const DEFAULT_HARVESTS = [
-  { id: "h_1", farmId: "farm_1", harvestDate: "2026-06-15", crop: "މެލަން", quantity: "1200", unit: "ކިލޯ", grade: "ގްރޭޑް އޭ", buyer: "މާލޭ މާރުކޭޓް", sellingPrice: 36000, notes: "ވަރަށް ރަނގަޅު ފޮނި މެލަން", createdDate: "2026-06-15T13:00:00Z" }
-];
+const DEFAULT_INVENTORY = [];
+const DEFAULT_CROPS = [];
+const DEFAULT_TRANSACTIONS = [];
+const DEFAULT_FERTILIZERS = [];
+const DEFAULT_HARVESTS = [];
 
 const DEFAULT_AUDIT_LOGS = [
-  { id: "log_1", farmId: null, timestamp: "2026-06-29T08:00:00Z", username: "sysadmin", eventType: "LOGIN", message: "ޕްލެޓްފޯމް އެޑްމިނިސްޓްރޭޓަރ ލޮގިން ވެއްޖެ", type: "system" },
-  { id: "log_2", farmId: "farm_1", timestamp: "2026-06-29T09:15:00Z", username: "villa_admin", eventType: "LOGIN", message: "ދަނޑުގެ އެޑްމިނިސްޓްރޭޓަރ ލޮގިން ވެއްޖެ", type: "farm" },
-  { id: "log_3", farmId: "farm_1", timestamp: "2026-06-29T10:05:00Z", username: "villa_worker", eventType: "RECORD_INCOME", message: "މުވައްޒަފު މެލަން އާމްދަނީ ރެކޯޑް ކޮށްފި (15,000 MVR)", type: "farm" }
+  { id: "log_1", farmId: null, timestamp: "2026-06-29T08:00:00Z", username: "sysadmin", eventType: "LOGIN", message: "ޕްލެޓްފޯމް އެޑްމިނިސްޓްރޭޓަރ ލޮގިން ވެއްޖެ", type: "system" }
 ];
 
-const DEFAULT_TREATMENT_PRODUCTS = [
-  {
-    id: "p_1",
-    farmId: "farm_1",
-    name: "NPK 15-15-15",
-    brand: "YaraMila",
-    category: "Fertilizer",
-    activeIngredient: "Nitrogen, Phosphorus, Potassium",
-    formulation: "Granular",
-    defaultUnit: "kg",
-    defaultDosage: "50g/plant",
-    supplier: "އެގްރޯ ބާޒާރު",
-    costPerUnit: 25.00,
-    safetyInterval: "24 Hours",
-    preHarvestInterval: "7 Days",
-    status: "active",
-    createdDate: "2026-06-01T08:00:00Z",
-    updatedDate: "2026-06-01T08:00:00Z"
-  },
-  {
-    id: "p_2",
-    farmId: "farm_1",
-    name: "Copper Oxychloride",
-    brand: "Coptox",
-    category: "Fungicide",
-    activeIngredient: "Copper Oxychloride 50% WP",
-    formulation: "Wettable Powder",
-    defaultUnit: "g",
-    defaultDosage: "2g/L",
-    supplier: "ލޯކަލް ފިހާރަ",
-    costPerUnit: 0.15,
-    safetyInterval: "48 Hours",
-    preHarvestInterval: "14 Days",
-    status: "active",
-    createdDate: "2026-06-01T08:00:00Z",
-    updatedDate: "2026-06-01T08:00:00Z"
-  }
-];
-
-const DEFAULT_TREATMENT_APPLICATIONS = [
-  {
-    id: "ta_1",
-    farmId: "farm_1",
-    cropId: "crop_1",
-    productId: "p_1",
-    userId: "villa_worker",
-    date: "2026-06-25",
-    time: "08:30",
-    crop: "Watermelon",
-    variety: "Hithadhoo Black",
-    plot: "Field A-1",
-    growthStage: "Vegetative",
-    category: "Fertilizer",
-    productName: "NPK 15-15-15",
-    quantityUsed: 10,
-    unit: "kg",
-    mixRatio: "Direct Soil",
-    waterVolume: "N/A",
-    applicationMethod: "Side Dressing",
-    appliedBy: "villa_worker",
-    cost: 250.00,
-    nextScheduledDate: "2026-07-02",
-    remarks: "ގަސްތަކަށް ކާނާ އެޅުން ރަނގަޅަށް ކުރެވުނު.",
-    photo: null,
-    status: "approved",
-    createdDate: "2026-06-25T09:00:00Z",
-    updatedDate: "2026-06-25T09:00:00Z"
-  }
-];
+const DEFAULT_TREATMENT_PRODUCTS = [];
+const DEFAULT_TREATMENT_APPLICATIONS = [];
 
 export function initDB() {
+  // Wipe out legacy database containing default demo farms
+  let existingServer = localStorage.getItem("dhandu_hisaabu_server_db");
+  if (existingServer && existingServer.includes('"farm_1"')) {
+    localStorage.removeItem("dhandu_hisaabu_server_db");
+    localStorage.removeItem("dhandu_hisaabu_local_db");
+  }
+
   let serverDB;
   if (!localStorage.getItem("dhandu_hisaabu_server_db")) {
     serverDB = {
