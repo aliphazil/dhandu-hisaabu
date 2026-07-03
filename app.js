@@ -24,7 +24,7 @@ import {
   resetPassword,
   recoverPassword,
   changePassword
-} from './database.js?v=1.5.7';
+} from './database.js?v=1.5.8';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -314,12 +314,18 @@ class App {
   }
 
   initSuggestedUnits() {
+    // Migrate legacy English suggestions to Dhivehi
+    let storedCats = localStorage.getItem("dhandu_hisaabu_suggested_categorys");
+    if (storedCats && storedCats.includes('"Seeds"')) {
+      localStorage.removeItem("dhandu_hisaabu_suggested_categorys");
+    }
+
     const defaults = {
       unit: ['ކިލޯ', 'ޕެކެޓް', 'ލީޓަރު', 'ފުޅި', 'އަދަދު', 'ބަސްތާ'],
       buyer: ['ރިސޯޓް', 'ލޯކަލް މާރުކޭޓް', 'ސުޕަމާކެޓް'],
       supplier: ['އެގްރޯ ބާޒާރު', 'ސިޓީ ގާޑަން', 'ލޯކަލް ފިހާރަ'],
       crop: ['ކަރާ', 'ކޮޕީފަތް', 'ބަރަބޯ', 'ކެކުރި', 'ދޮންކެޔޮ', 'ފަޅޯ', 'މިރުސް'],
-      category: ['Seeds', 'Fertilizer', 'Fuel', 'Labour', 'Equipment', 'Transport', 'Water', 'Electricity', 'Other']
+      category: ['އޮށް', 'ގަސްކާނާ', 'ތެޔޮ', 'މަސައްކަތު މީހުން', 'އާލާތްތައް', 'ދަތުރުފަތުރު', 'ފެން', 'ކަރަންޓު', 'އެހެނިހެން']
     };
 
     for (const key in defaults) {
@@ -1048,7 +1054,7 @@ class App {
         `<span class="badge badge-pending">ނުދައްކާ</span>`;
         
       const settleBtn = tx.paymentStatus !== 'paid' ? 
-        `<button class="btn btn-primary" style="padding: 4px 8px; min-height:30px; font-size:0.75rem; background-color: var(--success); border-color: var(--success); margin-inline-end: 6px;" onclick="window.app.settleTransaction('${tx.id}')">ޚަލާޞްކުރަން</button>` : 
+        `<button class="btn" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; min-height:auto; border-radius:50%; background:#2e7d32; border:none; color:white; cursor:pointer;" onclick="window.app.settleTransaction('${tx.id}')" title="ޚަލާޞްކުރަން"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></button>` : 
         '';
         
       tr.innerHTML = `
@@ -1059,9 +1065,11 @@ class App {
         <td class="date-num" style="font-weight: 700; color: var(--success);">${format2DP(tx.amount)}</td>
         <td>${statusBadge}</td>
         <td>
-          ${settleBtn}
-          <button class="btn btn-secondary" style="padding: 4px 8px; min-height:30px; font-size:0.75rem; margin-inline-end: 6px;" onclick="window.app.editTransaction('${tx.id}')">އިސްލާހުކުރަން</button>
-          <button class="btn btn-secondary" style="padding: 4px 8px; min-height:30px; font-size:0.75rem;" onclick="window.app.deleteRecord('transactions', '${tx.id}')" data-i18n="delete">ޑިލީޓް</button>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            ${settleBtn}
+            <button class="btn" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; min-height:auto; border-radius:50%; background:#f0f0f0; border:none; color:#333; cursor:pointer;" onclick="window.app.editTransaction('${tx.id}')" title="އިސްލާހުކުރަން"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button>
+            <button class="btn" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; min-height:auto; border-radius:50%; background:#c62828; border:none; color:white; cursor:pointer;" onclick="window.app.deleteRecord('transactions', '${tx.id}')" title="ފޮހެލަން"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
+          </div>
         </td>
       `;
       tableBody.appendChild(tr);
@@ -1086,8 +1094,10 @@ class App {
         <td style="font-size: 0.85rem;">${tx.description || '-'}<br><span class="text-muted" style="font-size:0.75rem;">Recorded by: ${tx.createdBy || ''}</span></td>
         <td class="date-num" style="font-weight: 700; color: var(--danger);">${format2DP(tx.amount)}</td>
         <td>
-          <button class="btn btn-secondary" style="padding: 4px 8px; min-height:30px; font-size:0.75rem; margin-inline-end: 6px;" onclick="window.app.editTransaction('${tx.id}')">އިސްލާހުކުރަން</button>
-          <button class="btn btn-secondary" style="padding: 4px 8px; min-height:30px; font-size:0.75rem;" onclick="window.app.deleteRecord('transactions', '${tx.id}')" data-i18n="delete">ޑިލީޓް</button>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <button class="btn" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; min-height:auto; border-radius:50%; background:#f0f0f0; border:none; color:#333; cursor:pointer;" onclick="window.app.editTransaction('${tx.id}')" title="އިސްލާހުކުރަން"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button>
+            <button class="btn" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; min-height:auto; border-radius:50%; background:#c62828; border:none; color:white; cursor:pointer;" onclick="window.app.deleteRecord('transactions', '${tx.id}')" title="ފޮހެލަން"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
+          </div>
         </td>
       `;
       tableBody.appendChild(tr);
@@ -1619,7 +1629,8 @@ class App {
     // Setup select options for crops
     const crops = queryTable('crops').filter(c => c.status === 'growing');
     const cropSelect = document.getElementById('tx-crop');
-    cropSelect.innerHTML = crops.map(c => `<option value="${c.name}">${t(c.name)} (${c.variety})</option>`).join('');
+    cropSelect.innerHTML = '<option value="">(ކަނޑައެޅިފައިވާ ވަކި ގަހެއް ނެތް)</option>' + 
+      crops.map(c => `<option value="${c.name}">${t(c.name)} (${c.variety})</option>`).join('');
     
     if (type === 'income') {
       modalTitle.textContent = t('recordIncome');
@@ -1634,8 +1645,8 @@ class App {
       modalTitle.textContent = 'ޚަރަދެއް ރެކޯޑްކުރަން';
       document.getElementById('tx-category-group').classList.remove('hidden');
       document.getElementById('tx-supplier-group').classList.remove('hidden');
+      document.getElementById('tx-crop-group').classList.remove('hidden');
       
-      document.getElementById('tx-crop-group').classList.add('hidden');
       document.getElementById('tx-buyer-group').classList.add('hidden');
       document.getElementById('tx-paystatus-group').classList.add('hidden');
       document.getElementById('tx-price-unit-group').classList.add('hidden');
@@ -1804,7 +1815,7 @@ class App {
     const data = {
       date,
       type,
-      crop: type === 'income' ? crop : null,
+      crop: crop || null,
       category: type === 'expense' ? category : null,
       amount,
       quantity,
@@ -2174,7 +2185,8 @@ class App {
     
     const crops = queryTable('crops').filter(c => c.status === 'growing');
     const cropSelect = document.getElementById('tx-crop');
-    cropSelect.innerHTML = crops.map(c => `<option value="${c.name}">${t(c.name)} (${c.variety})</option>`).join('');
+    cropSelect.innerHTML = '<option value="">(ކަނޑައެޅިފައިވާ ވަކި ގަހެއް ނެތް)</option>' + 
+      crops.map(c => `<option value="${c.name}">${t(c.name)} (${c.variety})</option>`).join('');
     
     if (tx.type === 'income') {
       modalTitle.textContent = 'އާމްދަނީ އިސްލާހުކުރަން';
@@ -2191,13 +2203,15 @@ class App {
       document.getElementById('tx-supplier-group').classList.add('hidden');
     } else if (tx.type === 'expense') {
       modalTitle.textContent = 'ޚަރަދު އިސްލާހުކުރަން';
+      if (tx.crop) cropSelect.value = tx.crop;
+      else cropSelect.value = '';
       document.getElementById('tx-category').value = tx.category || '';
       document.getElementById('tx-supplier').value = tx.supplier || '';
       
       document.getElementById('tx-category-group').classList.remove('hidden');
       document.getElementById('tx-supplier-group').classList.remove('hidden');
+      document.getElementById('tx-crop-group').classList.remove('hidden');
       
-      document.getElementById('tx-crop-group').classList.add('hidden');
       document.getElementById('tx-buyer-group').classList.add('hidden');
       document.getElementById('tx-paystatus-group').classList.add('hidden');
       document.getElementById('tx-price-unit-group').classList.add('hidden');
