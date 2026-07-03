@@ -977,8 +977,9 @@
         <button class="modal-close" onclick="window.app.closeModal('transaction')">&times;</button>
       </div>
       <form id="form-transaction" onsubmit="window.app.saveTransaction(event)">
-        <!-- Hidden input for type -->
+        <!-- Hidden input for type and editing ID -->
         <input type="hidden" id="tx-type" value="income">
+        <input type="hidden" id="tx-id" value="">
         
         <app-input type="date" id="tx-date" label="ތާރީޚް" required></app-input>
 
@@ -1283,6 +1284,6 @@
     </div>
   </div>
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=1.5.6"></script>
+  <script type="module" src="app.js?v=1.5.7"></script>
 </body>
 </html>

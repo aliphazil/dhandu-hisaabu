@@ -24,7 +24,7 @@ import {
   resetPassword,
   recoverPassword,
   changePassword
-} from './database.js?v=1.5.6';
+} from './database.js?v=1.5.7';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -1060,6 +1060,7 @@ class App {
         <td>${statusBadge}</td>
         <td>
           ${settleBtn}
+          <button class="btn btn-secondary" style="padding: 4px 8px; min-height:30px; font-size:0.75rem; margin-inline-end: 6px;" onclick="window.app.editTransaction('${tx.id}')">އިސްލާހުކުރަން</button>
           <button class="btn btn-secondary" style="padding: 4px 8px; min-height:30px; font-size:0.75rem;" onclick="window.app.deleteRecord('transactions', '${tx.id}')" data-i18n="delete">ޑިލީޓް</button>
         </td>
       `;
@@ -1085,6 +1086,7 @@ class App {
         <td style="font-size: 0.85rem;">${tx.description || '-'}<br><span class="text-muted" style="font-size:0.75rem;">Recorded by: ${tx.createdBy || ''}</span></td>
         <td class="date-num" style="font-weight: 700; color: var(--danger);">${format2DP(tx.amount)}</td>
         <td>
+          <button class="btn btn-secondary" style="padding: 4px 8px; min-height:30px; font-size:0.75rem; margin-inline-end: 6px;" onclick="window.app.editTransaction('${tx.id}')">އިސްލާހުކުރަން</button>
           <button class="btn btn-secondary" style="padding: 4px 8px; min-height:30px; font-size:0.75rem;" onclick="window.app.deleteRecord('transactions', '${tx.id}')" data-i18n="delete">ޑިލީޓް</button>
         </td>
       `;
@@ -1610,8 +1612,9 @@ class App {
     // Set transaction date to today's local date in YYYY-MM-DD
     document.getElementById('tx-date').value = new Date().toISOString().split('T')[0];
     
-    // Set type
+    // Set type and clear ID
     document.getElementById('tx-type').value = type;
+    document.getElementById('tx-id').value = '';
     
     // Setup select options for crops
     const crops = queryTable('crops').filter(c => c.status === 'growing');
@@ -1812,14 +1815,21 @@ class App {
       paymentStatus: type === 'income' ? paymentStatus : 'paid'
     };
     
+    const txId = document.getElementById('tx-id').value;
+    
     this.saveSuggestedUnit(unit);
     if (buyer) this.saveSuggestedItem('buyer', buyer);
     if (supplier) this.saveSuggestedItem('supplier', supplier);
     if (type === 'expense' && category) this.saveSuggestedItem('category', category);
-    insertRecord('transactions', data, this.isOnline);
-    this.closeModal('transaction');
     
-    this.showToast(this.isOnline ? "އާމްދަނީ/ޚަރަދު ރެކޯޑް ކުރެވިއްޖެ!" : "އޮފްލައިންކޮށް ސޭވްކުރެވިއްޖެ! ނެޓްވޯކް ލިބުމުން ސިންކްވާނެ.");
+    if (txId) {
+      updateRecord('transactions', txId, data, this.isOnline);
+      this.showToast("މުއާމަލާތް އިސްލާހުކުރެވިއްޖެ!");
+    } else {
+      insertRecord('transactions', data, this.isOnline);
+      this.showToast(this.isOnline ? "އާމްދަނީ/ޚަރަދު ރެކޯޑް ކުރެވިއްޖެ!" : "އޮފްލައިންކޮށް ސޭވްކުރެވިއްޖެ! ނެޓްވޯކް ލިބުމުން ސިންކްވާނެ.");
+    }
+    this.closeModal('transaction');
     this.showView(this.currentView);
   }
 
@@ -2139,6 +2149,61 @@ class App {
     
     document.getElementById('modal-crop-title').textContent = 'ގަހުގެ މައުލޫމާތު އިސްލާހުކުރުން';
     this.openModal('crop');
+  }
+
+  editTransaction(id) {
+    const transactions = queryTable('transactions');
+    const tx = transactions.find(t => t.id === id);
+    if (!tx) return;
+    
+    const modalTitle = document.getElementById('modal-transaction-title');
+    const form = document.getElementById('form-transaction');
+    form.reset();
+    
+    document.getElementById('tx-id').value = tx.id;
+    document.getElementById('tx-type').value = tx.type;
+    document.getElementById('tx-date').value = tx.date;
+    document.getElementById('tx-amount').value = tx.amount;
+    document.getElementById('tx-quantity').value = tx.quantity || '';
+    document.getElementById('tx-unit').value = tx.unit || '';
+    document.getElementById('tx-description').value = tx.description || '';
+    
+    if (document.getElementById('tx-price-unit')) {
+      document.getElementById('tx-price-unit').value = tx.pricePerUnit || '';
+    }
+    
+    const crops = queryTable('crops').filter(c => c.status === 'growing');
+    const cropSelect = document.getElementById('tx-crop');
+    cropSelect.innerHTML = crops.map(c => `<option value="${c.name}">${t(c.name)} (${c.variety})</option>`).join('');
+    
+    if (tx.type === 'income') {
+      modalTitle.textContent = 'އާމްދަނީ އިސްލާހުކުރަން';
+      if (tx.crop) cropSelect.value = tx.crop;
+      document.getElementById('tx-buyer').value = tx.buyer || '';
+      document.getElementById('tx-paystatus').value = tx.paymentStatus || 'paid';
+      
+      document.getElementById('tx-crop-group').classList.remove('hidden');
+      document.getElementById('tx-buyer-group').classList.remove('hidden');
+      document.getElementById('tx-paystatus-group').classList.remove('hidden');
+      document.getElementById('tx-price-unit-group').classList.remove('hidden');
+      
+      document.getElementById('tx-category-group').classList.add('hidden');
+      document.getElementById('tx-supplier-group').classList.add('hidden');
+    } else if (tx.type === 'expense') {
+      modalTitle.textContent = 'ޚަރަދު އިސްލާހުކުރަން';
+      document.getElementById('tx-category').value = tx.category || '';
+      document.getElementById('tx-supplier').value = tx.supplier || '';
+      
+      document.getElementById('tx-category-group').classList.remove('hidden');
+      document.getElementById('tx-supplier-group').classList.remove('hidden');
+      
+      document.getElementById('tx-crop-group').classList.add('hidden');
+      document.getElementById('tx-buyer-group').classList.add('hidden');
+      document.getElementById('tx-paystatus-group').classList.add('hidden');
+      document.getElementById('tx-price-unit-group').classList.add('hidden');
+    }
+    
+    this.openModal('transaction');
   }
 
   editInventory(id) {
