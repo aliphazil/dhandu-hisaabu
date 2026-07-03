@@ -24,7 +24,7 @@ import {
   resetPassword,
   recoverPassword,
   changePassword
-} from './database.js?v=1.5.8';
+} from './database.js?v=1.5.9';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -316,7 +316,7 @@ class App {
   initSuggestedUnits() {
     // Migrate legacy English suggestions to Dhivehi
     let storedCats = localStorage.getItem("dhandu_hisaabu_suggested_categorys");
-    if (storedCats && storedCats.includes('"Seeds"')) {
+    if (storedCats && /[a-zA-Z]/.test(storedCats)) {
       localStorage.removeItem("dhandu_hisaabu_suggested_categorys");
     }
 
