@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="ދަނޑު ހިސާބު - ދިވެހި ދަނޑުވެރިންނަށް ޚާއްޞަ މޯބައިލް އެޕްލިކޭޝަން">
   <title data-i18n="appName">ދަނޑު ހިސާބު</title>
-  <link rel="stylesheet" href="style.css?v=1.1.4">
+  <link rel="stylesheet" href="style.css?v=1.1.5">
 </head>
 <body>
   <!-- Suggestions datalists for forms -->
@@ -1317,7 +1317,79 @@
       </form>
     </div>
   </div>
+  <!-- H. GENERATED SALES INVOICE MODAL -->
+  <div class="modal-overlay" id="modal-invoice">
+    <div class="modal-content" style="max-width: 650px;">
+      <div class="modal-header no-print">
+        <h3 class="modal-title">ސޭލްސް އިންވޮއިސް</h3>
+        <button class="modal-close" onclick="window.app.closeModal('invoice')">&times;</button>
+      </div>
+      
+      <!-- Print Area -->
+      <div id="invoice-print-area" class="invoice-container" style="direction: rtl; font-family: var(--font-dhivehi-body); padding: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--primary); padding-bottom: 15px; margin-bottom: 20px;">
+          <div>
+            <div style="font-size: 2.5rem; margin-bottom: 5px;">🌿</div>
+            <h2 id="inv-farm-name" style="font-weight: 700; color: var(--primary-dark); margin: 0;">ދަނޑުގެ ނަން</h2>
+            <p id="inv-inv-farm-details" class="text-muted" style="margin: 3px 0 0 0; font-size: 0.9rem;">ރަށް | ފޯނު: - | އީމެއިލް: -</p>
+          </div>
+          <div style="text-align: left; direction: ltr;">
+            <h1 style="color: var(--primary); font-weight: 800; font-size: 1.8rem; margin: 0; text-transform: uppercase;">INVOICE</h1>
+            <p style="margin: 5px 0 0 0; font-weight: 600; font-family: var(--font-latin);">No: <span id="inv-number" class="date-num">INV-000</span></p>
+            <p style="margin: 3px 0 0 0; font-family: var(--font-latin);">Date: <span id="inv-date" class="date-num">2026-07-04</span></p>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 25px;">
+          <h4 style="font-weight: 700; color: var(--primary-dark); margin: 0 0 8px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">ބިލް ކުރެވުނު ފަރާތް (Bill To):</h4>
+          <strong id="inv-buyer-name" style="font-size: 1.1rem; display: block;">-</strong>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+          <thead>
+            <tr style="background-color: var(--primary-light); border-bottom: 2px solid var(--primary);">
+              <th style="padding: 10px; text-align: right; font-weight: 700;">ތަފްސީލް (Description)</th>
+              <th style="padding: 10px; text-align: center; font-weight: 700;">މިންވަރު (Qty)</th>
+              <th style="padding: 10px; text-align: left; font-weight: 700; direction: ltr;">ޔުނިޓް އަގު (Rate)</th>
+              <th style="padding: 10px; text-align: left; font-weight: 700; direction: ltr;">ޖުމްލަ (Total)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td id="inv-item-desc" style="padding: 12px 10px; font-weight: 600;">-</td>
+              <td id="inv-item-qty" style="padding: 12px 10px; text-align: center;" class="date-num">-</td>
+              <td id="inv-item-rate" style="padding: 12px 10px; text-align: left; direction: ltr;" class="date-num">-</td>
+              <td id="inv-item-total" style="padding: 12px 10px; text-align: left; font-weight: 700; direction: ltr;" class="date-num">-</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; background-color: var(--primary-light); padding: 15px; border-radius: var(--radius-md); margin-bottom: 30px;">
+          <span style="font-size: 1.1rem; font-weight: 700; color: var(--primary-dark);">ޖުމްލަ އަގު (Grand Total):</span>
+          <span id="inv-grand-total" style="font-size: 1.4rem; font-weight: 800; color: var(--success); direction: ltr;" class="date-num">-</span>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+          <p style="font-weight: 700; color: var(--primary); margin: 0 0 5px 0;">ވިޔަފާރި ކުރެއްވިތީ ޝުކުރިއްޔާ! (Thank you for your business!)</p>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Dhandu Hisaabu - Powered by Google Cloud Firestore</span>
+        </div>
+      </div>
+
+      <div class="btn-row no-print" style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="btn btn-secondary" onclick="window.app.closeModal('invoice')">ލައްޕާލަން</button>
+        <button type="button" class="btn btn-primary" onclick="window.print()" style="display: inline-flex; align-items: center; gap: 6px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+          </svg>
+          <span>ޕްރިންޓް ކުރަން</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=1.7.7"></script>
+  <script type="module" src="app.js?v=1.7.8"></script>
 </body>
 </html>

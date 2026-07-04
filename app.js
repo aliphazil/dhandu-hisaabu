@@ -25,7 +25,7 @@ import {
   recoverPassword,
   changePassword,
   pullFromFirestore
-} from './database.js?v=1.7.7';
+} from './database.js?v=1.7.8';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -1227,6 +1227,7 @@ class App {
         <td>
           <div style="display: flex; gap: 6px; align-items: center;">
             ${settleBtn}
+            <button class="btn" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; min-height:auto; border-radius:50%; background:#1976d2; border:none; color:white; cursor:pointer;" onclick="window.app.generateInvoice('${tx.id}')" title="އިންވޮއިސް"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></button>
             <button class="btn" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; min-height:auto; border-radius:50%; background:#f0f0f0; border:none; color:#333; cursor:pointer;" onclick="window.app.editTransaction('${tx.id}')" title="އިސްލާހުކުރަން"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button>
             <button class="btn" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; min-height:auto; border-radius:50%; background:#c62828; border:none; color:white; cursor:pointer;" onclick="window.app.deleteRecord('transactions', '${tx.id}')" title="ފޮހެލަން"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
           </div>
@@ -2397,6 +2398,51 @@ class App {
     }
     
     this.openModal('transaction');
+  }
+
+  generateInvoice(txId) {
+    const user = getActiveUser();
+    if (!user) return;
+
+    const txs = queryTable('transactions');
+    const tx = txs.find(t => t.id === txId);
+    if (!tx) {
+      this.showToast("Transaction not found.");
+      return;
+    }
+
+    const farms = queryTable('farms');
+    const farm = farms.find(f => f.id === tx.farmId || f.id === user.farmId);
+    
+    // Populate Farm details
+    if (farm) {
+      document.getElementById('inv-farm-name').textContent = farm.name;
+      document.getElementById('inv-inv-farm-details').textContent = `${farm.island} | ފޯނު: ${farm.contact} | އީމެއިލް: ${farm.email || '-'}`;
+    } else {
+      document.getElementById('inv-farm-name').textContent = "ދަނޑު ހިސާބު";
+      document.getElementById('inv-inv-farm-details').textContent = "";
+    }
+
+    // Populate Invoice header details
+    const numericId = tx.id.replace(/\D/g, '').slice(-6) || '000';
+    document.getElementById('inv-number').textContent = `INV-${tx.date.replace(/-/g, '')}-${numericId}`;
+    document.getElementById('inv-date').textContent = tx.date;
+    document.getElementById('inv-buyer-name').textContent = tx.buyer || 'އާންމު ފަރާތް (Cash Customer)';
+
+    // Populate Item details
+    const cropNameDhivehi = t(tx.crop);
+    document.getElementById('inv-item-desc').textContent = cropNameDhivehi + (tx.description ? ` (${tx.description})` : '');
+    document.getElementById('inv-item-qty').textContent = `${format2DP(tx.quantity)} ${tx.unit}`;
+    
+    // Calculate rate (unit price) if quantity > 0
+    const qty = parseFloat(tx.quantity) || 1;
+    const rate = parseFloat(tx.amount) / qty;
+    document.getElementById('inv-item-rate').textContent = `${format2DP(rate)} MVR`;
+    document.getElementById('inv-item-total').textContent = `${format2DP(tx.amount)} MVR`;
+    document.getElementById('inv-grand-total').textContent = `${format2DP(tx.amount)} MVR`;
+
+    // Open Modal
+    this.openModal('invoice');
   }
 
   editInventory(id) {
