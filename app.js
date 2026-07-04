@@ -25,7 +25,7 @@ import {
   recoverPassword,
   changePassword,
   pullFromFirestore
-} from './database.js?v=1.7.9';
+} from './database.js?v=1.8.0';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -1401,6 +1401,8 @@ class App {
       document.getElementById('profile-email').value = myFarm.email || '';
       document.getElementById('profile-size').value = myFarm.size;
       document.getElementById('profile-contact').value = myFarm.contact;
+      document.getElementById('profile-bank-name').value = myFarm.bankName || '';
+      document.getElementById('profile-bank-no').value = myFarm.bankNo || '';
     }
     this.initSuggestedUnits();
     
@@ -2228,6 +2230,8 @@ class App {
     const email = document.getElementById('profile-email').value;
     const size = document.getElementById('profile-size').value;
     const contact = document.getElementById('profile-contact').value;
+    const bankName = document.getElementById('profile-bank-name').value;
+    const bankNo = document.getElementById('profile-bank-no').value;
     
     const updatedFields = {
       name,
@@ -2235,7 +2239,9 @@ class App {
       island,
       email,
       size,
-      contact
+      contact,
+      bankName,
+      bankNo
     };
     
     updateRecord('farms', user.farmId, updatedFields, this.isOnline);
@@ -2271,6 +2277,8 @@ class App {
     const size = document.getElementById('farm-size-input').value;
     const contact = document.getElementById('farm-contact-input').value;
     const email = document.getElementById('farm-email-input').value;
+    const bankName = document.getElementById('farm-bank-name-input').value;
+    const bankNo = document.getElementById('farm-bank-no-input').value;
     const adminUsername = document.getElementById('farm-admin-username').value;
     const adminPassword = document.getElementById('farm-admin-password').value;
     
@@ -2285,6 +2293,8 @@ class App {
           size,
           contact,
           email,
+          bankName,
+          bankNo,
           adminUsername,
           adminPassword
         });
@@ -2300,6 +2310,8 @@ class App {
           size,
           contact,
           email,
+          bankName,
+          bankNo,
           adminUsername,
           adminPassword
         });
@@ -2451,6 +2463,16 @@ class App {
     document.getElementById('inv-item-rate').textContent = `${format2DP(rate)} ރުފިޔާ`;
     document.getElementById('inv-item-total').textContent = `${format2DP(tx.amount)} ރުފިޔާ`;
     document.getElementById('inv-grand-total').textContent = `${format2DP(tx.amount)} ރުފިޔާ`;
+
+    // Bank Account details
+    const bankSection = document.getElementById('inv-bank-section');
+    if (farm && farm.bankNo) {
+      bankSection.style.display = 'block';
+      document.getElementById('inv-bank-name').textContent = farm.bankName || farm.owner;
+      document.getElementById('inv-bank-no').textContent = farm.bankNo;
+    } else {
+      bankSection.style.display = 'none';
+    }
 
     // Open Modal
     this.openModal('invoice');

@@ -673,7 +673,9 @@ export function registerFarmSelf(farmData) {
     size: farmData.size,
     contact: farmData.contact,
     email: farmData.email || "",
-    gpsLocation: farmData.gpsLocation || ""
+    gpsLocation: farmData.gpsLocation || "",
+    bankName: farmData.bankName || "",
+    bankNo: farmData.bankNo || ""
   };
   
   // Create Farm Admin Account

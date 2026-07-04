@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="ދަނޑު ހިސާބު - ދިވެހި ދަނޑުވެރިންނަށް ޚާއްޞަ މޯބައިލް އެޕްލިކޭޝަން">
   <title data-i18n="appName">ދަނޑު ހިސާބު</title>
-  <link rel="stylesheet" href="style.css?v=1.1.6">
+  <link rel="stylesheet" href="style.css?v=1.1.7">
 </head>
 <body>
   <!-- Suggestions datalists for forms -->
@@ -899,6 +899,8 @@
           <app-input type="email" id="profile-email" label="އީމެއިލް އެޑްރެސް" required></app-input>
           <app-input type="text" id="profile-size" label="ދަނޑުގެ ބޮޑުމިން (އަކަފޫޓު)" required></app-input>
           <app-input type="text" id="profile-contact" label="ގުޅޭނެ ނަންބަރު" required></app-input>
+          <app-input type="text" id="profile-bank-name" label="ބޭންކް އެކައުންޓް ނަން" placeholder="މިސާލަކަށް: ޢަލީ މުޙައްމަދު"></app-input>
+          <app-input type="text" id="profile-bank-no" label="ބޭންކް އެކައުންޓް ނަންބަރު" placeholder="މިސާލަކަށް: 7730000XXXXXX"></app-input>
           <button type="submit" class="btn btn-primary" style="width: 100%; margin-block-start: 12px;" data-i18n="save">ރައްކާކުރަން</button>
         </form>
       </div>
@@ -1303,6 +1305,8 @@
         <app-input type="text" id="farm-size-input" label="ދަނޑުގެ ބޮޑުމިން (އަކަފޫޓު)" required></app-input>
         <app-input type="text" id="farm-contact-input" label="ގުޅޭނެ ފޯނު ނަންބަރު" required></app-input>
         <app-input type="email" id="farm-email-input" label="އީމެއިލް އެޑްރެސް" required placeholder="މިސާލަކަށް: info@example.com"></app-input>
+        <app-input type="text" id="farm-bank-name-input" label="ބޭންކް އެކައުންޓް ނަން" placeholder="މިސާލަކަށް: ޢަލީ މުޙައްމަދު"></app-input>
+        <app-input type="text" id="farm-bank-no-input" label="ބޭންކް އެކައުންޓް ނަންބަރު" placeholder="މިސާލަކަށް: 7730000XXXXXX"></app-input>
 
         <div style="margin-block-start: 18px; border-block-start: 1px solid var(--border-color); padding-block-start: 12px;">
           <h4 style="font-weight: 700; margin-block-end: 10px;" class="text-success">ދަނޑުގެ އެޑްމިން ޔޫޒަރ</h4>
@@ -1369,6 +1373,15 @@
           <span id="inv-grand-total" style="font-size: 1.4rem; font-weight: 800; color: var(--success); direction: ltr;" class="date-num">-</span>
         </div>
 
+        <!-- Bank Account Details (optional) -->
+        <div id="inv-bank-section" style="margin-bottom: 25px; border-top: 1px dashed var(--border-color); padding-top: 15px;">
+          <h4 style="font-weight: 700; color: var(--primary-dark); margin: 0 0 5px 0;">ފައިސާ ދެއްކެވުމަށް:</h4>
+          <p style="margin: 0; font-size: 0.95rem;">
+            އެކައުންޓް ނަން: <strong id="inv-bank-name">-</strong><br>
+            އެކައުންޓް ނަންބަރު: <strong id="inv-bank-no" class="date-num" style="direction: ltr; display: inline-block;">-</strong>
+          </p>
+        </div>
+
         <div style="text-align: center; margin-top: 40px; border-top: 1px solid var(--border-color); padding-top: 15px;">
           <p style="font-weight: 700; color: var(--primary); margin: 0 0 5px 0;">ވިޔަފާރި ކުރެއްވިތީ ޝުކުރިއްޔާ!</p>
           <span style="font-size: 0.8rem; color: var(--text-muted);">ދަނޑު ހިސާބު - ޕަވަރޑް ބައި ގޫގަލް ކްލައުޑް ފަޔަރސްޓޯރ</span>
@@ -1390,6 +1403,6 @@
   </div>
 
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=1.7.9"></script>
+  <script type="module" src="app.js?v=1.8.0"></script>
 </body>
 </html>
