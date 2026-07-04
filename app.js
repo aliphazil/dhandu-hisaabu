@@ -25,7 +25,7 @@ import {
   recoverPassword,
   changePassword,
   pullFromFirestore
-} from './database.js?v=1.6.7';
+} from './database.js?v=1.6.8';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -699,6 +699,21 @@ class App {
   toggleUserMenu() {
     const dropdown = document.getElementById('role-dropdown');
     if (dropdown) dropdown.classList.toggle('show');
+  }
+
+  async syncDatabaseNow() {
+    if (!this.isOnline) {
+      this.showToast("Cannot sync database: you are currently offline.");
+      return;
+    }
+    
+    this.showToast("ޑޭޓާ ސިންކްކުރަނީ...");
+    try {
+      await pullFromFirestore();
+      this.showToast("ޑޭޓާ ސިންކްކޮށް ނިމިއްޖެ!");
+    } catch (err) {
+      await this.showAlert("Sync failed: " + err.message);
+    }
   }
 
   // Routing View Switching

@@ -88,9 +88,17 @@
 
     <!-- 2. STAFF WORKER VIEW -->
     <section id="view-staff-dashboard" class="hidden">
-      <div id="staff-welcome" style="margin-block-end: 20px;">
-        <h2 style="font-weight: 700;">އައްސަލާމް ޢަލައިކުމް، <span id="staff-name">މުވައްޒަފު</span>!</h2>
-        <p class="text-muted" id="staff-farm-name">ދަނޑުގެ ނަން</p>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-block-end: 20px; flex-wrap: wrap; gap: 12px;">
+        <div id="staff-welcome" style="margin: 0;">
+          <h2 style="font-weight: 700;">އައްސަލާމް ޢަލައިކުމް، <span id="staff-name">މުވައްޒަފު</span>!</h2>
+          <p class="text-muted" id="staff-farm-name">ދަނޑުގެ ނަން</p>
+        </div>
+        <button class="btn btn-secondary" onclick="window.app.syncDatabaseNow()" style="display:inline-flex; align-items:center; gap:6px; min-height:40px; padding: 8px 16px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+          </svg>
+          <span>ޑޭޓާ ސިންކްކުރަން</span>
+        </button>
       </div>
 
       <!-- Quick Action Buttons -->
@@ -116,9 +124,17 @@
 
     <!-- 3. PLATFORM ADMINISTRATOR VIEW -->
     <section id="view-platform-dashboard" class="hidden">
-      <div style="margin-block-end: 20px;">
-        <h2 style="font-weight: 700;" data-i18n="platformAdminTab">ޕްލެޓްފޯމް މެނޭޖްމަންޓް</h2>
-        <p class="text-muted">އެޕްލިކޭޝަން ބޭނުންކުރާ ދަނޑުތަކާއި ސަބްސްކްރިޕްޝަންތައް ބެލެހެއްޓުން</p>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-block-end: 20px; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <h2 style="font-weight: 700;" data-i18n="platformAdminTab">ޕްލެޓްފޯމް މެނޭޖްމަންޓް</h2>
+          <p class="text-muted">އެޕްލިކޭޝަން ބޭނުންކުރާ ދަނޑުތަކާއި ސަބްސްކްރިޕްޝަންތައް ބެލެހެއްޓުން</p>
+        </div>
+        <button class="btn btn-secondary" onclick="window.app.syncDatabaseNow()" style="display:inline-flex; align-items:center; gap:6px; min-height:40px; padding: 8px 16px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+          </svg>
+          <span>ޑޭޓާ ސިންކްކުރަން</span>
+        </button>
       </div>
 
       <!-- Platform stats cards -->
@@ -195,9 +211,17 @@
       </div>
 
       <!-- Dashboard Title -->
-      <div style="margin-block-end: 20px;">
-        <h2 style="font-weight: 700;" id="farm-dashboard-welcome">ދަނޑުގެ މައުލޫމާތު</h2>
-        <p class="text-muted" id="farm-dashboard-island">ހިތަދޫ</p>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-block-end: 20px; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <h2 style="font-weight: 700;" id="farm-dashboard-welcome">ދަނޑުގެ މައުލޫމާތު</h2>
+          <p class="text-muted" id="farm-dashboard-island">ހިތަދޫ</p>
+        </div>
+        <button class="btn btn-secondary" onclick="window.app.syncDatabaseNow()" style="display:inline-flex; align-items:center; gap:6px; min-height:40px; padding: 8px 16px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+          </svg>
+          <span>ޑޭޓާ ސިންކްކުރަން</span>
+        </button>
       </div>
 
       <!-- Key Financial Metrics & Active Crops -->
@@ -1294,6 +1318,6 @@
     </div>
   </div>
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=1.6.7"></script>
+  <script type="module" src="app.js?v=1.6.8"></script>
 </body>
 </html>
