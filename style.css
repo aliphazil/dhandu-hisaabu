@@ -1256,13 +1256,17 @@ input[lang="en"], textarea[lang="en"] {
 
 /* Center Login View to the Screen */
 body:has(#view-login:not(.hidden)), body.login-page {
-  padding-block-start: 0;
-  padding-block-end: 0;
+  padding-block-start: 20px;
+  padding-block-end: 20px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 body:has(#view-login:not(.hidden)) .container, body.login-page .container {
-  margin: auto;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 480px;
 }
 
