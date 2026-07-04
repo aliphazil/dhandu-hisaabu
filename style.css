@@ -1258,6 +1258,8 @@ input[lang="en"], textarea[lang="en"] {
 body:has(#view-login:not(.hidden)), body.login-page {
   padding-block-start: 20px;
   padding-block-end: 20px;
+  padding-inline-start: 0 !important;
+  padding-inline-end: 0 !important;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
