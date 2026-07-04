@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="ދަނޑު ހިސާބު - ދިވެހި ދަނޑުވެރިންނަށް ޚާއްޞަ މޯބައިލް އެޕްލިކޭޝަން">
   <title data-i18n="appName">ދަނޑު ހިސާބު</title>
-  <link rel="stylesheet" href="style.css?v=1.1.7">
+  <link rel="stylesheet" href="style.css?v=1.1.8">
 </head>
 <body>
   <!-- Suggestions datalists for forms -->
@@ -279,9 +279,12 @@
 
     <!-- 6. INCOME VIEW -->
     <section id="view-income" class="hidden">
-      <div class="card-header-actions">
-        <h2 style="font-weight: 700;">އާމްދަނީ</h2>
-        <button class="btn btn-primary" onclick="window.app.openRecordModal('income')">💰 އާމްދަނީ އިތުރުކުރަން</button>
+      <div class="card-header-actions" style="display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+        <h2 style="font-weight: 700; margin: 0;">އާމްދަނީ</h2>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button class="btn btn-primary hidden" id="btn-bulk-invoice" onclick="window.app.generateBulkInvoice()" style="background-color: #0288d1; border-color: #0288d1; color: white;">🧾 ސެލެކްޓްކުރި އައިޓަމްތަކަށް އިންވޮއިސް ހަދަން (0)</button>
+          <button class="btn btn-primary" onclick="window.app.openRecordModal('income')">💰 އާމްދަނީ އިތުރުކުރަން</button>
+        </div>
       </div>
 
       <div class="card high-contrast-card" style="margin-block-start: 20px;">
@@ -289,10 +292,10 @@
           <table>
             <thead>
               <tr>
+                <th style="width: 40px; text-align: center;"><input type="checkbox" id="select-all-income" onchange="window.app.toggleSelectAllIncome(this)"></th>
                 <th data-i18n="date">ތާރީޚް</th>
                 <th>ގަސް</th>
                 <th>ބައިވެރިޔާ</th>
-                <th data-i18n="description">ތަފްސީލް</th>
                 <th>އަދަދު (<span class="mvr-symbol">$</span>)</th>
                 <th data-i18n="status">ހާލަތު</th>
                 <th data-i18n="actions">އަމަލުތައް</th>
@@ -321,7 +324,6 @@
                 <th data-i18n="date">ތާރީޚް</th>
                 <th>ކެޓަގަރީ</th>
                 <th>ސަޕްލަޔަރު</th>
-                <th data-i18n="description">ތަފްސީލް</th>
                 <th>އަދަދު (<span class="mvr-symbol">$</span>)</th>
                 <th data-i18n="actions">އަމަލުތައް</th>
               </tr>
@@ -1358,13 +1360,7 @@
               <th style="padding: 10px; text-align: left; font-weight: 700; direction: ltr;">ޖުމްލަ</th>
             </tr>
           </thead>
-          <tbody>
-            <tr style="border-bottom: 1px solid var(--border-color);">
-              <td id="inv-item-desc" style="padding: 12px 10px; font-weight: 600;">-</td>
-              <td id="inv-item-qty" style="padding: 12px 10px; text-align: center;" class="date-num">-</td>
-              <td id="inv-item-rate" style="padding: 12px 10px; text-align: left; direction: ltr;" class="date-num">-</td>
-              <td id="inv-item-total" style="padding: 12px 10px; text-align: left; font-weight: 700; direction: ltr;" class="date-num">-</td>
-            </tr>
+          <tbody id="invoice-items-body">
           </tbody>
         </table>
 
@@ -1403,6 +1399,6 @@
   </div>
 
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=1.8.0"></script>
+  <script type="module" src="app.js?v=1.8.1"></script>
 </body>
 </html>

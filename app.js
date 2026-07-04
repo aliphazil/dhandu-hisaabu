@@ -25,7 +25,7 @@ import {
   recoverPassword,
   changePassword,
   pullFromFirestore
-} from './database.js?v=1.8.0';
+} from './database.js?v=1.8.1';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -1218,10 +1218,10 @@ class App {
         '';
         
       tr.innerHTML = `
+        <td style="text-align: center;"><input type="checkbox" class="income-select-checkbox" value="${tx.id}" onchange="window.app.onIncomeSelectChange()"></td>
         <td class="date-num" style="white-space: nowrap;">${tx.date}</td>
         <td style="font-weight: 600;">${t(tx.crop)} (${format2DP(tx.quantity)} ${tx.unit})</td>
         <td>${tx.buyer || '-'}</td>
-        <td style="font-size: 0.85rem;">${tx.description || '-'}<br><span class="text-muted" style="font-size:0.75rem;">Recorded by: ${tx.createdBy || ''}</span></td>
         <td class="date-num" style="font-weight: 700; color: var(--success);">${format2DP(tx.amount)}</td>
         <td>${statusBadge}</td>
         <td>
@@ -1252,7 +1252,6 @@ class App {
         <td class="date-num" style="white-space: nowrap;">${tx.date}</td>
         <td style="font-weight: 600;">${t(tx.category)}</td>
         <td>${tx.supplier || '-'}</td>
-        <td style="font-size: 0.85rem;">${tx.description || '-'}<br><span class="text-muted" style="font-size:0.75rem;">Recorded by: ${tx.createdBy || ''}</span></td>
         <td class="date-num" style="font-weight: 700; color: var(--danger);">${format2DP(tx.amount)}</td>
         <td>
           <div style="display: flex; gap: 6px; align-items: center;">
@@ -2412,19 +2411,25 @@ class App {
     this.openModal('transaction');
   }
 
-  generateInvoice(txId) {
+  generateInvoice(txIdOrIds) {
     const user = getActiveUser();
     if (!user) return;
 
+    const txIds = Array.isArray(txIdOrIds) ? txIdOrIds : [txIdOrIds];
+    if (txIds.length === 0) {
+      this.showToast("ސެލެކްޓްކުރި ވަކި އައިޓަމެއް ނެތް.");
+      return;
+    }
+
     const txs = queryTable('transactions');
-    const tx = txs.find(t => t.id === txId);
-    if (!tx) {
+    const selectedTxs = txs.filter(t => txIds.includes(t.id));
+    if (selectedTxs.length === 0) {
       this.showToast("Transaction not found.");
       return;
     }
 
     const farms = queryTable('farms');
-    const farm = farms.find(f => f.id === tx.farmId || f.id === user.farmId);
+    const farm = farms.find(f => f.id === selectedTxs[0].farmId || f.id === user.farmId);
     
     // Populate Farm details
     if (farm) {
@@ -2436,12 +2441,18 @@ class App {
     }
 
     // Populate Invoice header details
-    const numericId = tx.id.replace(/\D/g, '').slice(-6) || '000';
-    document.getElementById('inv-number').textContent = `INV-${tx.date.replace(/-/g, '')}-${numericId}`;
-    document.getElementById('inv-date').textContent = tx.date;
-    document.getElementById('inv-buyer-name').textContent = tx.buyer || 'އާންމު ފަރާތް';
+    const numericId = selectedTxs[0].id.replace(/\D/g, '').slice(-4) || '000';
+    const multipleSuffix = selectedTxs.length > 1 ? `-${selectedTxs.length}` : '';
+    document.getElementById('inv-number').textContent = `INV-${selectedTxs[0].date.replace(/-/g, '')}-${numericId}${multipleSuffix}`;
+    document.getElementById('inv-date').textContent = selectedTxs[0].date;
+    
+    const buyerName = selectedTxs.find(t => t.buyer)?.buyer || 'އާންމު ފަރާތް';
+    document.getElementById('inv-buyer-name').textContent = buyerName;
 
-    // Populate Item details
+    // Populate Items Table
+    const itemsBody = document.getElementById('invoice-items-body');
+    itemsBody.innerHTML = '';
+
     const translateUnit = (unit) => {
       const lower = (unit || '').toLowerCase().trim();
       if (lower === 'kg') return 'ކިލޯ';
@@ -2453,16 +2464,29 @@ class App {
       return unit;
     };
 
-    const cropNameDhivehi = t(tx.crop);
-    document.getElementById('inv-item-desc').textContent = cropNameDhivehi + (tx.description ? ` (${tx.description})` : '');
-    document.getElementById('inv-item-qty').textContent = `${format2DP(tx.quantity)} ${translateUnit(tx.unit)}`;
-    
-    // Calculate rate (unit price) if quantity > 0
-    const qty = parseFloat(tx.quantity) || 1;
-    const rate = parseFloat(tx.amount) / qty;
-    document.getElementById('inv-item-rate').textContent = `${format2DP(rate)} ރުފިޔާ`;
-    document.getElementById('inv-item-total').textContent = `${format2DP(tx.amount)} ރުފިޔާ`;
-    document.getElementById('inv-grand-total').textContent = `${format2DP(tx.amount)} ރުފިޔާ`;
+    let grandTotal = 0;
+
+    selectedTxs.forEach(tx => {
+      const cropNameDhivehi = t(tx.crop);
+      const desc = cropNameDhivehi + (tx.description ? ` (${tx.description})` : '');
+      const qtyVal = parseFloat(tx.quantity) || 1;
+      const rateVal = parseFloat(tx.amount) / qtyVal;
+      const totalVal = parseFloat(tx.amount);
+      
+      grandTotal += totalVal;
+
+      const tr = document.createElement('tr');
+      tr.style.borderBottom = '1px solid var(--border-color)';
+      tr.innerHTML = `
+        <td style="padding: 12px 10px; font-weight: 600;">${desc}</td>
+        <td style="padding: 12px 10px; text-align: center;" class="date-num">${format2DP(tx.quantity)} ${translateUnit(tx.unit)}</td>
+        <td style="padding: 12px 10px; text-align: left; direction: ltr;" class="date-num">${format2DP(rateVal)} ރުފިޔާ</td>
+        <td style="padding: 12px 10px; text-align: left; font-weight: 700; direction: ltr;" class="date-num">${format2DP(totalVal)} ރުފިޔާ</td>
+      `;
+      itemsBody.appendChild(tr);
+    });
+
+    document.getElementById('inv-grand-total').textContent = `${format2DP(grandTotal)} ރުފިޔާ`;
 
     // Bank Account details
     const bankSection = document.getElementById('inv-bank-section');
@@ -2476,6 +2500,43 @@ class App {
 
     // Open Modal
     this.openModal('invoice');
+  }
+
+  toggleSelectAllIncome(masterCheckbox) {
+    const checkboxes = document.querySelectorAll('.income-select-checkbox');
+    checkboxes.forEach(cb => {
+      cb.checked = masterCheckbox.checked;
+    });
+    this.onIncomeSelectChange();
+  }
+
+  onIncomeSelectChange() {
+    const checkboxes = document.querySelectorAll('.income-select-checkbox');
+    const checkedBoxes = Array.from(checkboxes).filter(cb => cb.checked);
+    const bulkBtn = document.getElementById('btn-bulk-invoice');
+    
+    if (bulkBtn) {
+      if (checkedBoxes.length > 0) {
+        bulkBtn.classList.remove('hidden');
+        bulkBtn.textContent = `🧾 ސެލެކްޓްކުރި އައިޓަމްތަކަށް އިންވޮއިސް ހަދަން (${checkedBoxes.length})`;
+      } else {
+        bulkBtn.classList.add('hidden');
+      }
+    }
+  }
+
+  generateBulkInvoice() {
+    const checkboxes = document.querySelectorAll('.income-select-checkbox');
+    const checkedIds = Array.from(checkboxes)
+      .filter(cb => cb.checked)
+      .map(cb => cb.value);
+    
+    if (checkedIds.length === 0) {
+      this.showToast("ސެލެކްޓްކުރި ވަކި އައިޓަމެއް ނެތް.");
+      return;
+    }
+    
+    this.generateInvoice(checkedIds);
   }
 
   editInventory(id) {
