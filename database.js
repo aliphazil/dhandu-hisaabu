@@ -1,6 +1,6 @@
 // Database and Storage Engine for "ދަނޑު ހިސާބު" (Dhandu Hisaabu)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, doc, setDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, getDocs, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -500,34 +500,36 @@ export async function authenticate(username, password) {
   // If user is not found locally, fetch directly from remote Firestore
   if (!user && db) {
     try {
-      const querySnapshot = await getDocs(collection(db, "users"));
-      const usersList = [];
-      querySnapshot.forEach((doc) => {
-        usersList.push(doc.data());
-      });
-      
-      if (usersList.length > 0) {
-        // Preserve default users
-        DEFAULT_USERS.forEach(defUser => {
-          const exists = usersList.some(u => u.username === defUser.username);
-          if (!exists) {
-            usersList.push(defUser);
-          }
-        });
-        serverStore.users = usersList;
+      const userDoc = await getDoc(doc(db, "users", username));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        
+        // Cache the fetched user locally
+        serverStore.users = serverStore.users || [];
+        const existingIdx = serverStore.users.findIndex(u => u.username === username);
+        if (existingIdx !== -1) {
+          serverStore.users[existingIdx] = userData;
+        } else {
+          serverStore.users.push(userData);
+        }
         saveStore(serverStore, "server");
         
         const localStore = getStore("local");
-        localStore.users = usersList;
+        localStore.users = localStore.users || [];
+        const existingIdxL = localStore.users.findIndex(u => u.username === username);
+        if (existingIdxL !== -1) {
+          localStore.users[existingIdxL] = userData;
+        } else {
+          localStore.users.push(userData);
+        }
         saveStore(localStore, "local");
-      }
-      
-      // Try finding again with remote data
-      user = usersList.find(u => u.username === username && u.password === password);
-      
-      if (user) {
-        console.log("User authenticated via remote Firestore. Pulling full database sync...");
-        pullFromFirestore();
+        
+        // Match credentials
+        if (userData.password === password) {
+          user = userData;
+          console.log("User authenticated via remote Firestore. Pulling full database sync...");
+          pullFromFirestore();
+        }
       }
     } catch (err) {
       console.error("Firestore authenticate check failed:", err);
