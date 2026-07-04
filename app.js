@@ -25,7 +25,7 @@ import {
   recoverPassword,
   changePassword,
   pullFromFirestore
-} from './database.js?v=1.8.3';
+} from './database.js?v=1.8.4';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -232,7 +232,7 @@ class AppInput extends HTMLElement {
     const isEnglishField = [
       'password', 'email', 'url', 'number', 'tel'
     ].includes(type) || [
-      'username', 'password', 'email', 'url', 'id', 'key', 'phone', 'contact', 'size', 'price', 'quantity', 'amount', 'stock', 'min-stock', 'cost'
+      'username', 'password', 'email', 'url', 'id', 'key', 'phone', 'contact', 'size', 'price', 'quantity', 'amount', 'stock', 'min-stock', 'cost', 'bank'
     ].some(keyword => id.toLowerCase().includes(keyword)) || 
     this.getAttribute('lang') === 'en';
 

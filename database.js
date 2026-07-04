@@ -131,7 +131,26 @@ export async function pullFromFirestore() {
         querySnapshot.forEach((doc) => {
           list.push(doc.data());
         });
-        serverDB[table] = list;
+        
+        // Safe merge pulled list with local list to prevent data vanishing
+        const localList = serverDB[table] || [];
+        const mergedMap = new Map();
+        
+        localList.forEach(item => {
+          if (item) {
+            const key = item.id || item.username || JSON.stringify(item);
+            mergedMap.set(key, item);
+          }
+        });
+        
+        list.forEach(item => {
+          if (item) {
+            const key = item.id || item.username || JSON.stringify(item);
+            mergedMap.set(key, item);
+          }
+        });
+        
+        serverDB[table] = Array.from(mergedMap.values());
         hasUpdatedAny = true;
       } catch (tableErr) {
         console.error(`Failed to pull table ${table} from Firestore:`, tableErr);
