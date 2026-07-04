@@ -25,7 +25,7 @@ import {
   recoverPassword,
   changePassword,
   pullFromFirestore
-} from './database.js?v=1.7.3';
+} from './database.js?v=1.7.4';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {

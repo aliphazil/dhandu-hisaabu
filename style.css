@@ -1260,10 +1260,9 @@ body:has(#view-login:not(.hidden)), body.login-page {
   padding-block-end: 0;
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
 }
 body:has(#view-login:not(.hidden)) .container, body.login-page .container {
-  margin-block: auto;
+  margin: auto;
 }
 
