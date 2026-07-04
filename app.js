@@ -23,8 +23,9 @@ import {
   toggleFarmStatus,
   resetPassword,
   recoverPassword,
-  changePassword
-} from './database.js?v=1.6.5';
+  changePassword,
+  pullFromFirestore
+} from './database.js?v=1.6.6';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -682,6 +683,9 @@ class App {
       else if (session.role === 'staff') roleText = 'ދަނޑުގެ މުވައްޒަފު';
       roleEl.textContent = roleText;
     }
+    
+    // Trigger background database sync on login to ensure fresh data
+    pullFromFirestore();
   }
 
   logout() {
