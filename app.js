@@ -25,7 +25,7 @@ import {
   recoverPassword,
   changePassword,
   pullFromFirestore
-} from './database.js?v=1.8.2';
+} from './database.js?v=1.8.3';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -2537,6 +2537,31 @@ class App {
     }
     
     this.generateInvoice(checkedIds);
+  }
+
+  downloadInvoiceAsImage() {
+    const printArea = document.getElementById('invoice-print-area');
+    if (!printArea) return;
+
+    this.showToast("ފޮޓޯ ތައްޔާރުކުރަނީ...");
+
+    html2canvas(printArea, {
+      scale: 2.5,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      logging: false
+    }).then(canvas => {
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+      const link = document.createElement('a');
+      const invNum = document.getElementById('inv-number').textContent || 'invoice';
+      link.download = `${invNum}.jpeg`;
+      link.href = dataUrl;
+      link.click();
+      this.showToast("ފޮޓޯ ޑައުންލޯޑް ކުރެވިއްޖެ!");
+    }).catch(err => {
+      console.error("Failed to generate image:", err);
+      this.showToast("ފޮޓޯ ހެދުމުގައި މައްސަލައެއް ދިމާވެއްޖެ.");
+    });
   }
 
   editInventory(id) {
