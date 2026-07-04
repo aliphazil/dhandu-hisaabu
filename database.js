@@ -158,8 +158,8 @@ export async function pullFromFirestore() {
       if (outbox.length === 0) {
         localStorage.setItem("dhandu_hisaabu_local_db", JSON.stringify(serverDB));
         // Force app refresh if views are open
-        if (window.app && typeof window.app.navigate === "function" && window.app.currentView) {
-          window.app.navigate(window.app.currentView);
+        if (window.app && typeof window.app.showView === "function" && window.app.currentView) {
+          window.app.showView(window.app.currentView);
         }
       }
       console.log("Pulled fresh state from Firestore (preserved default users).");
@@ -530,7 +530,7 @@ export async function authenticate(username, password) {
       
       if (user) {
         console.log("User authenticated via remote Firestore. Pulling full database sync...");
-        await pullFromFirestore();
+        pullFromFirestore();
       }
     } catch (err) {
       console.error("Firestore authenticate check failed:", err);
@@ -550,7 +550,7 @@ export async function authenticate(username, password) {
     return session;
   }
   
-  throw new Error("Invalid username or password.");
+  throw new Error("ޔޫޒަރނޭމް ނުވަތަ ޕާސްވޯޑް ރަނގަޅެއް ނޫން!");
 }
 
 // Synchronization Manager
