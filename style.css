@@ -1255,7 +1255,7 @@ input[lang="en"], textarea[lang="en"] {
 }
 
 /* Center Login View to the Screen */
-body:has(#view-login:not(.hidden)) {
+body:has(#view-login:not(.hidden)), body.login-page {
   padding-block-start: 0;
   padding-block-end: 0;
   min-height: 100vh;
@@ -1263,7 +1263,7 @@ body:has(#view-login:not(.hidden)) {
   align-items: center;
   justify-content: center;
 }
-body:has(#view-login:not(.hidden)) .container {
+body:has(#view-login:not(.hidden)) .container, body.login-page .container {
   margin-block: auto;
 }
 

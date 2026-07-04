@@ -25,7 +25,7 @@ import {
   recoverPassword,
   changePassword,
   pullFromFirestore
-} from './database.js?v=1.7.2';
+} from './database.js?v=1.7.3';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -719,6 +719,9 @@ class App {
   // Routing View Switching
   showView(viewId) {
     this.currentView = viewId;
+    
+    // Toggle body login-page class for centering
+    document.body.classList.toggle('login-page', viewId === 'login');
     
     // Hide all view sections
     const views = [
