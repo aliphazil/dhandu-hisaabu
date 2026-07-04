@@ -128,24 +128,24 @@ export async function pullFromFirestore() {
   if (!db) return;
   try {
     const tables = ["farms", "users", "crops", "transactions", "fertilizer_records", "harvest_records", "inventory", "audit_logs", "treatment_products", "treatment_applications"];
-    const serverDB = {};
+    const serverDB = getStore("server") || {};
+    let hasUpdatedAny = false;
+    
     for (const table of tables) {
-      const querySnapshot = await getDocs(collection(db, table));
-      serverDB[table] = [];
-      querySnapshot.forEach((doc) => {
-        serverDB[table].push(doc.data());
-      });
-    }
-
-    let hasData = false;
-    for (const table of tables) {
-      if (serverDB[table] && serverDB[table].length > 0) {
-        hasData = true;
-        break;
+      try {
+        const querySnapshot = await getDocs(collection(db, table));
+        const list = [];
+        querySnapshot.forEach((doc) => {
+          list.push(doc.data());
+        });
+        serverDB[table] = list;
+        hasUpdatedAny = true;
+      } catch (tableErr) {
+        console.error(`Failed to pull table ${table} from Firestore:`, tableErr);
       }
     }
 
-    if (hasData) {
+    if (hasUpdatedAny) {
       if (!serverDB.users) serverDB.users = [];
       DEFAULT_USERS.forEach(defUser => {
         const exists = serverDB.users.some(u => u.username === defUser.username);
@@ -163,9 +163,6 @@ export async function pullFromFirestore() {
         }
       }
       console.log("Pulled fresh state from Firestore (preserved default users).");
-    } else {
-      console.log("Firestore is empty. Seeding with default data...");
-      await pushAllToFirestore();
     }
   } catch (err) {
     console.error("Firestore pull failed:", err);
