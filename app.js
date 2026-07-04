@@ -24,7 +24,7 @@ import {
   resetPassword,
   recoverPassword,
   changePassword
-} from './database.js?v=1.6.4';
+} from './database.js?v=1.6.5';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -278,7 +278,6 @@ class App {
     this.logout = this.logout.bind(this);
     this.toggleNetwork = this.toggleNetwork.bind(this);
     this.toggleUserMenu = this.toggleUserMenu.bind(this);
-    this.switchDemoRole = this.switchDemoRole.bind(this);
     
     this.init();
   }
