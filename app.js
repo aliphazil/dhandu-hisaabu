@@ -25,7 +25,7 @@ import {
   recoverPassword,
   changePassword,
   pullFromFirestore
-} from './database.js?v=1.7.8';
+} from './database.js?v=1.7.9';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -2427,19 +2427,30 @@ class App {
     const numericId = tx.id.replace(/\D/g, '').slice(-6) || '000';
     document.getElementById('inv-number').textContent = `INV-${tx.date.replace(/-/g, '')}-${numericId}`;
     document.getElementById('inv-date').textContent = tx.date;
-    document.getElementById('inv-buyer-name').textContent = tx.buyer || 'އާންމު ފަރާތް (Cash Customer)';
+    document.getElementById('inv-buyer-name').textContent = tx.buyer || 'އާންމު ފަރާތް';
 
     // Populate Item details
+    const translateUnit = (unit) => {
+      const lower = (unit || '').toLowerCase().trim();
+      if (lower === 'kg') return 'ކިލޯ';
+      if (lower === 'pcs' || lower === 'items') return 'އަދަދު';
+      if (lower === 'box') return 'ފޮށި';
+      if (lower === 'bundle') return 'ބޮނޑި';
+      if (lower === 'ton') return 'ޓަނު';
+      if (lower === 'grams' || lower === 'g') return 'ގްރާމް';
+      return unit;
+    };
+
     const cropNameDhivehi = t(tx.crop);
     document.getElementById('inv-item-desc').textContent = cropNameDhivehi + (tx.description ? ` (${tx.description})` : '');
-    document.getElementById('inv-item-qty').textContent = `${format2DP(tx.quantity)} ${tx.unit}`;
+    document.getElementById('inv-item-qty').textContent = `${format2DP(tx.quantity)} ${translateUnit(tx.unit)}`;
     
     // Calculate rate (unit price) if quantity > 0
     const qty = parseFloat(tx.quantity) || 1;
     const rate = parseFloat(tx.amount) / qty;
-    document.getElementById('inv-item-rate').textContent = `${format2DP(rate)} MVR`;
-    document.getElementById('inv-item-total').textContent = `${format2DP(tx.amount)} MVR`;
-    document.getElementById('inv-grand-total').textContent = `${format2DP(tx.amount)} MVR`;
+    document.getElementById('inv-item-rate').textContent = `${format2DP(rate)} ރުފިޔާ`;
+    document.getElementById('inv-item-total').textContent = `${format2DP(tx.amount)} ރުފިޔާ`;
+    document.getElementById('inv-grand-total').textContent = `${format2DP(tx.amount)} ރުފިޔާ`;
 
     // Open Modal
     this.openModal('invoice');
