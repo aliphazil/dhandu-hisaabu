@@ -42,13 +42,6 @@ const DEFAULT_TREATMENT_PRODUCTS = [];
 const DEFAULT_TREATMENT_APPLICATIONS = [];
 
 export function initDB() {
-  // Wipe out legacy database containing default demo farms
-  let existingServer = localStorage.getItem("dhandu_hisaabu_server_db");
-  if (existingServer && existingServer.includes('"farm_1"')) {
-    localStorage.removeItem("dhandu_hisaabu_server_db");
-    localStorage.removeItem("dhandu_hisaabu_local_db");
-  }
-
   let serverDB;
   if (!localStorage.getItem("dhandu_hisaabu_server_db")) {
     serverDB = {
