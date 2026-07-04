@@ -24,7 +24,7 @@ import {
   resetPassword,
   recoverPassword,
   changePassword
-} from './database.js?v=1.6.2';
+} from './database.js?v=1.6.3';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -671,11 +671,18 @@ class App {
       this.showView('farm-dashboard');
     }
     
-    // Highlight demo dropdown status
-    const buttons = document.querySelectorAll('#role-dropdown button');
-    buttons.forEach(btn => btn.classList.remove('active'));
-    const activeBtn = document.getElementById(`switch-${session.username}`);
-    if (activeBtn) activeBtn.classList.add('active');
+    // Set user info in header profile dropdown
+    const nameEl = document.getElementById('header-user-name');
+    const roleEl = document.getElementById('header-user-role');
+    if (nameEl && roleEl) {
+      nameEl.textContent = session.name || session.username;
+      
+      let roleText = '';
+      if (session.role === 'platform_admin') roleText = 'ޕްލެޓްފޯމް މެނޭޖަރ';
+      else if (session.role === 'farm_admin') roleText = 'ދަނޑުގެ އެޑްމިން';
+      else if (session.role === 'staff') roleText = 'ދަނޑުގެ މުވައްޒަފު';
+      roleEl.textContent = roleText;
+    }
   }
 
   logout() {
@@ -689,20 +696,6 @@ class App {
   toggleUserMenu() {
     const dropdown = document.getElementById('role-dropdown');
     if (dropdown) dropdown.classList.toggle('show');
-  }
-
-  switchDemoRole(username) {
-    const accounts = {
-      sysadmin: 'sysadminpassword',
-      villa_admin: 'villaadminpassword',
-      villa_worker: 'villaworkerpassword',
-      garden_admin: 'gardenadminpassword'
-    };
-    
-    if (accounts[username]) {
-      this.logout();
-      this.quickLogin(username, accounts[username]);
-    }
   }
 
   // Routing View Switching

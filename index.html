@@ -29,29 +29,15 @@
         <span id="network-text" data-i18n="online">އޮންލައިން</span>
       </div>
       
-      <!-- User profile & role switcher -->
+      <!-- User profile menu -->
       <div class="user-menu">
         <button class="avatar-btn" id="avatar-btn" onclick="window.app.toggleUserMenu()">👤</button>
-        <div class="role-switcher-dropdown" id="role-dropdown">
-          <h4 data-i18n="role">ރޯލް ބަދަލުކުރަން</h4>
-          <button id="switch-sysadmin" onclick="window.app.switchDemoRole('sysadmin')">
-            <strong data-i18n="platformAdmin">ޕްލެޓްފޯމް އެޑްމިން</strong>
-            <span>Username: sysadmin</span>
-          </button>
-          <button id="switch-villa-admin" onclick="window.app.switchDemoRole('villa_admin')">
-            <strong data-i18n="farmAdmin">ހިތަދޫ އެޑްމިން</strong>
-            <span>Username: villa_admin</span>
-          </button>
-          <button id="switch-villa-worker" onclick="window.app.switchDemoRole('villa_worker')">
-            <strong data-i18n="staffRole">ހިތަދޫ މުވައްޒަފު</strong>
-            <span>Username: villa_worker</span>
-          </button>
-          <button id="switch-garden-admin" onclick="window.app.switchDemoRole('garden_admin')">
-            <strong data-i18n="farmAdmin">ކުނަހަންދޫ އެޑްމިން</strong>
-            <span>Username: garden_admin</span>
-          </button>
-          <hr style="margin: 6px 0; border: none; border-block-start: 1px solid var(--border-color);">
-          <button onclick="window.app.logout()" style="color: var(--danger);" data-i18n="logout">ލޮގްއައުޓް</button>
+        <div class="role-switcher-dropdown" id="role-dropdown" style="min-width: 180px;">
+          <div style="padding: 12px; text-align: center; border-bottom: 1px solid var(--border-color); margin-bottom: 6px;">
+            <strong id="header-user-name" style="display: block; font-size: 1rem; color: var(--primary-dark);"></strong>
+            <span id="header-user-role" style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;"></span>
+          </div>
+          <button onclick="window.app.logout()" style="color: var(--danger); width: 100%; border: none; background: none; padding: 10px; cursor: pointer; text-align: center; font-weight: 600;" data-i18n="logout">ލޮގްއައުޓް</button>
         </div>
       </div>
     </div>
@@ -1308,6 +1294,6 @@
     </div>
   </div>
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=1.6.2"></script>
+  <script type="module" src="app.js?v=1.6.3"></script>
 </body>
 </html>
