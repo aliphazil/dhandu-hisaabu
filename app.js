@@ -24,7 +24,7 @@ import {
   resetPassword,
   recoverPassword,
   changePassword
-} from './database.js?v=1.6.1';
+} from './database.js?v=1.6.2';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -566,6 +566,61 @@ class App {
         setTimeout(() => {
           overlay.remove();
           resolve(true);
+        }, 150);
+      });
+    });
+  }
+
+  showPrompt(message) {
+    return new Promise((resolve) => {
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay show';
+      overlay.style.zIndex = '9999';
+      overlay.style.backdropFilter = 'blur(8px)';
+      overlay.style.webkitBackdropFilter = 'blur(8px)';
+      overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
+      
+      const content = document.createElement('div');
+      content.className = 'modal-content';
+      content.style.maxWidth = '360px';
+      content.style.textAlign = 'center';
+      content.style.padding = '24px';
+      
+      content.innerHTML = `
+        <div style="font-size: 2.5rem; margin-bottom: 12px;">🔑</div>
+        <p style="font-size: 1rem; font-weight: 600; margin-bottom: 16px; line-height: 1.5; color: var(--text-dark);">${message}</p>
+        <div style="margin-bottom: 20px;">
+          <input type="text" id="prompt-input-val" class="form-input" style="width: 100%; text-align: center; font-size: 1.1rem; padding: 10px;" placeholder="މިސާލަކަށް: 123456" />
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+          <button class="btn btn-secondary" id="prompt-cancel" style="min-width: 90px; padding: 8px 16px; font-weight:600; font-size:0.9rem; border-radius:20px;">ކެންސަލް</button>
+          <button class="btn btn-primary" id="prompt-ok" style="min-width: 90px; padding: 8px 16px; font-weight:600; font-size:0.9rem; border-radius:20px;">ކަށަވަރުކުރަން</button>
+        </div>
+      `;
+      
+      overlay.appendChild(content);
+      document.body.appendChild(overlay);
+      
+      const inputEl = content.querySelector('#prompt-input-val');
+      const cancelBtn = content.querySelector('#prompt-cancel');
+      const okBtn = content.querySelector('#prompt-ok');
+      
+      inputEl.focus();
+      
+      cancelBtn.addEventListener('click', () => {
+        overlay.classList.remove('show');
+        setTimeout(() => {
+          overlay.remove();
+          resolve(null);
+        }, 150);
+      });
+      
+      okBtn.addEventListener('click', () => {
+        const val = inputEl.value.trim();
+        overlay.classList.remove('show');
+        setTimeout(() => {
+          overlay.remove();
+          resolve(val || null);
         }, 150);
       });
     });
@@ -1282,9 +1337,17 @@ class App {
         <td style="font-family: var(--font-latin);">${s.username}</td>
         <td><span class="badge ${s.status === 'active' ? 'badge-paid' : 'badge-suspended'}">${s.status.toUpperCase()}</span></td>
         <td>
-          <div style="display: flex; gap: 6px;">
-            <button class="btn btn-secondary" style="padding: 4px 8px; min-height:30px; font-size:0.75rem;" onclick="window.app.resetStaffPassword('${s.username}')">Reset Pass</button>
-            <button class="btn btn-secondary" style="padding: 4px 8px; min-height:30px; font-size:0.75rem;" onclick="window.app.toggleStaffStatus('${s.username}')">Toggle</button>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <button class="btn" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; min-height:auto; border-radius:50%; background:#f0f0f0; border:none; color:#333; cursor:pointer;" onclick="window.app.resetStaffPassword('${s.username}')" title="ޕާސްވޯޑް ރީސެޓްކުރަން">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+              </svg>
+            </button>
+            <button class="btn" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; min-height:auto; border-radius:50%; background:${s.status === 'active' ? '#c62828' : '#2e7d32'}; border:none; color:white; cursor:pointer;" onclick="window.app.toggleStaffStatus('${s.username}')" title="${s.status === 'active' ? 'ސަސްޕެންޑް ކުރަން' : 'އެކްޓިވް ކުރަން'}">
+              ${s.status === 'active' ? 
+                `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>` : 
+                `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>`}
+            </button>
           </div>
         </td>
       `;
@@ -1325,6 +1388,17 @@ class App {
       document.getElementById('profile-contact').value = myFarm.contact;
     }
     this.initSuggestedUnits();
+    
+    // Load staff management section inside Profile if the user is a farm_admin
+    const staffSection = document.getElementById('profile-staff-section');
+    if (staffSection) {
+      if (user.role === 'farm_admin') {
+        staffSection.classList.remove('hidden');
+        this.loadStaff();
+      } else {
+        staffSection.classList.add('hidden');
+      }
+    }
   }
 
   // Report Generator Logic
@@ -2326,8 +2400,8 @@ class App {
     this.openModal('inventory');
   }
 
-  resetStaffPassword(username) {
-    const newPass = prompt("އާ ޕާސްވޯޑް ޖައްސަވާ:");
+  async resetStaffPassword(username) {
+    const newPass = await this.showPrompt("އާ ޕާސްވޯޑް ޖައްސަވާ:");
     if (newPass) {
       resetPassword(username, newPass);
       this.showToast("ޕާސްވޯޑް ރީސެޓް ކުރެވިއްޖެ!");
