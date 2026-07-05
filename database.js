@@ -418,6 +418,26 @@ export function updateRecord(table, id, updatedFields, isOnline = true) {
           console.error(`Firestore update to ${table} failed:`, err);
         });
       }
+    } else {
+      // Create new record in serverDB and push to Firestore
+      const newRecord = {
+        id: id,
+        ...updatedFields,
+        updatedBy: user ? user.username : "system",
+        updatedDate: new Date().toISOString()
+      };
+      if (table !== "farms" && user) {
+        newRecord.farmId = user.farmId;
+      }
+      serverDB[table].push(newRecord);
+      saveStore(serverDB, "server");
+      
+      if (db) {
+        const docRef = doc(db, table, id);
+        setDoc(docRef, newRecord, { merge: true }).catch(err => {
+          console.error(`Firestore insert/update to ${table} failed:`, err);
+        });
+      }
     }
     
     // Local DB update
@@ -427,9 +447,21 @@ export function updateRecord(table, id, updatedFields, isOnline = true) {
       localDB[table][localIndex] = {
         ...localDB[table][localIndex],
         ...updatedFields,
-        updatedBy: user.username,
+        updatedBy: user ? user.username : "system",
         updatedDate: new Date().toISOString()
       };
+      saveStore(localDB, "local");
+    } else {
+      const newRecord = {
+        id: id,
+        ...updatedFields,
+        updatedBy: user ? user.username : "system",
+        updatedDate: new Date().toISOString()
+      };
+      if (table !== "farms" && user) {
+        newRecord.farmId = user.farmId;
+      }
+      localDB[table].push(newRecord);
       saveStore(localDB, "local");
     }
     
@@ -442,9 +474,21 @@ export function updateRecord(table, id, updatedFields, isOnline = true) {
       localDB[table][localIndex] = {
         ...localDB[table][localIndex],
         ...updatedFields,
-        updatedBy: user.username,
+        updatedBy: user ? user.username : "system",
         updatedDate: new Date().toISOString()
       };
+      saveStore(localDB, "local");
+    } else {
+      const newRecord = {
+        id: id,
+        ...updatedFields,
+        updatedBy: user ? user.username : "system",
+        updatedDate: new Date().toISOString()
+      };
+      if (table !== "farms" && user) {
+        newRecord.farmId = user.farmId;
+      }
+      localDB[table].push(newRecord);
       saveStore(localDB, "local");
     }
     
@@ -956,4 +1000,32 @@ export function changePassword(currentPassword, newPassword) {
 
   logAuditEvent("CHANGE_PASSWORD", `Password changed by user: ${currentUser.username}`, currentUser.role === "platform_admin");
   return { success: true };
+}
+
+// Ensure the farm document is loaded into the local cache from Firestore
+export async function ensureFarmCached(farmId) {
+  if (!farmId) return null;
+  const localDB = getStore("local");
+  const serverDB = getStore("server");
+  
+  let farm = localDB.farms.find(f => f.id === farmId);
+  if (farm) return farm;
+  
+  if (db) {
+    try {
+      const docRef = doc(db, "farms", farmId);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const farmData = docSnap.data();
+        localDB.farms.push(farmData);
+        serverDB.farms.push(farmData);
+        saveStore(localDB, "local");
+        saveStore(serverDB, "server");
+        return farmData;
+      }
+    } catch (err) {
+      console.error("Failed to fetch farm from Firestore:", err);
+    }
+  }
+  return null;
 }

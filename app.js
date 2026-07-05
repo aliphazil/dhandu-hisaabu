@@ -25,8 +25,9 @@ import {
   recoverPassword,
   changePassword,
   pullFromFirestore,
-  saveUserToFirestore
-} from './database.js?v=1.9.9';
+  saveUserToFirestore,
+  ensureFarmCached
+} from './database.js?v=2.0.0';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -1406,8 +1407,11 @@ class App {
     });
   }
 
-  loadProfile() {
+  async loadProfile() {
     const user = getActiveUser();
+    if (user && user.farmId) {
+      await ensureFarmCached(user.farmId);
+    }
     const farms = queryTable('farms');
     const myFarm = farms.find(f => f.id === user.farmId);
     
