@@ -26,7 +26,7 @@ import {
   changePassword,
   pullFromFirestore,
   saveUserToFirestore
-} from './database.js?v=1.9.4';
+} from './database.js?v=1.9.5';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -2543,17 +2543,21 @@ class App {
     
     const hasUnsettled = selectedTxs.some(t => t.paymentStatus === 'pending');
 
-    if (farm && farm.bankNo) {
+    const bankNo = (farm && farm.bankNo) ? farm.bankNo : "7706346582101";
+    const bankName = (farm && farm.bankNo) ? (farm.bankName || farm.owner) : "Ali Fazil";
+    const contact = (farm && farm.contact) ? farm.contact : "9982629";
+
+    if (bankNo) {
       bankSection.style.display = 'block';
-      document.getElementById('inv-bank-name').textContent = farm.bankName || farm.owner;
-      document.getElementById('inv-bank-no').textContent = farm.bankNo;
+      document.getElementById('inv-bank-name').textContent = bankName;
+      document.getElementById('inv-bank-no').textContent = bankNo;
     } else {
       bankSection.style.display = 'none';
     }
 
-    if (hasUnsettled && farm && farm.bankNo) {
+    if (hasUnsettled) {
       unsettledSection.style.display = 'block';
-      unsettledNote.textContent = `މި ބިލުގައިވާ ފައިސާ ${farm.bankNo} – ${farm.bankName || farm.owner} އެކައުންޓަށް ޖަމާކުރުމަށްފަހު ${farm.contact} އަށް ސްލިޕް ފޮނުވައިދިނުން އެދެމެވެ.`;
+      unsettledNote.textContent = `މި ބިލުގައިވާ ފައިސާ ${bankNo} – ${bankName} އެކައުންޓަށް ޖަމާކުރުމަށްފަހު ${contact} އަށް ސްލިޕް ފޮނުވައިދިނުން އެދެމެވެ.`;
     } else {
       unsettledSection.style.display = 'none';
     }
