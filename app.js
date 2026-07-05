@@ -25,7 +25,7 @@ import {
   recoverPassword,
   changePassword,
   pullFromFirestore
-} from './database.js?v=1.8.5';
+} from './database.js?v=1.8.6';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -234,6 +234,7 @@ class AppInput extends HTMLElement {
     ].includes(type) || [
       'username', 'password', 'email', 'url', 'id', 'key', 'phone', 'contact', 'size', 'price', 'quantity', 'amount', 'stock', 'min-stock', 'cost', 'bank'
     ].some(keyword => id.toLowerCase().includes(keyword)) || 
+    ['profile-bank-name', 'farm-bank-name-input', 'profile-bank-no', 'farm-bank-no-input'].includes(id) ||
     this.getAttribute('lang') === 'en';
 
     // Remove the ID from the parent so the child wrapper or inner element has the unique ID
