@@ -25,7 +25,7 @@ import {
   recoverPassword,
   changePassword,
   pullFromFirestore
-} from './database.js?v=1.8.7';
+} from './database.js?v=1.8.8';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -304,12 +304,7 @@ class App {
       this.showView('login');
     }
 
-    // Setup recurring background sync (every 20 seconds) to sync modifications from other devices
-    setInterval(() => {
-      if (this.isOnline && getActiveUser()) {
-        pullFromFirestore();
-      }
-    }, 20000);
+
     
     // Setup event listeners for closing modal dropdowns
     document.addEventListener('click', (e) => {

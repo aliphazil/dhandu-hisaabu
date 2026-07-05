@@ -118,9 +118,8 @@ export async function pushAllToFirestore() {
 
 // Background pull sync helper
 export async function pullFromFirestore() {
-  if (!db) return;
-  const user = getActiveUser();
-  if (!user) return; // Only pull if logged in
+  // Sync over other devices disabled by request
+  return;
 
   try {
     const tables = ["farms", "users", "crops", "transactions", "fertilizer_records", "harvest_records", "inventory", "audit_logs", "treatment_products", "treatment_applications"];
