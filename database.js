@@ -104,7 +104,10 @@ export async function pushAllToFirestore() {
     for (const table of tables) {
       const records = serverDB[table] || [];
       for (const record of records) {
-        const docId = record.id || record.username;
+        let docId = record.id || record.username;
+        if (table === "users") {
+          docId = (record.username === "sysadmin") ? record.username : `${record.farmId}_${record.username}`;
+        }
         if (docId) {
           await setDoc(doc(db, table, docId), record);
         }
@@ -528,21 +531,28 @@ function deductInventoryFertilizer(fertilizerName, quantity, isOnline) {
 }
 
 // Authentication Logic
-export async function authenticate(username, password) {
+export async function authenticate(username, password, farmId = "") {
   initDB();
   const serverStore = getStore("server");
-  let user = serverStore.users.find(u => u.username === username && u.password === password);
+  let user;
+  
+  if (username === "sysadmin") {
+    user = serverStore.users.find(u => u.username === username && u.password === password && !u.farmId);
+  } else {
+    user = serverStore.users.find(u => u.username === username && u.password === password && u.farmId === farmId);
+  }
   
   // If user is not found locally, fetch directly from remote Firestore
   if (!user && db) {
     try {
-      const userDoc = await getDoc(doc(db, "users", username));
+      const docId = username === "sysadmin" ? username : `${farmId}_${username}`;
+      const userDoc = await getDoc(doc(db, "users", docId));
       if (userDoc.exists()) {
         const userData = userDoc.data();
         
         // Cache the fetched user locally
         serverStore.users = serverStore.users || [];
-        const existingIdx = serverStore.users.findIndex(u => u.username === username);
+        const existingIdx = serverStore.users.findIndex(u => u.username === username && u.farmId === userData.farmId);
         if (existingIdx !== -1) {
           serverStore.users[existingIdx] = userData;
         } else {
@@ -552,7 +562,7 @@ export async function authenticate(username, password) {
         
         const localStore = getStore("local");
         localStore.users = localStore.users || [];
-        const existingIdxL = localStore.users.findIndex(u => u.username === username);
+        const existingIdxL = localStore.users.findIndex(u => u.username === username && u.farmId === userData.farmId);
         if (existingIdxL !== -1) {
           localStore.users[existingIdxL] = userData;
         } else {
@@ -586,6 +596,17 @@ export async function authenticate(username, password) {
   }
   
   throw new Error("ޔޫޒަރނޭމް ނުވަތަ ޕާސްވޯޑް ރަނގަޅެއް ނޫން!");
+}
+
+export async function saveUserToFirestore(userRecord) {
+  if (!db) return;
+  try {
+    const docId = userRecord.username === "sysadmin" ? userRecord.username : `${userRecord.farmId}_${userRecord.username}`;
+    await setDoc(doc(db, "users", docId), userRecord);
+    console.log("User successfully saved to Firestore:", docId);
+  } catch (err) {
+    console.error("Failed to save user to Firestore:", err);
+  }
 }
 
 // Synchronization Manager
@@ -681,7 +702,7 @@ export function createFarm(farmData) {
   // Async push to Firestore
   if (db) {
     setDoc(doc(db, "farms", newFarm.id), newFarm).catch(err => console.error(err));
-    setDoc(doc(db, "users", newAdmin.username), newAdmin).catch(err => console.error(err));
+    setDoc(doc(db, "users", `${newFarm.id}_${newAdmin.username}`), newAdmin).catch(err => console.error(err));
   }
   
   logAuditEvent("CREATE_FARM", `Created new farm: ${farmData.name} (ID: ${newFarmId})`, true);
@@ -693,9 +714,8 @@ export function registerFarmSelf(farmData) {
   const serverDB = getStore("server");
   const localDB = getStore("local");
   
-  const duplicate = serverDB.users.find(u => u.username === farmData.adminUsername);
-  if (duplicate) {
-    throw new Error("Username already taken. Please choose another username.");
+  if (farmData.adminUsername === "sysadmin") {
+    throw new Error("Security Exception: 'sysadmin' is a reserved system administrator username.");
   }
   
   const newFarmId = "farm_" + Date.now();
@@ -760,7 +780,7 @@ export function registerFarmSelf(farmData) {
   // Async push to Firestore
   if (db) {
     setDoc(doc(db, "farms", newFarm.id), newFarm).catch(err => console.error(err));
-    setDoc(doc(db, "users", newAdmin.username), newAdmin).catch(err => console.error(err));
+    setDoc(doc(db, "users", `${newFarmId}_${newAdmin.username}`), newAdmin).catch(err => console.error(err));
     setDoc(doc(db, "inventory", defaultSeeds.id), defaultSeeds).catch(err => console.error(err));
     setDoc(doc(db, "inventory", defaultFert.id), defaultFert).catch(err => console.error(err));
     setDoc(doc(db, "audit_logs", logItem.id), logItem).catch(err => console.error(err));
@@ -805,7 +825,8 @@ export function toggleFarmStatus(farmId) {
       
       serverDB.users.forEach(u => {
         if (u.farmId === farmId) {
-          setDoc(doc(db, "users", u.username), u, { merge: true }).catch(err => console.error(err));
+          const docId = (u.username === "sysadmin") ? u.username : `${u.farmId}_${u.username}`;
+          setDoc(doc(db, "users", docId), u, { merge: true }).catch(err => console.error(err));
         }
       });
     }
@@ -843,7 +864,8 @@ export function resetPassword(username, newPassword) {
     
     // Async push to Firestore
     if (db) {
-      setDoc(doc(db, "users", username), serverDB.users[targetUserIdx], { merge: true }).catch(err => console.error(err));
+      const docId = (targetUser.username === "sysadmin") ? targetUser.username : `${targetUser.farmId}_${targetUser.username}`;
+      setDoc(doc(db, "users", docId), serverDB.users[targetUserIdx], { merge: true }).catch(err => console.error(err));
     }
     
     logAuditEvent("RESET_PASSWORD", `Password reset for user: ${username}`, currentUser.role === "platform_admin");
@@ -854,11 +876,14 @@ export function resetPassword(username, newPassword) {
 }
 
 // Password recovery via registered email validation
-export function recoverPassword(username, email, newPassword) {
+export function recoverPassword(username, email, newPassword, farmId = "") {
   const serverDB = getStore("server");
   const localDB = getStore("local");
 
-  const user = serverDB.users.find(u => u.username === username);
+  const user = username === "sysadmin"
+    ? serverDB.users.find(u => u.username === username && !u.farmId)
+    : serverDB.users.find(u => u.username === username && u.farmId === farmId);
+
   if (!user) {
     throw new Error("މި ޔޫޒަރނޭމްގެ އެކައުންޓެއް ނެތް.");
   }
@@ -881,10 +906,10 @@ export function recoverPassword(username, email, newPassword) {
   }
 
   // Update password in server and local DBs
-  const serverUserIdx = serverDB.users.findIndex(u => u.username === username);
+  const serverUserIdx = serverDB.users.findIndex(u => u.username === username && u.farmId === user.farmId);
   if (serverUserIdx !== -1) serverDB.users[serverUserIdx].password = newPassword;
 
-  const localUserIdx = localDB.users.findIndex(u => u.username === username);
+  const localUserIdx = localDB.users.findIndex(u => u.username === username && u.farmId === user.farmId);
   if (localUserIdx !== -1) localDB.users[localUserIdx].password = newPassword;
 
   saveStore(serverDB, "server");

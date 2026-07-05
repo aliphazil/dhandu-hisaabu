@@ -24,8 +24,9 @@ import {
   resetPassword,
   recoverPassword,
   changePassword,
-  pullFromFirestore
-} from './database.js?v=1.8.8';
+  pullFromFirestore,
+  saveUserToFirestore
+} from './database.js?v=1.8.9';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -631,14 +632,26 @@ class App {
 
   async handleLogin(e) {
     e.preventDefault();
+    const farmCodeEl = document.getElementById('login-farm-code');
     const userEl = document.getElementById('login-username');
     const passEl = document.getElementById('login-password');
     const errEl = document.getElementById('login-error');
     
+    const farmCode = farmCodeEl ? farmCodeEl.value.trim() : "";
+    const username = userEl.value.trim();
+    const password = passEl.value;
+
+    if (username !== "sysadmin" && !farmCode) {
+      errEl.classList.remove('hidden');
+      errEl.textContent = "ދަނޑުގެ ކޯޑު ޖައްސަވަން ޖެހޭނެއެވެ.";
+      return;
+    }
+
     try {
-      const session = await authenticate(userEl.value, passEl.value);
+      const session = await authenticate(username, password, farmCode);
       errEl.classList.add('hidden');
       this.loginSuccess(session);
+      if (farmCodeEl) farmCodeEl.value = '';
       userEl.value = '';
       passEl.value = '';
     } catch (err) {
@@ -648,8 +661,10 @@ class App {
   }
 
   quickLogin(username, password) {
+    const farmCodeEl = document.getElementById('login-farm-code');
     const userEl = document.getElementById('login-username');
     const passEl = document.getElementById('login-password');
+    if (farmCodeEl) farmCodeEl.value = '';
     if (userEl && passEl) {
       userEl.value = username;
       passEl.value = password;
@@ -1954,15 +1969,18 @@ class App {
 
   async handleForgotPassword(e) {
     e.preventDefault();
+    const farmCode = document.getElementById('forgot-farm-code').value.trim();
     const username = document.getElementById('forgot-username').value;
     const email = document.getElementById('forgot-email').value;
     const newPassword = document.getElementById('forgot-new-password').value;
 
     try {
-      recoverPassword(username, email, newPassword);
+      recoverPassword(username, email, newPassword, farmCode);
       this.closeModal('forgot-password');
       this.showToast("ޕާސްވޯޑް ކާމިޔާބުކަމާއެކު ބަދަލުކުރެވިއްޖެ! ލޮގިންވެވަޑައިގަންނަވާ.");
       // Auto-fill login credentials
+      const farmCodeEl = document.getElementById('login-farm-code');
+      if (farmCodeEl) farmCodeEl.value = farmCode;
       document.getElementById('login-username').value = username;
       document.getElementById('login-password').value = newPassword;
     } catch (err) {
@@ -2196,16 +2214,16 @@ class App {
     
     if (id) {
       // Update
-      const uIdxL = localDB.users.findIndex(u => u.username === username);
+      const uIdxL = localDB.users.findIndex(u => u.username === username && u.farmId === newStaffUser.farmId);
       if (uIdxL !== -1) localDB.users[uIdxL] = newStaffUser;
       
-      const uIdxS = serverDB.users.findIndex(u => u.username === username);
+      const uIdxS = serverDB.users.findIndex(u => u.username === username && u.farmId === newStaffUser.farmId);
       if (uIdxS !== -1) serverDB.users[uIdxS] = newStaffUser;
       
       logAuditEvent("UPDATE_STAFF", `Updated staff credentials: ${username}`);
     } else {
       // Check duplicate
-      const duplicate = localDB.users.find(u => u.username === username);
+      const duplicate = localDB.users.find(u => u.username === username && u.farmId === newStaffUser.farmId);
       if (duplicate) {
         await this.showAlert("މި ޔޫޒަރނޭމް މިހާރުވެސް ބޭނުންކުރެވެމުންދަނީ. އެހެން ޔޫޒަރނޭމެއް ޖައްސަވާ.");
         return;
@@ -2214,6 +2232,9 @@ class App {
       serverDB.users.push(newStaffUser);
       logAuditEvent("CREATE_STAFF", `Added new staff member: ${username}`);
     }
+    
+    // Save to Firestore
+    saveUserToFirestore(newStaffUser);
     
     localStorage.setItem('dhandu_hisaabu_local_db', JSON.stringify(localDB));
     localStorage.setItem('dhandu_hisaabu_server_db', JSON.stringify(serverDB));
@@ -2288,7 +2309,7 @@ class App {
     
     try {
       if (activeUser && activeUser.role === 'platform_admin') {
-        createFarm({
+        const res = createFarm({
           name,
           owner,
           island,
@@ -2301,11 +2322,11 @@ class App {
           adminPassword
         });
         this.closeModal('create-farm');
-        this.showToast("ދަނޑު ރަޖިސްޓްރީ ކުރެވި، އެޑްމިން ޔޫޒަރ ހެދިއްޖެ!");
+        await this.showAlert(`އާ ދަނޑެއް ކާމިޔާބުކަމާއެކު ރަޖިސްޓްރީ ކުރެވިއްޖެ!\n\nދަނޑުގެ ކޯޑު: ${res.farmId}`);
         this.showView('platform-dashboard');
       } else {
         // Self registration by a guest farmer
-        registerFarmSelf({
+        const res = registerFarmSelf({
           name,
           owner,
           island,
@@ -2318,9 +2339,11 @@ class App {
           adminPassword
         });
         this.closeModal('create-farm');
-        this.showToast("ދަނޑު ރަޖިސްޓްރީ ކުރެވިއްޖެ! ލޮގިންވެވަައިގަންނަވާ.");
+        await this.showAlert(`ދަނޑު ރަޖިސްޓްރީ ކުރެވިއްޖެ!\n\nދަނޑުގެ ކޯޑު: ${res.farmId}\n(ލޮގިންވާއިރު މި ކޯޑު ބޭނުންކުރަންވާނެއެވެ. ލިޔެ ރައްކާކުރައްވާ!)`);
         
         // Auto-fill login credentials
+        const farmCodeEl = document.getElementById('login-farm-code');
+        if (farmCodeEl) farmCodeEl.value = res.farmId;
         document.getElementById('login-username').value = adminUsername;
         document.getElementById('login-password').value = adminPassword;
       }
