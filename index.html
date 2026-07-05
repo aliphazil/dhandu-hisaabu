@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="ދަނޑު ހިސާބު - ދިވެހި ދަނޑުވެރިންނަށް ޚާއްޞަ މޯބައިލް އެޕްލިކޭޝަން">
   <title data-i18n="appName">ދަނޑު ހިސާބު</title>
-  <link rel="stylesheet" href="style.css?v=1.1.27">
+  <link rel="stylesheet" href="style.css?v=1.1.28">
   <!-- HTML2Canvas for Invoice as Image downloading -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
@@ -62,7 +62,7 @@
       </div>
 
       <form id="login-form" onsubmit="window.app.handleLogin(event)">
-        <app-input type="text" id="login-farm-code" label="ދަނޑުގެ ކޯޑު" placeholder="މިސާލަކަށް: farm_17834567290" lang="en"></app-input>
+        <app-input type="text" id="login-farm-code" label="ފޯނު ނަންބަރު / NID" placeholder="މިސާލަކަށް: 9982629" lang="en"></app-input>
         <app-input type="text" id="login-username" label="ޔޫޒަރނޭމް" required autocomplete="username"></app-input>
         <app-input type="password" id="login-password" label="ޕާސްވޯޑް" required autocomplete="current-password"></app-input>
         <div style="text-align: right; margin-block-end: 14px; margin-block-start: -8px;">
@@ -1288,7 +1288,7 @@
       </div>
       <form id="form-forgot-password" onsubmit="window.app.handleForgotPassword(event)">
         <p class="text-muted" style="font-size: 0.85rem; margin-block-end: 14px;">ޕާސްވޯޑް ބަދަލުކުރުމަށް ތިރީގައިވާ މައުލޫމާތު ފުރިހަމަކުރައްވާށެވެ.</p>
-        <app-input type="text" id="forgot-farm-code" label="ދަނޑުގެ ކޯޑު" placeholder="މިސާލަކަށް: farm_17834567290" lang="en"></app-input>
+        <app-input type="text" id="forgot-farm-code" label="ފޯނު ނަންބަރު / NID" placeholder="މިސާލަކަށް: 9982629" lang="en"></app-input>
         <app-input type="text" id="forgot-username" label="ޔޫޒަރނޭމް" required placeholder="މިސާލަކަށް: villa_admin"></app-input>
         <app-input type="email" id="forgot-email" label="ރަޖިސްޓްރީކުރި އީމެއިލް އެޑްރެސް" required placeholder="މިސާލަކަށް: email@example.com"></app-input>
         <app-input type="password" id="forgot-new-password" label="އާ ޕާސްވޯޑް" required placeholder="މިސާލަކަށް: 123456"></app-input>
@@ -1429,6 +1429,6 @@
   </div>
 
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=2.0.0"></script>
+  <script type="module" src="app.js?v=2.0.1"></script>
 </body>
 </html>

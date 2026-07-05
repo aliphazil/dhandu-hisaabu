@@ -715,7 +715,10 @@ export function createFarm(farmData) {
   const serverDB = getStore("server");
   const localDB = getStore("local");
   
-  const newFarmId = "farm_" + Date.now();
+  const newFarmId = farmData.contact.trim().replace(/[^a-zA-Z0-9]/g, "");
+  if (serverDB.farms.some(f => f.id === newFarmId)) {
+    throw new Error("މި ފޯނު ނަންބަރު ނުވަތަ NID އަށް މިހާރުވެސް ދަނޑެއް ރަޖިސްޓްރީ ކުރެވިފައިވެއެވެ!");
+  }
   const newFarm = {
     id: newFarmId,
     status: "active",
@@ -762,7 +765,10 @@ export function registerFarmSelf(farmData) {
     throw new Error("Security Exception: 'sysadmin' is a reserved system administrator username.");
   }
   
-  const newFarmId = "farm_" + Date.now();
+  const newFarmId = farmData.contact.trim().replace(/[^a-zA-Z0-9]/g, "");
+  if (serverDB.farms.some(f => f.id === newFarmId)) {
+    throw new Error("މި ފޯނު ނަންބަރު ނުވަތަ NID އަށް މިހާރުވެސް ދަނޑެއް ރަޖިސްޓްރީ ކުރެވިފައިވެއެވެ!");
+  }
   const newFarm = {
     id: newFarmId,
     status: "active",
