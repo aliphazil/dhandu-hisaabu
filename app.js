@@ -26,7 +26,7 @@ import {
   changePassword,
   pullFromFirestore,
   saveUserToFirestore
-} from './database.js?v=1.9.3';
+} from './database.js?v=1.9.4';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -2553,7 +2553,7 @@ class App {
 
     if (hasUnsettled && farm && farm.bankNo) {
       unsettledSection.style.display = 'block';
-      unsettledNote.textContent = `މި ބިލުގައިވާ ފައިސާ ${farm.bankNo}، ${farm.bankName || farm.owner} އަށް ޖަމާކުރެއްވުމަށްފަހު ${farm.contact} އަށް ސްލިޕް ފޮނުވައިދިނުން އެދެމެވެ.`;
+      unsettledNote.textContent = `މި ބިލުގައިވާ ފައިސާ ${farm.bankNo} – ${farm.bankName || farm.owner} އެކައުންޓަށް ޖަމާކުރުމަށްފަހު ${farm.contact} އަށް ސްލިޕް ފޮނުވައިދިނުން އެދެމެވެ.`;
     } else {
       unsettledSection.style.display = 'none';
     }
