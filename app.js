@@ -27,7 +27,7 @@ import {
   pullFromFirestore,
   saveUserToFirestore,
   ensureFarmCached
-} from './database.js?v=2.0.1';
+} from './database.js?v=2.0.2';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -1422,6 +1422,7 @@ class App {
       document.getElementById('profile-email').value = myFarm.email || '';
       document.getElementById('profile-size').value = myFarm.size;
       document.getElementById('profile-contact').value = myFarm.contact;
+      document.getElementById('profile-nid').value = myFarm.nid || '';
       document.getElementById('profile-bank-name').value = myFarm.bankName || '';
       document.getElementById('profile-bank-no').value = myFarm.bankNo || '';
     }
@@ -2278,6 +2279,7 @@ class App {
     const email = document.getElementById('profile-email').value;
     const size = document.getElementById('profile-size').value;
     const contact = document.getElementById('profile-contact').value;
+    const nid = document.getElementById('profile-nid').value;
     const bankName = document.getElementById('profile-bank-name').value;
     const bankNo = document.getElementById('profile-bank-no').value;
     
@@ -2288,6 +2290,7 @@ class App {
       email,
       size,
       contact,
+      nid,
       bankName,
       bankNo
     };
@@ -2324,6 +2327,7 @@ class App {
     const island = document.getElementById('farm-island-input').value;
     const size = document.getElementById('farm-size-input').value;
     const contact = document.getElementById('farm-contact-input').value;
+    const nid = document.getElementById('farm-nid-input').value.trim();
     const email = document.getElementById('farm-email-input').value;
     const bankName = document.getElementById('farm-bank-name-input').value;
     const bankNo = document.getElementById('farm-bank-no-input').value;
@@ -2340,6 +2344,7 @@ class App {
           island,
           size,
           contact,
+          nid,
           email,
           bankName,
           bankNo,
@@ -2357,6 +2362,7 @@ class App {
           island,
           size,
           contact,
+          nid,
           email,
           bankName,
           bankNo,

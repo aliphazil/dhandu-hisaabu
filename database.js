@@ -575,10 +575,24 @@ function deductInventoryFertilizer(fertilizerName, quantity, isOnline) {
 }
 
 // Authentication Logic
-export async function authenticate(username, password, farmId = "") {
+export async function authenticate(username, password, farmIdInput = "") {
   initDB();
   const serverStore = getStore("server");
   let user;
+  
+  // Resolve farm ID from input (which could be actual farm ID, contact phone, or NID)
+  let farmId = farmIdInput.trim().replace(/[^a-zA-Z0-9]/g, "");
+  if (username !== "sysadmin" && farmId) {
+    const matchedFarm = serverStore.farms.find(f => 
+      f.id.toLowerCase() === farmId.toLowerCase() ||
+      f.contact.replace(/[^a-zA-Z0-9]/g, "") === farmId ||
+      (f.nid && f.nid.toLowerCase() === farmId.toLowerCase()) ||
+      (f.nid && ("a" + f.nid.toLowerCase()) === farmId.toLowerCase())
+    );
+    if (matchedFarm) {
+      farmId = matchedFarm.id;
+    }
+  }
   
   if (username === "sysadmin") {
     user = serverStore.users.find(u => u.username === username && u.password === password && !u.farmId);
@@ -715,15 +729,22 @@ export function createFarm(farmData) {
   const serverDB = getStore("server");
   const localDB = getStore("local");
   
-  const newFarmId = farmData.contact.trim().replace(/[^a-zA-Z0-9]/g, "");
-  if (serverDB.farms.some(f => f.id === newFarmId)) {
-    throw new Error("މި ފޯނު ނަންބަރު ނުވަތަ NID އަށް މިހާރުވެސް ދަނޑެއް ރަޖިސްޓްރީ ކުރެވިފައިވެއެވެ!");
+  let rawNid = (farmData.nid || "").trim().replace(/[^a-zA-Z0-9]/g, "");
+  if (rawNid.toLowerCase().startsWith('a')) {
+    rawNid = rawNid.slice(1);
   }
+  const newFarmId = "A" + rawNid;
+  
+  if (serverDB.farms.some(f => f.id.toLowerCase() === newFarmId.toLowerCase())) {
+    throw new Error("މި އައިޑީ ކާޑު ނަންބަރަށް މިހާރުވެސް ދަނޑެއް ރަޖިސްޓްރީ ކުރެވިފައިވެއެވެ!");
+  }
+  
   const newFarm = {
     id: newFarmId,
     status: "active",
     createdDate: new Date().toISOString(),
-    ...farmData
+    ...farmData,
+    nid: rawNid
   };
   
   // Create Farm Admin Account
@@ -765,10 +786,16 @@ export function registerFarmSelf(farmData) {
     throw new Error("Security Exception: 'sysadmin' is a reserved system administrator username.");
   }
   
-  const newFarmId = farmData.contact.trim().replace(/[^a-zA-Z0-9]/g, "");
-  if (serverDB.farms.some(f => f.id === newFarmId)) {
-    throw new Error("މި ފޯނު ނަންބަރު ނުވަތަ NID އަށް މިހާރުވެސް ދަނޑެއް ރަޖިސްޓްރީ ކުރެވިފައިވެއެވެ!");
+  let rawNid = (farmData.nid || "").trim().replace(/[^a-zA-Z0-9]/g, "");
+  if (rawNid.toLowerCase().startsWith('a')) {
+    rawNid = rawNid.slice(1);
   }
+  const newFarmId = "A" + rawNid;
+  
+  if (serverDB.farms.some(f => f.id.toLowerCase() === newFarmId.toLowerCase())) {
+    throw new Error("މި އައިޑީ ކާޑު ނަންބަރަށް މިހާރުވެސް ދަނޑެއް ރަޖިސްޓްރީ ކުރެވިފައިވެއެވެ!");
+  }
+  
   const newFarm = {
     id: newFarmId,
     status: "active",
@@ -778,6 +805,7 @@ export function registerFarmSelf(farmData) {
     island: farmData.island,
     size: farmData.size,
     contact: farmData.contact,
+    nid: rawNid,
     email: farmData.email || "",
     gpsLocation: farmData.gpsLocation || "",
     bankName: farmData.bankName || "",
@@ -926,9 +954,23 @@ export function resetPassword(username, newPassword) {
 }
 
 // Password recovery via registered email validation
-export function recoverPassword(username, email, newPassword, farmId = "") {
+export function recoverPassword(username, email, newPassword, farmIdInput = "") {
   const serverDB = getStore("server");
   const localDB = getStore("local");
+
+  // Resolve farm ID from input (actual ID, contact phone, or NID)
+  let farmId = farmIdInput.trim().replace(/[^a-zA-Z0-9]/g, "");
+  if (username !== "sysadmin" && farmId) {
+    const matchedFarm = serverDB.farms.find(f => 
+      f.id.toLowerCase() === farmId.toLowerCase() ||
+      f.contact.replace(/[^a-zA-Z0-9]/g, "") === farmId ||
+      (f.nid && f.nid.toLowerCase() === farmId.toLowerCase()) ||
+      (f.nid && ("a" + f.nid.toLowerCase()) === farmId.toLowerCase())
+    );
+    if (matchedFarm) {
+      farmId = matchedFarm.id;
+    }
+  }
 
   const user = username === "sysadmin"
     ? serverDB.users.find(u => u.username === username && !u.farmId)
