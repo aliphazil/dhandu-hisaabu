@@ -26,7 +26,7 @@ import {
   changePassword,
   pullFromFirestore,
   saveUserToFirestore
-} from './database.js?v=1.9.1';
+} from './database.js?v=1.9.2';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -2528,13 +2528,13 @@ class App {
       tr.innerHTML = `
         <td style="padding: 12px 10px; font-weight: 600;">${desc}</td>
         <td style="padding: 12px 10px; text-align: center;" class="date-num">${format2DP(tx.quantity)} ${translateUnit(tx.unit)}</td>
-        <td style="padding: 12px 10px; text-align: left; direction: ltr;" class="date-num">${format2DP(rateVal)} ރުފިޔާ</td>
-        <td style="padding: 12px 10px; text-align: left; font-weight: 700; direction: ltr;" class="date-num">${format2DP(totalVal)} ރުފިޔާ</td>
+        <td style="padding: 12px 10px; text-align: left; direction: ltr;" class="date-num">${format2DP(rateVal)}</td>
+        <td style="padding: 12px 10px; text-align: left; font-weight: 700; direction: ltr;" class="date-num">${format2DP(totalVal)}</td>
       `;
       itemsBody.appendChild(tr);
     });
 
-    document.getElementById('inv-grand-total').textContent = `${format2DP(grandTotal)} ރުފިޔާ`;
+    document.getElementById('inv-grand-total').textContent = `ރުފިޔާ ${format2DP(grandTotal)}`;
 
     // Bank Account details
     const bankSection = document.getElementById('inv-bank-section');
