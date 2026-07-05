@@ -1,6 +1,6 @@
 // Database and Storage Engine for "ދަނޑު ހިސާބު" (Dhandu Hisaabu)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, doc, setDoc, getDocs, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, getDocs, getDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -119,6 +119,9 @@ export async function pushAllToFirestore() {
 // Background pull sync helper
 export async function pullFromFirestore() {
   if (!db) return;
+  const user = getActiveUser();
+  if (!user) return; // Only pull if logged in
+
   try {
     const tables = ["farms", "users", "crops", "transactions", "fertilizer_records", "harvest_records", "inventory", "audit_logs", "treatment_products", "treatment_applications"];
     const serverDB = getStore("server") || {};
@@ -126,7 +129,21 @@ export async function pullFromFirestore() {
     
     for (const table of tables) {
       try {
-        const querySnapshot = await getDocs(collection(db, table));
+        let q;
+        if (user.role === "platform_admin") {
+          q = collection(db, table);
+        } else {
+          // Farm tenancy filtering
+          if (table === "users") {
+            q = query(collection(db, table), where("farmId", "==", user.farmId));
+          } else if (table === "farms") {
+            q = query(collection(db, table), where("id", "==", user.farmId));
+          } else {
+            q = query(collection(db, table), where("farmId", "==", user.farmId));
+          }
+        }
+
+        const querySnapshot = await getDocs(q);
         const list = [];
         querySnapshot.forEach((doc) => {
           list.push(doc.data());
@@ -150,8 +167,16 @@ export async function pullFromFirestore() {
           }
         });
         
-        serverDB[table] = Array.from(mergedMap.values());
-        hasUpdatedAny = true;
+        const mergedList = Array.from(mergedMap.values());
+        
+        // Check if there is any difference between localList and mergedList
+        const isDifferent = localList.length !== mergedList.length || 
+          JSON.stringify(localList) !== JSON.stringify(mergedList);
+          
+        if (isDifferent) {
+          serverDB[table] = mergedList;
+          hasUpdatedAny = true;
+        }
       } catch (tableErr) {
         console.error(`Failed to pull table ${table} from Firestore:`, tableErr);
       }
