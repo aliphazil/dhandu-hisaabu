@@ -575,7 +575,7 @@ function deductInventoryFertilizer(fertilizerName, quantity, isOnline) {
 }
 
 // Helper to resolve farm ID from contact phone, NID, or direct ID (querying Firestore if missing locally)
-async function resolveFarmId(farmIdInput) {
+async function resolveFarmId(farmIdInput, username = "") {
   if (!farmIdInput) return "";
   const serverStore = getStore("server");
   
@@ -594,29 +594,65 @@ async function resolveFarmId(farmIdInput) {
   
   if (db) {
     try {
+      // If username is provided, match by username first to find potential farmIds in Firestore users collection
+      if (username && username !== "sysadmin") {
+        const qUser = query(collection(db, "users"), where("username", "==", username));
+        const snapUser = await getDocs(qUser);
+        for (const uDoc of snapUser.docs) {
+          const userData = uDoc.data();
+          const farmDoc = await getDoc(doc(db, "farms", userData.farmId));
+          if (farmDoc.exists()) {
+            const farmData = farmDoc.data();
+            const inputClean = farmIdInput.trim().replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+            const fIdClean = farmData.id.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+            const fContactClean = farmData.contact.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+            const fNidClean = (farmData.nid || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+            
+            if (fIdClean === inputClean || fContactClean === inputClean || fNidClean === inputClean || ("a" + fNidClean) === inputClean) {
+              // Cache the farm
+              serverStore.farms = serverStore.farms || [];
+              serverStore.farms.push(farmData);
+              const localStore = getStore("local");
+              localStore.farms = localStore.farms || [];
+              localStore.farms.push(farmData);
+              saveStore(serverStore, "server");
+              saveStore(localStore, "local");
+              return farmData.id;
+            }
+          }
+        }
+      }
+      
+      // Fallback 1: Try fetching directly by ID (e.g. farm_xxx or A147169)
       const farmDoc = await getDoc(doc(db, "farms", farmIdInput.trim()));
       if (farmDoc.exists()) {
         const farmData = farmDoc.data();
+        serverStore.farms = serverStore.farms || [];
         serverStore.farms.push(farmData);
         const localStore = getStore("local");
+        localStore.farms = localStore.farms || [];
         localStore.farms.push(farmData);
         saveStore(serverStore, "server");
         saveStore(localStore, "local");
         return farmData.id;
       }
       
+      // Fallback 2: Try querying by contact phone number
       const qContact = query(collection(db, "farms"), where("contact", "==", farmIdInput.trim()));
       const snapContact = await getDocs(qContact);
       if (!snapContact.empty) {
         const farmData = snapContact.docs[0].data();
+        serverStore.farms = serverStore.farms || [];
         serverStore.farms.push(farmData);
         const localStore = getStore("local");
+        localStore.farms = localStore.farms || [];
         localStore.farms.push(farmData);
         saveStore(serverStore, "server");
         saveStore(localStore, "local");
         return farmData.id;
       }
       
+      // Fallback 3: Try querying by NID
       let cleanNid = farmIdInput.trim().replace(/[^a-zA-Z0-9]/g, "");
       if (cleanNid.toLowerCase().startsWith('a')) {
         cleanNid = cleanNid.slice(1);
@@ -625,8 +661,10 @@ async function resolveFarmId(farmIdInput) {
       const snapNid = await getDocs(qNid);
       if (!snapNid.empty) {
         const farmData = snapNid.docs[0].data();
+        serverStore.farms = serverStore.farms || [];
         serverStore.farms.push(farmData);
         const localStore = getStore("local");
+        localStore.farms = localStore.farms || [];
         localStore.farms.push(farmData);
         saveStore(serverStore, "server");
         saveStore(localStore, "local");
@@ -647,7 +685,7 @@ export async function authenticate(username, password, farmIdInput = "") {
   
   let farmId = "";
   if (username !== "sysadmin") {
-    farmId = await resolveFarmId(farmIdInput);
+    farmId = await resolveFarmId(farmIdInput, username);
   }
   
   if (username === "sysadmin") {
@@ -1015,7 +1053,7 @@ export async function recoverPassword(username, email, newPassword, farmIdInput 
 
   let farmId = "";
   if (username !== "sysadmin") {
-    farmId = await resolveFarmId(farmIdInput);
+    farmId = await resolveFarmId(farmIdInput, username);
   }
 
   const user = username === "sysadmin"

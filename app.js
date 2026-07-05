@@ -27,7 +27,7 @@ import {
   pullFromFirestore,
   saveUserToFirestore,
   ensureFarmCached
-} from './database.js?v=2.0.3';
+} from './database.js?v=2.0.4';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
