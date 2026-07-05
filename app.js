@@ -26,7 +26,7 @@ import {
   changePassword,
   pullFromFirestore,
   saveUserToFirestore
-} from './database.js?v=1.9.0';
+} from './database.js?v=1.9.1';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -2538,12 +2538,24 @@ class App {
 
     // Bank Account details
     const bankSection = document.getElementById('inv-bank-section');
+    const unsettledSection = document.getElementById('inv-unsettled-note-section');
+    const unsettledNote = document.getElementById('inv-unsettled-note');
+    
+    const hasUnsettled = selectedTxs.some(t => t.paymentStatus === 'pending');
+
     if (farm && farm.bankNo) {
       bankSection.style.display = 'block';
       document.getElementById('inv-bank-name').textContent = farm.bankName || farm.owner;
       document.getElementById('inv-bank-no').textContent = farm.bankNo;
     } else {
       bankSection.style.display = 'none';
+    }
+
+    if (hasUnsettled && farm && farm.bankNo) {
+      unsettledSection.style.display = 'block';
+      unsettledNote.textContent = `މި ބިލުގައިވާ ފައިސާ ${farm.bankNo}، ${farm.bankName || farm.owner} އަށް ޖަމާކުރެއްވުމަށްފަހު ${farm.contact} އަށް ސްލިޕް ފޮނުވައިދިނުން އެދެމެވެ.`;
+    } else {
+      unsettledSection.style.display = 'none';
     }
 
     // Open Modal
