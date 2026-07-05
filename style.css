@@ -1351,3 +1351,22 @@ body:has(#view-login:not(.hidden)) .container, body.login-page .container {
   }
 }
 
+.invoice-paid-stamp {
+  position: absolute;
+  top: 35px;
+  left: 45px;
+  border: 4px double #2e7d32;
+  color: #2e7d32;
+  font-size: 1.6rem;
+  font-weight: 800;
+  padding: 8px 18px;
+  border-radius: 6px;
+  transform: rotate(-15deg);
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 10;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: none;
+}
+
