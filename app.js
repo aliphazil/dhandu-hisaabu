@@ -26,7 +26,7 @@ import {
   changePassword,
   pullFromFirestore,
   saveUserToFirestore
-} from './database.js?v=1.9.8';
+} from './database.js?v=1.9.9';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -2561,7 +2561,7 @@ class App {
       bankSection.style.display = 'none';
       unsettledSection.style.display = 'none';
       
-      if (paidStamp) paidStamp.style.display = 'block';
+      if (paidStamp) paidStamp.style.display = 'inline-block';
     }
 
     // Open Modal

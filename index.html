@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="ދަނޑު ހިސާބު - ދިވެހި ދަނޑުވެރިންނަށް ޚާއްޞަ މޯބައިލް އެޕްލިކޭޝަން">
   <title data-i18n="appName">ދަނޑު ހިސާބު</title>
-  <link rel="stylesheet" href="style.css?v=1.1.25">
+  <link rel="stylesheet" href="style.css?v=1.1.26">
   <!-- HTML2Canvas for Invoice as Image downloading -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
@@ -1341,8 +1341,6 @@
       
       <!-- Print Area -->
       <div id="invoice-print-area" class="invoice-container" style="position: relative; direction: rtl; font-family: var(--font-dhivehi-body); padding: 10px;">
-        <!-- Paid Stamp Overlay -->
-        <div id="inv-paid-stamp" class="invoice-paid-stamp">ޚަލާޞްވެފައި</div>
         
         <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--primary); padding-bottom: 15px; margin-bottom: 20px;">
           <div>
@@ -1397,6 +1395,11 @@
           <p id="inv-unsettled-note" style="margin: 0; font-size: 0.95rem; font-weight: 600; color: var(--primary-dark); line-height: 1.6;"></p>
         </div>
 
+        <!-- Paid Stamp Area -->
+        <div style="text-align: center;">
+          <div id="inv-paid-stamp" class="invoice-paid-stamp">ފައިސާ ދައްކާފަ</div>
+        </div>
+
         <div style="text-align: center; margin-top: 40px; border-top: 1px solid var(--border-color); padding-top: 15px;">
           <p style="font-weight: 700; color: var(--primary); margin: 0 0 5px 0;">ވިޔަފާރި ކުރެއްވިތީ ޝުކުރިއްޔާ!</p>
           <span style="font-size: 0.8rem; color: var(--text-muted);">ދަނޑު ހިސާބު - ޕަވަރޑް ބައި ގޫގަލް ކްލައުޑް ފަޔަރސްޓޯރ</span>
@@ -1426,6 +1429,6 @@
   </div>
 
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=1.9.8"></script>
+  <script type="module" src="app.js?v=1.9.9"></script>
 </body>
 </html>
