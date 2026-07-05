@@ -26,7 +26,7 @@ import {
   changePassword,
   pullFromFirestore,
   saveUserToFirestore
-} from './database.js?v=1.9.2';
+} from './database.js?v=1.9.3';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -2534,7 +2534,7 @@ class App {
       itemsBody.appendChild(tr);
     });
 
-    document.getElementById('inv-grand-total').textContent = `ރުފިޔާ ${format2DP(grandTotal)}`;
+    document.getElementById('inv-grand-total').textContent = format2DP(grandTotal);
 
     // Bank Account details
     const bankSection = document.getElementById('inv-bank-section');

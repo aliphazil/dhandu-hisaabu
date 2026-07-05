@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="ދަނޑު ހިސާބު - ދިވެހި ދަނޑުވެރިންނަށް ޚާއްޞަ މޯބައިލް އެޕްލިކޭޝަން">
   <title data-i18n="appName">ދަނޑު ހިސާބު</title>
-  <link rel="stylesheet" href="style.css?v=1.1.19">
+  <link rel="stylesheet" href="style.css?v=1.1.20">
   <!-- HTML2Canvas for Invoice as Image downloading -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
@@ -1374,7 +1374,10 @@
 
         <div style="display: flex; justify-content: space-between; align-items: center; background-color: var(--primary-light); padding: 15px; border-radius: var(--radius-md); margin-bottom: 30px;">
           <span style="font-size: 1.1rem; font-weight: 700; color: var(--primary-dark);">ޖުމްލަ އަގު:</span>
-          <span id="inv-grand-total" style="font-size: 1.4rem; font-weight: 800; color: var(--success); direction: ltr;" class="date-num">-</span>
+          <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 1.4rem; font-weight: 800; color: var(--success); direction: ltr;">
+            <span style="font-size: 1rem; font-weight: 700; color: var(--success);">ރުފިޔާ</span>
+            <span id="inv-grand-total" class="date-num">-</span>
+          </div>
         </div>
 
         <!-- Bank Account Details (optional) -->
@@ -1420,6 +1423,6 @@
   </div>
 
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=1.9.2"></script>
+  <script type="module" src="app.js?v=1.9.3"></script>
 </body>
 </html>
