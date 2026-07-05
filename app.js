@@ -26,7 +26,7 @@ import {
   changePassword,
   pullFromFirestore,
   saveUserToFirestore
-} from './database.js?v=1.8.9';
+} from './database.js?v=1.9.0';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -1837,6 +1837,7 @@ class App {
       document.getElementById('tx-buyer-group').classList.remove('hidden');
       document.getElementById('tx-paystatus-group').classList.remove('hidden');
       document.getElementById('tx-price-unit-group').classList.remove('hidden');
+      this.setPaymentStatus('paid');
       
       document.getElementById('tx-category-group').classList.add('hidden');
       document.getElementById('tx-supplier-group').classList.add('hidden');
@@ -1986,6 +1987,26 @@ class App {
     } catch (err) {
       await this.showAlert(err.message);
     }
+  }
+
+  setPaymentStatus(status) {
+    const select = document.getElementById('tx-paystatus');
+    if (select) {
+      select.value = status;
+      select.dispatchEvent(new Event('change'));
+    }
+    this.updatePaymentStatusUI(status);
+  }
+
+  updatePaymentStatusUI(status) {
+    const btns = document.querySelectorAll('#tx-paystatus-segments .segment-btn');
+    btns.forEach(btn => {
+      if (btn.getAttribute('data-value') === status) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
   }
 
   // Record Form Calculations & Math
@@ -2410,6 +2431,7 @@ class App {
       if (tx.crop) cropSelect.value = tx.crop;
       document.getElementById('tx-buyer').value = tx.buyer || '';
       document.getElementById('tx-paystatus').value = tx.paymentStatus || 'paid';
+      this.updatePaymentStatusUI(tx.paymentStatus || 'paid');
       
       document.getElementById('tx-crop-group').classList.remove('hidden');
       document.getElementById('tx-buyer-group').classList.remove('hidden');

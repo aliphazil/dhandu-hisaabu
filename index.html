@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="ދަނޑު ހިސާބު - ދިވެހި ދަނޑުވެރިންނަށް ޚާއްޞަ މޯބައިލް އެޕްލިކޭޝަން">
   <title data-i18n="appName">ދަނޑު ހިސާބު</title>
-  <link rel="stylesheet" href="style.css?v=1.1.16">
+  <link rel="stylesheet" href="style.css?v=1.1.17">
   <!-- HTML2Canvas for Invoice as Image downloading -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
@@ -1058,8 +1058,12 @@
         </div>
 
         <div class="form-group" id="tx-paystatus-group">
-          <label for="tx-paystatus">ޕޭމަންޓް ހާލަތު</label>
-          <select id="tx-paystatus" class="form-input">
+          <label>ޕޭމަންޓް ހާލަތު</label>
+          <div class="segmented-control" id="tx-paystatus-segments">
+            <button type="button" class="segment-btn active" data-value="paid" onclick="window.app.setPaymentStatus('paid')">ޚަލާޞްވެފައި</button>
+            <button type="button" class="segment-btn" data-value="pending" onclick="window.app.setPaymentStatus('pending')">ނުދައްކާ</button>
+          </div>
+          <select id="tx-paystatus" class="hidden">
             <option value="paid" data-i18n="badge-paid">ފައިސާ ލިބިއްޖެ / ދައްކައިފި</option>
             <option value="pending" data-i18n="badge-pending">ޕެންޑިންގް / ނުލިބޭ</option>
           </select>
@@ -1411,6 +1415,6 @@
   </div>
 
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=1.8.9"></script>
+  <script type="module" src="app.js?v=1.9.0"></script>
 </body>
 </html>

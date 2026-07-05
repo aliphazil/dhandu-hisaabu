@@ -1308,3 +1308,46 @@ body:has(#view-login:not(.hidden)) .container, body.login-page .container {
   }
 }
 
+/* Segmented Control Styles */
+.segmented-control {
+  display: flex;
+  background-color: #f1f3f4;
+  border: 1px solid var(--border-color, #dadce0);
+  border-radius: 8px;
+  padding: 4px;
+  width: 100%;
+  gap: 4px;
+  box-sizing: border-box;
+  margin-block-start: 6px;
+}
+
+.segment-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #3c4043;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-align: center;
+}
+
+.segment-btn.active {
+  background-color: var(--primary-color, hsl(150, 75%, 28%));
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  .segmented-control {
+    background-color: #202124;
+    border-color: #3c4043;
+  }
+  .segment-btn {
+    color: #e8eaed;
+  }
+}
+
