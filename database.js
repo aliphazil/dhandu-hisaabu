@@ -574,24 +574,80 @@ function deductInventoryFertilizer(fertilizerName, quantity, isOnline) {
   }
 }
 
+// Helper to resolve farm ID from contact phone, NID, or direct ID (querying Firestore if missing locally)
+async function resolveFarmId(farmIdInput) {
+  if (!farmIdInput) return "";
+  const serverStore = getStore("server");
+  
+  let farmId = farmIdInput.trim().replace(/[^a-zA-Z0-9]/g, "");
+  
+  const matchedFarm = serverStore.farms.find(f => 
+    f.id.toLowerCase() === farmId.toLowerCase() ||
+    f.contact.replace(/[^a-zA-Z0-9]/g, "") === farmId ||
+    (f.nid && f.nid.toLowerCase() === farmId.toLowerCase()) ||
+    (f.nid && ("a" + f.nid.toLowerCase()) === farmId.toLowerCase())
+  );
+  
+  if (matchedFarm) {
+    return matchedFarm.id;
+  }
+  
+  if (db) {
+    try {
+      const farmDoc = await getDoc(doc(db, "farms", farmIdInput.trim()));
+      if (farmDoc.exists()) {
+        const farmData = farmDoc.data();
+        serverStore.farms.push(farmData);
+        const localStore = getStore("local");
+        localStore.farms.push(farmData);
+        saveStore(serverStore, "server");
+        saveStore(localStore, "local");
+        return farmData.id;
+      }
+      
+      const qContact = query(collection(db, "farms"), where("contact", "==", farmIdInput.trim()));
+      const snapContact = await getDocs(qContact);
+      if (!snapContact.empty) {
+        const farmData = snapContact.docs[0].data();
+        serverStore.farms.push(farmData);
+        const localStore = getStore("local");
+        localStore.farms.push(farmData);
+        saveStore(serverStore, "server");
+        saveStore(localStore, "local");
+        return farmData.id;
+      }
+      
+      let cleanNid = farmIdInput.trim().replace(/[^a-zA-Z0-9]/g, "");
+      if (cleanNid.toLowerCase().startsWith('a')) {
+        cleanNid = cleanNid.slice(1);
+      }
+      const qNid = query(collection(db, "farms"), where("nid", "==", cleanNid));
+      const snapNid = await getDocs(qNid);
+      if (!snapNid.empty) {
+        const farmData = snapNid.docs[0].data();
+        serverStore.farms.push(farmData);
+        const localStore = getStore("local");
+        localStore.farms.push(farmData);
+        saveStore(serverStore, "server");
+        saveStore(localStore, "local");
+        return farmData.id;
+      }
+    } catch (err) {
+      console.error("Firestore farm resolution failed:", err);
+    }
+  }
+  return farmId;
+}
+
 // Authentication Logic
 export async function authenticate(username, password, farmIdInput = "") {
   initDB();
   const serverStore = getStore("server");
   let user;
   
-  // Resolve farm ID from input (which could be actual farm ID, contact phone, or NID)
-  let farmId = farmIdInput.trim().replace(/[^a-zA-Z0-9]/g, "");
-  if (username !== "sysadmin" && farmId) {
-    const matchedFarm = serverStore.farms.find(f => 
-      f.id.toLowerCase() === farmId.toLowerCase() ||
-      f.contact.replace(/[^a-zA-Z0-9]/g, "") === farmId ||
-      (f.nid && f.nid.toLowerCase() === farmId.toLowerCase()) ||
-      (f.nid && ("a" + f.nid.toLowerCase()) === farmId.toLowerCase())
-    );
-    if (matchedFarm) {
-      farmId = matchedFarm.id;
-    }
+  let farmId = "";
+  if (username !== "sysadmin") {
+    farmId = await resolveFarmId(farmIdInput);
   }
   
   if (username === "sysadmin") {
@@ -953,23 +1009,13 @@ export function resetPassword(username, newPassword) {
   throw new Error("User not found.");
 }
 
-// Password recovery via registered email validation
-export function recoverPassword(username, email, newPassword, farmIdInput = "") {
+export async function recoverPassword(username, email, newPassword, farmIdInput = "") {
   const serverDB = getStore("server");
   const localDB = getStore("local");
 
-  // Resolve farm ID from input (actual ID, contact phone, or NID)
-  let farmId = farmIdInput.trim().replace(/[^a-zA-Z0-9]/g, "");
-  if (username !== "sysadmin" && farmId) {
-    const matchedFarm = serverDB.farms.find(f => 
-      f.id.toLowerCase() === farmId.toLowerCase() ||
-      f.contact.replace(/[^a-zA-Z0-9]/g, "") === farmId ||
-      (f.nid && f.nid.toLowerCase() === farmId.toLowerCase()) ||
-      (f.nid && ("a" + f.nid.toLowerCase()) === farmId.toLowerCase())
-    );
-    if (matchedFarm) {
-      farmId = matchedFarm.id;
-    }
+  let farmId = "";
+  if (username !== "sysadmin") {
+    farmId = await resolveFarmId(farmIdInput);
   }
 
   const user = username === "sysadmin"

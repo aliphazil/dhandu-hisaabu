@@ -27,7 +27,7 @@ import {
   pullFromFirestore,
   saveUserToFirestore,
   ensureFarmCached
-} from './database.js?v=2.0.2';
+} from './database.js?v=2.0.3';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -1981,7 +1981,7 @@ class App {
     const newPassword = document.getElementById('forgot-new-password').value;
 
     try {
-      recoverPassword(username, email, newPassword, farmCode);
+      await recoverPassword(username, email, newPassword, farmCode);
       this.closeModal('forgot-password');
       this.showToast("ޕާސްވޯޑް ކާމިޔާބުކަމާއެކު ބަދަލުކުރެވިއްޖެ! ލޮގިންވެވަޑައިގަންނަވާ.");
       // Auto-fill login credentials
