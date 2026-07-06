@@ -1231,3 +1231,37 @@ export async function syncMappings(farmId) {
   }
 }
 
+// Fetch and sync all platform data (farms, users, audit logs) from Firestore for sysadmin
+export async function syncPlatformData() {
+  initDB();
+  if (db) {
+    try {
+      const [snapFarms, snapUsers, snapLogs] = await Promise.all([
+        getDocs(collection(db, "farms")),
+        getDocs(collection(db, "users")),
+        getDocs(collection(db, "audit_logs"))
+      ]);
+
+      const remoteFarms = snapFarms.docs.map(d => d.data());
+      const remoteUsers = snapUsers.docs.map(d => d.data());
+      const remoteLogs = snapLogs.docs.map(d => d.data());
+
+      const serverStore = getStore("server");
+      serverStore.farms = remoteFarms;
+      serverStore.users = remoteUsers;
+      serverStore.audit_logs = remoteLogs;
+      saveStore(serverStore, "server");
+
+      const localStore = getStore("local");
+      localStore.farms = remoteFarms;
+      localStore.users = remoteUsers;
+      localStore.audit_logs = remoteLogs;
+      saveStore(localStore, "local");
+      return true;
+    } catch (err) {
+      console.error("syncPlatformData failed:", err);
+    }
+  }
+  return false;
+}
+

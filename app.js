@@ -27,8 +27,9 @@ import {
   pullFromFirestore,
   saveUserToFirestore,
   ensureFarmCached,
-  syncMappings
-} from './database.js?v=2.0.6';
+  syncMappings,
+  syncPlatformData
+} from './database.js?v=2.0.7';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -1124,7 +1125,7 @@ class App {
     }
   }
 
-  loadPlatformDashboard() {
+  renderPlatformDashboardUI() {
     const farms = queryTable('farms');
     const localDB = JSON.parse(localStorage.getItem('dhandu_hisaabu_local_db') || '{}');
     const usersCount = (localDB.users || []).length;
@@ -1172,6 +1173,21 @@ class App {
       `;
       logsBody.appendChild(tr);
     });
+  }
+
+  async loadPlatformDashboard() {
+    this.renderPlatformDashboardUI();
+    
+    if (this.isOnline) {
+      try {
+        const synced = await syncPlatformData();
+        if (synced) {
+          this.renderPlatformDashboardUI();
+        }
+      } catch (err) {
+        console.error("Platform dashboard sync failed:", err);
+      }
+    }
   }
 
   loadCrops() {
