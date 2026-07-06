@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="ދަނޑު ހިސާބު - ދިވެހި ދަނޑުވެރިންނަށް ޚާއްޞަ މޯބައިލް އެޕްލިކޭޝަން">
   <title data-i18n="appName">ދަނޑު ހިސާބު</title>
-  <link rel="stylesheet" href="style.css?v=1.1.34">
+  <link rel="stylesheet" href="style.css?v=1.1.35">
   <!-- HTML2Canvas for Invoice as Image downloading -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
@@ -1211,8 +1211,20 @@
           </select>
         </div>
 
-        <app-input type="text" id="harvest-buyer" label="ވިއްކި ފަރާތް (ގަތް މީހާ)" placeholder="މިސާލަކަށް: ރިސޯޓް، މާރުކޭޓް" list="suggested-buyers"></app-input>
-        <app-input type="number" id="harvest-price" label="ވިއްކި ޖުމްލަ އަގު (ރުފިޔާ)" min="0"></app-input>
+        <div class="form-group">
+          <label for="harvest-disposition">ބޭނުންކުރި ގޮތް / ހާލަތު</label>
+          <select id="harvest-disposition" class="form-input" onchange="window.app.toggleHarvestDispositionFields()">
+            <option value="sold">ވިއްކީ (Sold)</option>
+            <option value="home">ގޭގައި ބޭނުންކުރީ (Home Use)</option>
+            <option value="gift">ހަދިޔާކުރީ (Gift)</option>
+            <option value="spoiled">ހަލާކުވީ / އުކާލީ (Spoiled / Discarded)</option>
+          </select>
+        </div>
+
+        <div id="harvest-sales-fields">
+          <app-input type="text" id="harvest-buyer" label="ވިއްކި ފަރާތް (ގަތް މީހާ)" placeholder="މިސާލަކަށް: ރިސޯޓް، މާރުކޭޓް" list="suggested-buyers"></app-input>
+          <app-input type="number" id="harvest-price" label="ވިއްކި ޖުމްލަ އަގު (ރުފިޔާ)" min="0"></app-input>
+        </div>
         <app-input type="text" id="harvest-notes" label="ނޯޓް"></app-input>
 
         <div class="btn-row">
@@ -1435,6 +1447,6 @@
   </div>
 
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=2.0.7"></script>
+  <script type="module" src="app.js?v=2.0.8"></script>
 </body>
 </html>

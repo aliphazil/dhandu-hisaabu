@@ -29,7 +29,7 @@ import {
   ensureFarmCached,
   syncMappings,
   syncPlatformData
-} from './database.js?v=2.0.7';
+} from './database.js?v=2.0.8';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -1337,12 +1337,23 @@ class App {
     
     sorted.forEach(h => {
       const tr = document.createElement('tr');
+      let priceOrStatusStr = '';
+      if (h.disposition === 'home') {
+        priceOrStatusStr = `<span class="badge badge-growing">ގޭގައި ބޭނުންކުރީ</span>`;
+      } else if (h.disposition === 'gift') {
+        priceOrStatusStr = `<span class="badge badge-growing" style="background-color: #6366f1;">ހަދިޔާކުރީ</span>`;
+      } else if (h.disposition === 'spoiled') {
+        priceOrStatusStr = `<span class="badge badge-suspended">ހަލާކުވީ / އުކާލީ</span>`;
+      } else {
+        priceOrStatusStr = h.sellingPrice && h.sellingPrice > 0 ? format2DP(h.sellingPrice) + CURRENCY_HTML : '-';
+      }
+
       tr.innerHTML = `
         <td class="date-num">${h.harvestDate}</td>
         <td style="font-weight: 700;">${t(h.crop)}</td>
         <td class="date-num">${format2DP(h.quantity)} ${h.unit}</td>
         <td><span class="badge badge-growing">${t(h.grade)}</span></td>
-        <td class="date-num" style="font-weight: 700;">${h.sellingPrice ? format2DP(h.sellingPrice) + CURRENCY_HTML : '-'}</td>
+        <td class="date-num" style="font-weight: 700; text-align: center;">${priceOrStatusStr}</td>
         <td>
           <button class="btn btn-secondary" style="padding: 4px 8px; min-height:30px; font-size:0.75rem;" onclick="window.app.deleteRecord('harvest_records', '${h.id}')" data-i18n="delete">ޑިލީޓް</button>
         </td>
@@ -1893,6 +1904,16 @@ class App {
     const cropSelect = document.getElementById('harvest-crop');
     cropSelect.innerHTML = crops.map(c => `<option value="${c.name}">${t(c.name)} (${c.variety})</option>`).join('');
     
+    // Reset disposition field visibility
+    const dispositionSelect = document.getElementById('harvest-disposition');
+    if (dispositionSelect) {
+      dispositionSelect.value = 'sold';
+    }
+    const salesFields = document.getElementById('harvest-sales-fields');
+    if (salesFields) {
+      salesFields.classList.remove('hidden');
+    }
+    
     this.openModal('harvest');
   }
 
@@ -2126,6 +2147,18 @@ class App {
     this.showView(this.currentView);
   }
 
+  toggleHarvestDispositionFields() {
+    const disp = document.getElementById('harvest-disposition').value;
+    const salesFields = document.getElementById('harvest-sales-fields');
+    if (disp === 'sold') {
+      salesFields.classList.remove('hidden');
+    } else {
+      salesFields.classList.add('hidden');
+      document.getElementById('harvest-buyer').value = '';
+      document.getElementById('harvest-price').value = '';
+    }
+  }
+
   saveHarvest(e) {
     e.preventDefault();
     const date = document.getElementById('harvest-date').value;
@@ -2133,6 +2166,7 @@ class App {
     const quantity = document.getElementById('harvest-quantity').value;
     const unit = document.getElementById('harvest-unit').value;
     const grade = document.getElementById('harvest-grade').value;
+    const disposition = document.getElementById('harvest-disposition').value;
     const buyer = document.getElementById('harvest-buyer').value;
     const sellingPrice = document.getElementById('harvest-price').value;
     const notes = document.getElementById('harvest-notes').value;
@@ -2143,6 +2177,7 @@ class App {
       quantity,
       unit,
       grade,
+      disposition,
       buyer,
       sellingPrice,
       notes
