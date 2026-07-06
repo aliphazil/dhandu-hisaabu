@@ -26,8 +26,9 @@ import {
   changePassword,
   pullFromFirestore,
   saveUserToFirestore,
-  ensureFarmCached
-} from './database.js?v=2.0.5';
+  ensureFarmCached,
+  syncMappings
+} from './database.js?v=2.0.6';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -302,6 +303,9 @@ class App {
       this.isOnline = localStorage.getItem("dhandu_hisaabu_online_state") !== "offline";
       this.updateNetworkUI();
       this.loginSuccess(session);
+      if (session.farmId) {
+        syncMappings(session.farmId).catch(err => console.error("Startup syncMappings failed:", err));
+      }
     } else {
       this.showView('login');
     }
@@ -652,6 +656,9 @@ class App {
       const session = await authenticate(username, password, farmCode);
       errEl.classList.add('hidden');
       this.loginSuccess(session);
+      if (session.farmId) {
+        syncMappings(session.farmId).catch(err => console.error("Login syncMappings failed:", err));
+      }
       if (farmCodeEl) farmCodeEl.value = '';
       userEl.value = '';
       passEl.value = '';
@@ -2297,6 +2304,7 @@ class App {
     };
     
     updateRecord('farms', user.farmId, updatedFields, this.isOnline);
+    syncMappings(user.farmId).catch(err => console.error("Profile save syncMappings failed:", err));
     this.showToast("ދަނޑުގެ ޕްރޮފައިލް އަޕްޑޭޓް ކުރެވިއްޖެ!");
     this.showView(this.currentView);
   }

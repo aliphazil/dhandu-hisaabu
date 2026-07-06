@@ -594,7 +594,55 @@ async function resolveFarmId(farmIdInput, username = "") {
   
   if (db) {
     try {
-      // If username is provided, match by username first to find potential farmIds in Firestore users collection
+      const inputClean = farmIdInput.trim().replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+      
+      // 1. Try checking the mappings collection using getDoc (queryless operation)
+      const mapDoc = await getDoc(doc(db, "mappings", inputClean));
+      if (mapDoc.exists()) {
+        const resolvedId = mapDoc.data().farmId;
+        const farmDoc = await getDoc(doc(db, "farms", resolvedId));
+        if (farmDoc.exists()) {
+          const farmData = farmDoc.data();
+          serverStore.farms = serverStore.farms || [];
+          if (!serverStore.farms.some(f => f.id === farmData.id)) {
+            serverStore.farms.push(farmData);
+          }
+          const localStore = getStore("local");
+          localStore.farms = localStore.farms || [];
+          if (!localStore.farms.some(f => f.id === farmData.id)) {
+            localStore.farms.push(farmData);
+          }
+          saveStore(serverStore, "server");
+          saveStore(localStore, "local");
+          return farmData.id;
+        }
+      }
+
+      // 2. Try fetching directly by ID (e.g. farm_xxx or A147169)
+      let farmDoc = await getDoc(doc(db, "farms", farmIdInput.trim()));
+      if (!farmDoc.exists()) {
+        // Try prepending 'A' if NID format and not already prefixed
+        if (!farmIdInput.trim().toLowerCase().startsWith('a')) {
+          farmDoc = await getDoc(doc(db, "farms", "A" + inputClean.toUpperCase()));
+        }
+      }
+      if (farmDoc.exists()) {
+        const farmData = farmDoc.data();
+        serverStore.farms = serverStore.farms || [];
+        if (!serverStore.farms.some(f => f.id === farmData.id)) {
+          serverStore.farms.push(farmData);
+        }
+        const localStore = getStore("local");
+        localStore.farms = localStore.farms || [];
+        if (!localStore.farms.some(f => f.id === farmData.id)) {
+          localStore.farms.push(farmData);
+        }
+        saveStore(serverStore, "server");
+        saveStore(localStore, "local");
+        return farmData.id;
+      }
+      
+      // 3. Fallback: match by username first to find potential farmIds in Firestore users collection
       if (username && username !== "sysadmin") {
         const qUser = query(collection(db, "users"), where("username", "==", username));
         const snapUser = await getDocs(qUser);
@@ -603,7 +651,6 @@ async function resolveFarmId(farmIdInput, username = "") {
           const farmDoc = await getDoc(doc(db, "farms", userData.farmId));
           if (farmDoc.exists()) {
             const farmData = farmDoc.data();
-            const inputClean = farmIdInput.trim().replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
             const fIdClean = farmData.id.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
             const fContactClean = farmData.contact.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
             const fNidClean = (farmData.nid || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
@@ -611,10 +658,14 @@ async function resolveFarmId(farmIdInput, username = "") {
             if (fIdClean === inputClean || fContactClean === inputClean || fNidClean === inputClean || ("a" + fNidClean) === inputClean) {
               // Cache the farm
               serverStore.farms = serverStore.farms || [];
-              serverStore.farms.push(farmData);
+              if (!serverStore.farms.some(f => f.id === farmData.id)) {
+                serverStore.farms.push(farmData);
+              }
               const localStore = getStore("local");
               localStore.farms = localStore.farms || [];
-              localStore.farms.push(farmData);
+              if (!localStore.farms.some(f => f.id === farmData.id)) {
+                localStore.farms.push(farmData);
+              }
               saveStore(serverStore, "server");
               saveStore(localStore, "local");
               return farmData.id;
@@ -623,36 +674,26 @@ async function resolveFarmId(farmIdInput, username = "") {
         }
       }
       
-      // Fallback 1: Try fetching directly by ID (e.g. farm_xxx or A147169)
-      const farmDoc = await getDoc(doc(db, "farms", farmIdInput.trim()));
-      if (farmDoc.exists()) {
-        const farmData = farmDoc.data();
-        serverStore.farms = serverStore.farms || [];
-        serverStore.farms.push(farmData);
-        const localStore = getStore("local");
-        localStore.farms = localStore.farms || [];
-        localStore.farms.push(farmData);
-        saveStore(serverStore, "server");
-        saveStore(localStore, "local");
-        return farmData.id;
-      }
-      
-      // Fallback 2: Try querying by contact phone number
+      // 4. Fallback: Try querying by contact phone number
       const qContact = query(collection(db, "farms"), where("contact", "==", farmIdInput.trim()));
       const snapContact = await getDocs(qContact);
       if (!snapContact.empty) {
         const farmData = snapContact.docs[0].data();
         serverStore.farms = serverStore.farms || [];
-        serverStore.farms.push(farmData);
+        if (!serverStore.farms.some(f => f.id === farmData.id)) {
+          serverStore.farms.push(farmData);
+        }
         const localStore = getStore("local");
         localStore.farms = localStore.farms || [];
-        localStore.farms.push(farmData);
+        if (!localStore.farms.some(f => f.id === farmData.id)) {
+          localStore.farms.push(farmData);
+        }
         saveStore(serverStore, "server");
         saveStore(localStore, "local");
         return farmData.id;
       }
       
-      // Fallback 3: Try querying by NID
+      // 5. Fallback: Try querying by NID
       let cleanNid = farmIdInput.trim().replace(/[^a-zA-Z0-9]/g, "");
       if (cleanNid.toLowerCase().startsWith('a')) {
         cleanNid = cleanNid.slice(1);
@@ -662,10 +703,14 @@ async function resolveFarmId(farmIdInput, username = "") {
       if (!snapNid.empty) {
         const farmData = snapNid.docs[0].data();
         serverStore.farms = serverStore.farms || [];
-        serverStore.farms.push(farmData);
+        if (!serverStore.farms.some(f => f.id === farmData.id)) {
+          serverStore.farms.push(farmData);
+        }
         const localStore = getStore("local");
         localStore.farms = localStore.farms || [];
-        localStore.farms.push(farmData);
+        if (!localStore.farms.some(f => f.id === farmData.id)) {
+          localStore.farms.push(farmData);
+        }
         saveStore(serverStore, "server");
         saveStore(localStore, "local");
         return farmData.id;
@@ -1161,3 +1206,28 @@ export async function ensureFarmCached(farmId) {
   }
   return null;
 }
+
+// Write queryless direct-key mapping documents to Firestore for this farm
+export async function syncMappings(farmId) {
+  if (!db || !farmId) return;
+  try {
+    const farmDoc = await getDoc(doc(db, "farms", farmId));
+    if (farmDoc.exists()) {
+      const farmData = farmDoc.data();
+      const phoneKey = farmData.contact ? farmData.contact.trim().replace(/[^a-zA-Z0-9]/g, "") : "";
+      if (phoneKey) {
+        await setDoc(doc(db, "mappings", phoneKey), { farmId: farmId });
+      }
+      const nidKey = farmData.nid ? farmData.nid.trim().replace(/[^a-zA-Z0-9]/g, "").toLowerCase() : "";
+      if (nidKey) {
+        await setDoc(doc(db, "mappings", nidKey), { farmId: farmId });
+        if (!nidKey.startsWith('a')) {
+          await setDoc(doc(db, "mappings", "a" + nidKey), { farmId: farmId });
+        }
+      }
+    }
+  } catch (err) {
+    console.error("Failed to sync mappings:", err);
+  }
+}
+
