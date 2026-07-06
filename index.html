@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="ދަނޑު ހިސާބު - ދިވެހި ދަނޑުވެރިންނަށް ޚާއްޞަ މޯބައިލް އެޕްލިކޭޝަން">
   <title data-i18n="appName">ދަނޑު ހިސާބު</title>
-  <link rel="stylesheet" href="style.css?v=1.1.31">
+  <link rel="stylesheet" href="style.css?v=1.1.32">
   <!-- HTML2Canvas for Invoice as Image downloading -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
@@ -63,6 +63,9 @@
 
       <form id="login-form" onsubmit="window.app.handleLogin(event)">
         <app-input type="text" id="login-farm-code" label="ފޯނު ނަންބަރު / NID" placeholder="މިސާލަކަށް: 9982629" lang="en"></app-input>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: -8px; margin-bottom: 12px; line-height: 1.4; text-align: right;">
+          ދަނޑުގެ ލޮގިން ކޯޑަކަށް ބޭނުންކުރާނީ ފޯނު ނަންބަރު، NID ނުވަތަ ޕްރޮފައިލް ސެޓިންގްސްގައިވާ ކޯޑެވެ.
+        </p>
         <app-input type="text" id="login-username" label="ޔޫޒަރނޭމް" required autocomplete="username"></app-input>
         <app-input type="password" id="login-password" label="ޕާސްވޯޑް" required autocomplete="current-password"></app-input>
         <div style="text-align: right; margin-block-end: 14px; margin-block-start: -8px;">
@@ -898,6 +901,7 @@
       <h2 style="font-weight: 700; margin-block-end: 20px;" data-i18n="profile">ދަނޑުގެ ޕްރޮފައިލް</h2>
       <div class="card high-contrast-card">
         <form id="profile-form" onsubmit="window.app.saveProfile(event)">
+          <app-input type="text" id="profile-farm-code" label="ދަނޑުގެ ލޮގިން ކޯޑު (ފާމް ކޯޑު)" readonly lang="en"></app-input>
           <app-input type="text" id="profile-farm-name" label="ދަނޑުގެ ނަން" required></app-input>
           <app-input type="text" id="profile-owner-name" label="ވެރިފަރާތުގެ ނަން" required></app-input>
           <app-input type="text" id="profile-island" label="ރަށް" required></app-input>
@@ -1431,6 +1435,6 @@
   </div>
 
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=2.0.4"></script>
+  <script type="module" src="app.js?v=2.0.5"></script>
 </body>
 </html>

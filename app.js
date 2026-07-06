@@ -27,7 +27,7 @@ import {
   pullFromFirestore,
   saveUserToFirestore,
   ensureFarmCached
-} from './database.js?v=2.0.4';
+} from './database.js?v=2.0.5';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -1416,6 +1416,7 @@ class App {
     const myFarm = farms.find(f => f.id === user.farmId);
     
     if (myFarm) {
+      document.getElementById('profile-farm-code').value = myFarm.id;
       document.getElementById('profile-farm-name').value = myFarm.name;
       document.getElementById('profile-owner-name').value = myFarm.owner;
       document.getElementById('profile-island').value = myFarm.island;
