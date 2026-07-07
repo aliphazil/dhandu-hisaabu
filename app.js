@@ -29,7 +29,7 @@ import {
   ensureFarmCached,
   syncMappings,
   syncPlatformData
-} from './database.js?v=2.0.8';
+} from './database.js?v=2.0.9';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {

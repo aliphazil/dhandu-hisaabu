@@ -1311,8 +1311,8 @@ body:has(#view-login:not(.hidden)) .container, body.login-page .container {
 /* Segmented Control Styles */
 .segmented-control {
   display: flex;
-  background-color: #f1f3f4;
-  border: 1px solid var(--border-color, #dadce0);
+  background-color: #ffffff;
+  border: 2px solid var(--primary-color, hsl(150, 75%, 28%));
   border-radius: 8px;
   padding: 4px;
   width: 100%;
@@ -1328,7 +1328,7 @@ body:has(#view-login:not(.hidden)) .container, body.login-page .container {
   padding: 10px 16px;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #3c4043;
+  color: #202124;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
@@ -1343,11 +1343,14 @@ body:has(#view-login:not(.hidden)) .container, body.login-page .container {
 
 @media (prefers-color-scheme: dark) {
   .segmented-control {
-    background-color: #202124;
-    border-color: #3c4043;
+    background-color: #ffffff;
+    border-color: var(--primary-color, hsl(150, 75%, 28%));
   }
   .segment-btn {
-    color: #e8eaed;
+    color: #202124;
+  }
+  .segment-btn.active {
+    color: #ffffff;
   }
 }
 
