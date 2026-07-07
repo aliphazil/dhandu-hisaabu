@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="ދަނޑު ހިސާބު - ދިވެހި ދަނޑުވެރިންނަށް ޚާއްޞަ މޯބައިލް އެޕްލިކޭޝަން">
   <title data-i18n="appName">ދަނޑު ހިސާބު</title>
-  <link rel="stylesheet" href="style.css?v=1.1.38">
+  <link rel="stylesheet" href="style.css?v=1.1.39">
   <!-- HTML2Canvas for Invoice as Image downloading -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
@@ -1029,6 +1029,17 @@
         
         <app-input type="date" id="tx-date" label="ތާރީޚް" required></app-input>
 
+        <!-- Disposition/Usage for Income type -->
+        <div class="form-group" id="tx-disposition-group">
+          <label for="tx-disposition">ބޭނުންކުރި ގޮތް / ހާލަތު</label>
+          <select id="tx-disposition" class="form-input" onchange="window.app.toggleTxDispositionFields()">
+            <option value="sold">ވިއްކީ (Sold)</option>
+            <option value="home">ގޭގައި ބޭނުންކުރީ (Home Use)</option>
+            <option value="gift">ހަދިޔާކުރީ (Gift)</option>
+            <option value="spoiled">ހަލާކުވީ / އުކާލީ (Spoiled / Discarded)</option>
+          </select>
+        </div>
+
         <!-- Crop selection (For income and crop-based expenses) -->
         <div class="form-group" id="tx-crop-group">
           <label for="tx-crop" data-i18n="crops">ގަސްތައް</label>
@@ -1055,7 +1066,7 @@
           <app-input type="text" id="tx-unit" label="ޔުނިޓް" placeholder="މިސާލަކަށް: ކިލޯ، ޕެކެޓް" list="suggested-units"></app-input>
         </div>
 
-        <div class="form-row-2col">
+        <div id="tx-price-row" class="form-row-2col">
           <div id="tx-price-unit-group">
             <app-input type="number" id="tx-price-unit" label="ޔުނިޓެއްގެ އަގު" min="0" oninput="window.app.calculateTxTotal()"></app-input>
           </div>
@@ -1447,6 +1458,6 @@
   </div>
 
   <!-- Main JavaScript File -->
-  <script type="module" src="app.js?v=2.0.11"></script>
+  <script type="module" src="app.js?v=2.0.12"></script>
 </body>
 </html>

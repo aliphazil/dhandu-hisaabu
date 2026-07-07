@@ -29,7 +29,7 @@ import {
   ensureFarmCached,
   syncMappings,
   syncPlatformData
-} from './database.js?v=2.0.11';
+} from './database.js?v=2.0.12';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -844,14 +844,6 @@ class App {
           </svg>
           <span data-i18n="treatments">ބޭސް/ކާނާ</span>
         </button>
-        <button class="nav-item" onclick="window.app.showView('harvests')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <path d="M16 10a4 4 0 0 1-8 0"></path>
-          </svg>
-          <span data-i18n="harvests">މައުސޫލު ހޮވުން</span>
-        </button>
       `;
     } else {
       // Farm Admin Nav
@@ -890,14 +882,6 @@ class App {
             <path d="M17 12.5c2-.5 4-2.5 4.5-4.5-2 0-4 1.5-4.5 4.5z" />
           </svg>
           <span data-i18n="crops">ގަސްތައް</span>
-        </button>
-        <button class="nav-item" onclick="window.app.showView('harvests')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <path d="M16 10a4 4 0 0 1-8 0"></path>
-          </svg>
-          <span data-i18n="harvests">މައުސޫލު ހޮވުން</span>
         </button>
         <button class="nav-item" onclick="window.app.showView('reports')">
           <svg viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -1267,25 +1251,49 @@ class App {
       
     transactions.forEach(tx => {
       const tr = document.createElement('tr');
-      const statusBadge = tx.paymentStatus === 'paid' ? 
-        `<span class="badge badge-paid">ދައްކާފައި</span>` : 
-        `<span class="badge badge-pending">ނުދައްކާ</span>`;
+      
+      let statusBadge = '';
+      let amountStyleColor = 'var(--success)';
+      let amountDisplayStr = format2DP(tx.amount);
+      const isSales = !['home', 'gift', 'spoiled'].includes(tx.disposition);
+
+      if (tx.disposition === 'home') {
+        statusBadge = `<span class="badge badge-growing">ގޭގައި ބޭނުންކުރީ</span>`;
+        amountStyleColor = '#757575';
+        amountDisplayStr = '-';
+      } else if (tx.disposition === 'gift') {
+        statusBadge = `<span class="badge badge-growing" style="background-color: #6366f1;">ހަދިޔާކުރީ</span>`;
+        amountStyleColor = '#757575';
+        amountDisplayStr = '-';
+      } else if (tx.disposition === 'spoiled') {
+        statusBadge = `<span class="badge badge-suspended">ހަލާކުވީ / އުކާލީ</span>`;
+        amountStyleColor = '#c62828';
+        amountDisplayStr = '-';
+      } else {
+        statusBadge = tx.paymentStatus === 'paid' ? 
+          `<span class="badge badge-paid">ދައްކާފައި</span>` : 
+          `<span class="badge badge-pending">ނުދައްކާ</span>`;
+      }
         
-      const settleBtn = tx.paymentStatus !== 'paid' ? 
+      const settleBtn = (tx.paymentStatus !== 'paid' && isSales) ? 
         `<button class="btn" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; min-height:auto; border-radius:50%; background:#2e7d32; border:none; color:white; cursor:pointer;" onclick="window.app.settleTransaction('${tx.id}')" title="ޚަލާޞްކުރަން"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></button>` : 
+        '';
+        
+      const invoiceBtn = isSales ? 
+        `<button class="btn" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; min-height:auto; border-radius:50%; background:#1976d2; border:none; color:white; cursor:pointer;" onclick="window.app.generateInvoice('${tx.id}')" title="އިންވޮއިސް"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></button>` : 
         '';
         
       tr.innerHTML = `
         <td style="text-align: center;"><input type="checkbox" class="income-select-checkbox" value="${tx.id}" onchange="window.app.onIncomeSelectChange()"></td>
         <td class="date-num" style="white-space: nowrap;">${tx.date}</td>
         <td style="font-weight: 600;">${t(tx.crop)} (${format2DP(tx.quantity)} ${tx.unit})</td>
-        <td>${tx.buyer || '-'}</td>
-        <td class="date-num" style="font-weight: 700; color: var(--success);">${format2DP(tx.amount)}</td>
+        <td>${tx.buyer || (tx.disposition && tx.disposition !== 'sold' ? tx.description : '-')}</td>
+        <td class="date-num" style="font-weight: 700; color: ${amountStyleColor};">${amountDisplayStr}</td>
         <td>${statusBadge}</td>
         <td>
           <div style="display: flex; gap: 6px; align-items: center;">
             ${settleBtn}
-            <button class="btn" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; min-height:auto; border-radius:50%; background:#1976d2; border:none; color:white; cursor:pointer;" onclick="window.app.generateInvoice('${tx.id}')" title="އިންވޮއިސް"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></button>
+            ${invoiceBtn}
             <button class="btn" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; min-height:auto; border-radius:50%; background:#f0f0f0; border:none; color:#333; cursor:pointer;" onclick="window.app.editTransaction('${tx.id}')" title="އިސްލާހުކުރަން"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button>
             <button class="btn" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; min-height:auto; border-radius:50%; background:#c62828; border:none; color:white; cursor:pointer;" onclick="window.app.deleteRecord('transactions', '${tx.id}')" title="ފޮހެލަން"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
           </div>
@@ -1880,6 +1888,29 @@ class App {
     const modal = document.getElementById(`modal-${modalId}`);
     if (modal) modal.classList.remove('show');
   }
+  toggleTxDispositionFields() {
+    const disp = document.getElementById('tx-disposition').value;
+    const buyerGroup = document.getElementById('tx-buyer-group');
+    const priceRow = document.getElementById('tx-price-row');
+    const paystatusGroup = document.getElementById('tx-paystatus-group');
+    
+    if (disp === 'sold') {
+      buyerGroup.classList.remove('hidden');
+      priceRow.classList.remove('hidden');
+      paystatusGroup.classList.remove('hidden');
+      document.getElementById('tx-amount').removeAttribute('readonly');
+    } else {
+      buyerGroup.classList.add('hidden');
+      priceRow.classList.add('hidden');
+      paystatusGroup.classList.add('hidden');
+      
+      document.getElementById('tx-buyer').value = '';
+      document.getElementById('tx-price-unit').value = '';
+      document.getElementById('tx-amount').value = '0';
+      document.getElementById('tx-amount').setAttribute('readonly', 'true');
+    }
+  }
+
   openRecordModal(type) {
     const modalTitle = document.getElementById('modal-transaction-title');
     const form = document.getElementById('form-transaction');
@@ -1898,12 +1929,21 @@ class App {
     cropSelect.innerHTML = '<option value="">(ކަނޑައެޅިފައިވާ ވަކި ގަހެއް ނެތް)</option>' + 
       crops.map(c => `<option value="${c.name}">${t(c.name)} (${c.variety})</option>`).join('');
     
+    // Reset disposition fields
+    const dispSelect = document.getElementById('tx-disposition');
+    if (dispSelect) dispSelect.value = 'sold';
+    document.getElementById('tx-amount').removeAttribute('readonly');
+    
     if (type === 'income') {
       modalTitle.textContent = t('recordIncome');
       document.getElementById('tx-crop-group').classList.remove('hidden');
       document.getElementById('tx-buyer-group').classList.remove('hidden');
+      document.getElementById('tx-price-row').classList.remove('hidden');
       document.getElementById('tx-paystatus-group').classList.remove('hidden');
       document.getElementById('tx-price-unit-group').classList.remove('hidden');
+      if (document.getElementById('tx-disposition-group')) {
+        document.getElementById('tx-disposition-group').classList.remove('hidden');
+      }
       this.setPaymentStatus('paid');
       
       document.getElementById('tx-category-group').classList.add('hidden');
@@ -1913,10 +1953,14 @@ class App {
       document.getElementById('tx-category-group').classList.remove('hidden');
       document.getElementById('tx-supplier-group').classList.remove('hidden');
       document.getElementById('tx-crop-group').classList.remove('hidden');
+      document.getElementById('tx-price-row').classList.remove('hidden');
       
       document.getElementById('tx-buyer-group').classList.add('hidden');
       document.getElementById('tx-paystatus-group').classList.add('hidden');
       document.getElementById('tx-price-unit-group').classList.add('hidden');
+      if (document.getElementById('tx-disposition-group')) {
+        document.getElementById('tx-disposition-group').classList.add('hidden');
+      }
     }
     
     this.openModal('transaction');
@@ -2104,19 +2148,33 @@ class App {
     const date = document.getElementById('tx-date').value;
     const crop = document.getElementById('tx-crop').value;
     const category = document.getElementById('tx-category').value;
-    const amount = document.getElementById('tx-amount').value;
+    const disposition = type === 'income' ? document.getElementById('tx-disposition').value : 'sold';
+    
+    let amount = document.getElementById('tx-amount').value;
     const quantity = document.getElementById('tx-quantity').value;
     const unit = document.getElementById('tx-unit').value;
-    const buyer = document.getElementById('tx-buyer').value;
+    let buyer = document.getElementById('tx-buyer').value;
     const supplier = document.getElementById('tx-supplier').value;
-    const description = document.getElementById('tx-description').value;
-    const paymentStatus = document.getElementById('tx-paystatus').value;
+    let description = document.getElementById('tx-description').value;
+    let paymentStatus = document.getElementById('tx-paystatus').value;
+    
+    if (type === 'income' && disposition !== 'sold') {
+      amount = '0';
+      buyer = null;
+      paymentStatus = 'paid';
+      if (!description) {
+        if (disposition === 'home') description = 'ގޭގައި ބޭނުންކުރުން';
+        else if (disposition === 'gift') description = 'ހަދިޔާކުރުން';
+        else if (disposition === 'spoiled') description = 'ހަލާކުވީ / އުކާލީ';
+      }
+    }
     
     const data = {
       date,
       type,
       crop: crop || null,
       category: type === 'expense' ? category : null,
+      disposition,
       amount,
       quantity,
       unit,
@@ -2523,6 +2581,13 @@ class App {
     cropSelect.innerHTML = '<option value="">(ކަނޑައެޅިފައިވާ ވަކި ގަހެއް ނެތް)</option>' + 
       crops.map(c => `<option value="${c.name}">${t(c.name)} (${c.variety})</option>`).join('');
     
+    // Set tx-disposition selection
+    const dispSelect = document.getElementById('tx-disposition');
+    if (dispSelect) {
+      dispSelect.value = tx.disposition || 'sold';
+    }
+    document.getElementById('tx-amount').removeAttribute('readonly');
+    
     if (tx.type === 'income') {
       modalTitle.textContent = 'އާމްދަނީ އިސްލާހުކުރަން';
       if (tx.crop) cropSelect.value = tx.crop;
@@ -2531,9 +2596,13 @@ class App {
       this.updatePaymentStatusUI(tx.paymentStatus || 'paid');
       
       document.getElementById('tx-crop-group').classList.remove('hidden');
-      document.getElementById('tx-buyer-group').classList.remove('hidden');
-      document.getElementById('tx-paystatus-group').classList.remove('hidden');
-      document.getElementById('tx-price-unit-group').classList.remove('hidden');
+      document.getElementById('tx-price-row').classList.remove('hidden');
+      
+      if (document.getElementById('tx-disposition-group')) {
+        document.getElementById('tx-disposition-group').classList.remove('hidden');
+      }
+      
+      this.toggleTxDispositionFields(); // Toggle fields visibility based on loaded disposition
       
       document.getElementById('tx-category-group').classList.add('hidden');
       document.getElementById('tx-supplier-group').classList.add('hidden');
@@ -2547,10 +2616,14 @@ class App {
       document.getElementById('tx-category-group').classList.remove('hidden');
       document.getElementById('tx-supplier-group').classList.remove('hidden');
       document.getElementById('tx-crop-group').classList.remove('hidden');
+      document.getElementById('tx-price-row').classList.remove('hidden');
       
       document.getElementById('tx-buyer-group').classList.add('hidden');
       document.getElementById('tx-paystatus-group').classList.add('hidden');
       document.getElementById('tx-price-unit-group').classList.add('hidden');
+      if (document.getElementById('tx-disposition-group')) {
+        document.getElementById('tx-disposition-group').classList.add('hidden');
+      }
     }
     
     this.openModal('transaction');
