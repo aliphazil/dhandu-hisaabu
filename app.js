@@ -29,7 +29,7 @@ import {
   ensureFarmCached,
   syncMappings,
   syncPlatformData
-} from './database.js?v=2.0.9';
+} from './database.js?v=2.0.10';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -1718,7 +1718,7 @@ class App {
           <th>ގަހުގެ ބާވަތް</th>
           <th>ކޮލިޓީ / ގްރޭޑް</th>
           <th style="text-align: end;">މިންވަރު</th>
-          <th style="text-align: end;">ވިއްކި ޖުމްލަ އަގު</th>
+          <th style="text-align: end;">ބޭނުންކުރި ގޮތް / އަގު</th>
         </tr>
       `;
       
@@ -1731,13 +1731,24 @@ class App {
         grandTotalHarvest += qty;
         grandTotalIncome += price;
         
+        let destStr = '';
+        if (h.disposition === 'home') {
+          destStr = 'ގޭގައި ބޭނުންކުރީ';
+        } else if (h.disposition === 'gift') {
+          destStr = 'ހަދިޔާކުރީ';
+        } else if (h.disposition === 'spoiled') {
+          destStr = 'ހަލާކުވީ / އުކާލީ';
+        } else {
+          destStr = price > 0 ? format2DP(price) : 'ވިއްކި (އަގެއް ނެތް)';
+        }
+        
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td class="date-num">${h.harvestDate}</td>
           <td style="font-weight:700;">${t(h.crop)}</td>
           <td>${t(h.grade)}</td>
           <td class="date-num" style="text-align: end;">${format2DP(qty)} ${h.unit}</td>
-          <td class="date-num" style="text-align: end;">${format2DP(price)}</td>
+          <td style="text-align: end; font-weight:700;">${destStr}</td>
         `;
         tableBody.appendChild(tr);
       });
