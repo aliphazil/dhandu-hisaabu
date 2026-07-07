@@ -29,7 +29,7 @@ import {
   ensureFarmCached,
   syncMappings,
   syncPlatformData
-} from './database.js?v=2.0.13';
+} from './database.js?v=2.0.14';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -1535,20 +1535,33 @@ class App {
     tableHead.innerHTML = '';
     tableBody.innerHTML = '';
     
-    let transactions = queryTable('transactions');
-    let crops = queryTable('crops');
-    let fertilizer = queryTable('fertilizer_records');
+    let transactions = queryTable('transactions') || [];
+    let crops = queryTable('crops') || [];
+    let fertilizer = queryTable('fertilizer_records') || [];
     let harvests = queryTable('harvest_records') || [];
+    
+    const txHarvests = transactions.filter(t => t.type === 'income' && t.crop).map(t => ({
+      harvestDate: t.date,
+      crop: t.crop,
+      quantity: t.quantity || 0,
+      unit: t.unit || '',
+      grade: '-',
+      disposition: t.disposition || 'sold',
+      sellingPrice: t.amount || 0,
+      notes: t.description || ''
+    }));
+    
+    let allHarvests = [...harvests, ...txHarvests];
     
     if (startDateVal) {
       transactions = transactions.filter(t => new Date(t.date) >= new Date(startDateVal));
       fertilizer = fertilizer.filter(f => new Date(f.date) >= new Date(startDateVal));
-      harvests = harvests.filter(h => new Date(h.harvestDate) >= new Date(startDateVal));
+      allHarvests = allHarvests.filter(h => new Date(h.harvestDate) >= new Date(startDateVal));
     }
     if (endDateVal) {
       transactions = transactions.filter(t => new Date(t.date) <= new Date(endDateVal));
       fertilizer = fertilizer.filter(f => new Date(f.date) <= new Date(endDateVal));
-      harvests = harvests.filter(h => new Date(h.harvestDate) <= new Date(endDateVal));
+      allHarvests = allHarvests.filter(h => new Date(h.harvestDate) <= new Date(endDateVal));
     }
     
     if (type === 'pl') {
@@ -1749,7 +1762,7 @@ class App {
       let grandTotalHarvest = 0;
       let grandTotalIncome = 0;
       
-      harvests.forEach(h => {
+      allHarvests.forEach(h => {
         const qty = parseFloat(h.quantity) || 0;
         const price = parseFloat(h.sellingPrice) || 0;
         grandTotalHarvest += qty;
