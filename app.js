@@ -29,7 +29,7 @@ import {
   ensureFarmCached,
   syncMappings,
   syncPlatformData
-} from './database.js?v=2.0.15';
+} from './database.js?v=2.0.16';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -3673,7 +3673,12 @@ class App {
 window.addEventListener('DOMContentLoaded', () => {
   window.app = new App();
   
-  // Web layout and keyboard language selection are handled by <dhivehi-input> and <english-input> custom components.
+  // Register Service Worker for PWA
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('Service Worker Registered!', reg))
+      .catch(err => console.error('Service Worker Registration Failed:', err));
+  }
   
   // Dynamic setup for Fertilizer Modal stock items
   const fertNameSelect = document.getElementById('fert-name');
