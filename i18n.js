@@ -119,7 +119,7 @@ export const translations = {
     profitAndLoss: "ފައިދާ އާއި ގެއްލުމުގެ ރިޕޯޓް",
     cropPerformance: "ގަސްތަކުގެ ރިޕޯޓް",
     fertilizerUsage: "ގަސްކާނާ ބޭނުންކުރި މިންވަރު",
-    harvestSummary: "މައުސޫލު ހޮވުމުގެ ޚުލާސާ",
+    harvestSummary: "ގޮވާމުގެ ޚުލާސާ",
     expenseByCategory: "ޚަރަދުތައް ކެޓަގަރީން",
     exportExcel: "އެކްސެލް އަށް އެކްސްޕޯޓް",
     exportPDF: "ޕީ.ޑީ.އެފް އަށް ޕްރިންޓް",

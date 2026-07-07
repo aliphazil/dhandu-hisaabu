@@ -5,7 +5,7 @@ import {
   getLanguage, 
   setLanguage, 
   translateDOM 
-} from './i18n.js?v=1.1.6';
+} from './i18n.js?v=1.1.7';
 
 import {
   initDB,
@@ -29,7 +29,7 @@ import {
   ensureFarmCached,
   syncMappings,
   syncPlatformData
-} from './database.js?v=2.0.14';
+} from './database.js?v=2.0.15';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
