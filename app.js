@@ -29,7 +29,7 @@ import {
   ensureFarmCached,
   syncMappings,
   syncPlatformData
-} from './database.js?v=2.0.10';
+} from './database.js?v=2.0.11';
 
 // Global 2 decimal places number formatter
 function format2DP(val) {
@@ -844,6 +844,14 @@ class App {
           </svg>
           <span data-i18n="treatments">ބޭސް/ކާނާ</span>
         </button>
+        <button class="nav-item" onclick="window.app.showView('harvests')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          <span data-i18n="harvests">މައުސޫލު ހޮވުން</span>
+        </button>
       `;
     } else {
       // Farm Admin Nav
@@ -882,6 +890,14 @@ class App {
             <path d="M17 12.5c2-.5 4-2.5 4.5-4.5-2 0-4 1.5-4.5 4.5z" />
           </svg>
           <span data-i18n="crops">ގަސްތައް</span>
+        </button>
+        <button class="nav-item" onclick="window.app.showView('harvests')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          <span data-i18n="harvests">މައުސޫލު ހޮވުން</span>
         </button>
         <button class="nav-item" onclick="window.app.showView('reports')">
           <svg viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
